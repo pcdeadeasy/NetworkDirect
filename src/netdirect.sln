@@ -50,6 +50,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ndmw", "unittests\ndmw\ndmw
 EndProject
 Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "VCToolsVersionUpdate", "VCToolsVersionUpdate\VCToolsVersionUpdate.pyproj", "{E9678F09-BB70-41C1-B8F8-600A92B91027}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Logger", "Logger\Logger.vcxproj", "{7124FA54-4B6D-4BF1-A373-06B665FCC703}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -234,6 +236,16 @@ Global
 		{E9678F09-BB70-41C1-B8F8-600A92B91027}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E9678F09-BB70-41C1-B8F8-600A92B91027}.Release|x64.ActiveCfg = Release|Any CPU
 		{E9678F09-BB70-41C1-B8F8-600A92B91027}.Release|x86.ActiveCfg = Release|Any CPU
+		{7124FA54-4B6D-4BF1-A373-06B665FCC703}.Debug|Any CPU.ActiveCfg = Debug|Win32
+		{7124FA54-4B6D-4BF1-A373-06B665FCC703}.Debug|x64.ActiveCfg = Debug|x64
+		{7124FA54-4B6D-4BF1-A373-06B665FCC703}.Debug|x64.Build.0 = Debug|x64
+		{7124FA54-4B6D-4BF1-A373-06B665FCC703}.Debug|x86.ActiveCfg = Debug|Win32
+		{7124FA54-4B6D-4BF1-A373-06B665FCC703}.Debug|x86.Build.0 = Debug|Win32
+		{7124FA54-4B6D-4BF1-A373-06B665FCC703}.Release|Any CPU.ActiveCfg = Release|Win32
+		{7124FA54-4B6D-4BF1-A373-06B665FCC703}.Release|x64.ActiveCfg = Release|x64
+		{7124FA54-4B6D-4BF1-A373-06B665FCC703}.Release|x64.Build.0 = Release|x64
+		{7124FA54-4B6D-4BF1-A373-06B665FCC703}.Release|x86.ActiveCfg = Release|Win32
+		{7124FA54-4B6D-4BF1-A373-06B665FCC703}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
