@@ -50,7 +50,6 @@ public:
   }
 };
 
-#ifdef _LOGGING
 #define LOG(...)                                                            \
     do {                                                                      \
       if (LoggerWorker::Stream != 0)                                          \
@@ -58,6 +57,3 @@ public:
         LoggerWorker::log(__FUNCTION__, __FILE__, __LINE__, __VA_ARGS__);     \
       }                                                                       \
     } while(false)
-#else
-#define LOG(...) {}
-#endif
