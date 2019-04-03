@@ -49,7 +49,7 @@ static LPWSTR GetLastErrorStrW()
 int Win::WSAStartup(WORD wVersionRequested, LPWSADATA lpWSAData) 
 {
   int const ans = ::WSAStartup(wVersionRequested, lpWSAData);
-  LOG("WSAStartup %x %p -> %d\n", wVersionRequested, lpWSAData, ans);
+  LOG("WSAStartup %x %p -> %d", wVersionRequested, lpWSAData, ans);
   if (ans != 0) 
   {
     LOG_LAST_ERROR();
@@ -61,7 +61,7 @@ int Win::WSAStartup(WORD wVersionRequested, LPWSADATA lpWSAData)
 int Win::WSACleanup() 
 {
   int const ans = ::WSACleanup();
-  LOG("WSACleanup () -> %d\n", ans);
+  LOG("WSACleanup () -> %d", ans);
   if (ans != 0) 
   {
     LOG_LAST_ERROR();
@@ -73,17 +73,10 @@ int Win::WSACleanup()
 int Win::WSCEnumProtocols(LPINT lpiProtocols, LPWSAPROTOCOL_INFOW lpProtocolBuffer, LPDWORD lpdwBufferLength, LPINT lpErrno) 
 {
   int const ans = ::WSCEnumProtocols(lpiProtocols, lpProtocolBuffer, lpdwBufferLength, lpErrno);
-  LOG("WSCEnumProtocols %p %p %p %p -> %d\n", lpiProtocols, lpProtocolBuffer, lpdwBufferLength, lpErrno, ans);
+  LOG("WSCEnumProtocols %p %p %p %p -> %d", lpiProtocols, lpProtocolBuffer, lpdwBufferLength, lpErrno, ans);
   if (ans == SOCKET_ERROR) 
   {
-    if (lpErrno != NULL) 
-    {
-      LOG("\n%S\n", GetSystemHresultStrW(*lpErrno));
-    }
-    else 
-    {
-      LOG_LAST_ERROR();
-    }
+    LOG_LAST_ERROR();
     throw Win::Error();
   }
   return ans;
@@ -92,17 +85,10 @@ int Win::WSCEnumProtocols(LPINT lpiProtocols, LPWSAPROTOCOL_INFOW lpProtocolBuff
 int Win::WSCGetProiderPath(LPGUID lpProviderId, WCHAR *lpszProviderDllPath, LPINT lpProviderDllPathLen, LPINT lpErrno) 
 {
   int const ans = ::WSCGetProviderPath(lpProviderId, lpszProviderDllPath, lpProviderDllPathLen, lpErrno);
-  LOG("WSCGetProviderPath %p %p %p %p -> %d\n", lpProviderId, lpszProviderDllPath, lpProviderDllPathLen, lpErrno, ans);
+  LOG("WSCGetProviderPath %p %p %p %p -> %d", lpProviderId, lpszProviderDllPath, lpProviderDllPathLen, lpErrno, ans);
   if (ans == SOCKET_ERROR) 
   {
-    if (lpErrno != NULL) 
-    {
-      LOG("\n%S\n", GetSystemHresultStrW(*lpErrno));
-    }
-    else 
-    {
-      LOG_LAST_ERROR();
-    }
+    LOG_LAST_ERROR();
     throw Win::Error();
   }
   return ans;
@@ -112,11 +98,11 @@ void Win::CoInitialize(void* lpReserved)
 {
   if (lpReserved != NULL) 
   {
-    LOG("lpReserved: %p\n", lpReserved);
+    LOG("lpReserved: %p", lpReserved);
     throw Win::Error();
   }
   HRESULT const hr = ::CoInitialize(NULL);
-  LOG("Conitialize %p -> %08X\n", (void*)0, hr);
+  LOG("Conitialize %p -> %08X", (void*)0, hr);
   if (FAILED(hr)) 
   {
     LOG_LAST_ERROR();
@@ -127,13 +113,13 @@ void Win::CoInitialize(void* lpReserved)
 void Win::CoUninitialize() 
 {
   ::CoUninitialize();
-  LOG("CoUninitialize () -> ()\n");
+  LOG("CoUninitialize () -> ()");
 }
 
 void Win::HeapWalk(HANDLE hHeap, LPPROCESS_HEAP_ENTRY lpEntry) 
 {
   BOOL const ans = ::HeapWalk(hHeap, lpEntry);
-  LOG("HeapWalk %p %p -> %s\n", hHeap, lpEntry, ans ? "TRUE" : "FALSE");
+  LOG("HeapWalk %p %p -> %s", hHeap, lpEntry, ans ? "TRUE" : "FALSE");
   if (ans == FALSE) 
   {
     if (GetLastError() == ERROR_NO_MORE_ITEMS)
@@ -148,7 +134,7 @@ void Win::HeapWalk(HANDLE hHeap, LPPROCESS_HEAP_ENTRY lpEntry)
 HANDLE Win::HeapCreate(DWORD flOptions, SIZE_T dwInitialSize, SIZE_T dwMaximumSize) 
 {
   HANDLE const ans = ::HeapCreate(flOptions, dwInitialSize, dwMaximumSize);
-  LOG("HeapCreate %08X %llu %llu -> %p\n", flOptions, dwInitialSize, dwMaximumSize, ans);
+  LOG("HeapCreate %08X %llu %llu -> %p", flOptions, dwInitialSize, dwMaximumSize, ans);
   if (ans == NULL) 
   {
     LOG_LAST_ERROR();
@@ -160,7 +146,7 @@ HANDLE Win::HeapCreate(DWORD flOptions, SIZE_T dwInitialSize, SIZE_T dwMaximumSi
 void Win::HeapDestroy(HANDLE hHeap) 
 {
   BOOL const ans = ::HeapDestroy(hHeap);
-  LOG("HeapDestroy %p -> %s\n", hHeap, ans ? "TRUE" : "FALSE");
+  LOG("HeapDestroy %p -> %s", hHeap, ans ? "TRUE" : "FALSE");
   if (ans == FALSE) 
   {
     // Don't throw
@@ -171,7 +157,7 @@ void Win::HeapDestroy(HANDLE hHeap)
 void Win::HeapLock(HANDLE hHeap) 
 {
   BOOL const ans = ::HeapLock(hHeap);
-  LOG("HeapLock %p -> %s\n", hHeap, ans ? "TRUE" : "FALSE");
+  LOG("HeapLock %p -> %s", hHeap, ans ? "TRUE" : "FALSE");
   if (ans == FALSE) 
   {
     LOG_LAST_ERROR();
@@ -182,7 +168,7 @@ void Win::HeapLock(HANDLE hHeap)
 void Win::HeapUnlock(HANDLE hHeap) 
 {
   BOOL const ans = ::HeapUnlock(hHeap);
-  LOG("HeapUnlock %p -> %s\n", hHeap, ans ? "TRUE" : "FALSE");
+  LOG("HeapUnlock %p -> %s", hHeap, ans ? "TRUE" : "FALSE");
   if (ans == FALSE) 
   {
     LOG_LAST_ERROR();
@@ -192,7 +178,7 @@ void Win::HeapUnlock(HANDLE hHeap)
 void* Win::HeapAlloc(HANDLE hHeap, DWORD dwFlags, SIZE_T size) 
 {
   void* const ans = ::HeapAlloc(hHeap, dwFlags, size);
-  LOG("HeapAlloc %p %08X %llu -> %p\n", hHeap, dwFlags, size, ans);
+  LOG("HeapAlloc %p %08X %llu -> %p", hHeap, dwFlags, size, ans);
   if (ans == NULL) 
   {
     LOG_LAST_ERROR();
@@ -204,7 +190,7 @@ void* Win::HeapAlloc(HANDLE hHeap, DWORD dwFlags, SIZE_T size)
 void Win::HeapFree(HANDLE hHeap, DWORD dwFlags, void* lpMem) 
 {
   BOOL const ans = ::HeapFree(hHeap, dwFlags, lpMem);
-  LOG("HeapFree %p %08X %p -> %s\n", hHeap, dwFlags, lpMem, ans ? "TRUE" : "FALSE");
+  LOG("HeapFree %p %08X %p -> %s", hHeap, dwFlags, lpMem, ans ? "TRUE" : "FALSE");
   if (ans == NULL) 
   {
     LOG_LAST_ERROR();
@@ -214,7 +200,7 @@ void Win::HeapFree(HANDLE hHeap, DWORD dwFlags, void* lpMem)
 void* Win::HeapReAlloc(HANDLE hHeap, DWORD dwFlags, void* lpMem, SIZE_T size) 
 {
   void* const ans = ::HeapReAlloc(hHeap, dwFlags, lpMem, size);
-  LOG("HeapReAlloc %p %08X %p %llu -> %p\n", hHeap, dwFlags, lpMem, size, ans);
+  LOG("HeapReAlloc %p %08X %p %llu -> %p", hHeap, dwFlags, lpMem, size, ans);
   if (ans == FALSE) 
   {
     LOG_LAST_ERROR();
@@ -227,11 +213,11 @@ HMODULE Win::LoadLibraryW(LPCWSTR lpLibFileName)
 {
   if (lpLibFileName == NULL) 
   {
-    LOG("lpLibFileName is NULL\n");
+    LOG("lpLibFileName is NULL");
     throw Win::Error();
   }
   HMODULE const ans = ::LoadLibraryW(lpLibFileName);
-  LOG("LoadLibraryW \"%S\" -> %p\n", lpLibFileName, ans);
+  LOG("LoadLibraryW \"%S\" -> %p", lpLibFileName, ans);
   if (ans == NULL) 
   {
     LOG_LAST_ERROR();
@@ -244,7 +230,7 @@ void Win::FreeLibrary(HMODULE hModule)
 {
   if (hModule == NULL) 
   {
-    LOG("hModule is NULL\n");
+    LOG("hModule is NULL");
   }
   else 
   {

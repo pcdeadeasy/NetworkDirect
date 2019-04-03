@@ -72,7 +72,7 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>$(SolutionDir)Winshim;$(SolutionDir)Logger;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)..\out\Debug-x64\include\;$(SolutionDir)Winshim;$(SolutionDir)Logger;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>

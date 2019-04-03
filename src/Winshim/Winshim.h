@@ -248,7 +248,7 @@ class CModule
 {
   HMODULE const m_hModule;
 public:
-  CModule(wchar_t* dll_path) : m_hModule(Win::LoadLibraryW(dll_path)) 
+  CModule(const wchar_t* dll_path) : m_hModule(Win::LoadLibraryW(dll_path)) 
   {
   }
   ~CModule() 
