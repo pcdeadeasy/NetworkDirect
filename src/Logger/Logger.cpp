@@ -1,4 +1,5 @@
 #include "stdafx.h"
+#include <Windows.h>
 #include <stdarg.h>
 #include <stdio.h>
 #include "Logger.h"
@@ -34,6 +35,9 @@ void LoggerWorker::log(const char *function, const char *file, unsigned int line
     fprintf(Stream, ",\n");
 
     define_number(Stream, "line", line);
+    fprintf(Stream, ",\n");
+
+    define_number(Stream, "thread", GetCurrentThreadId());
 
     fprintf(Stream, "\n");
     fprintf(Stream, "  }\n");

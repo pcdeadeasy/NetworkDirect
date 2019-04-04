@@ -7,6 +7,7 @@
 #include "precomp.h"
 #include "ndaddr.h"
 #include "ndprov.h"
+#include <Logger.h>
 
 
 namespace NetworkDirect
@@ -21,13 +22,16 @@ namespace NetworkDirect
         m_Version(version),
         m_Active(true)
     {
+        LOG("Entering Provider::Provider");
         m_link.Flink = &m_link;
         m_link.Blink = &m_link;
+        LOG("Exiting Provider::Provider -> void");
     }
 
 
     Provider::~Provider()
     {
+        LOG("Entering Provider::~Provider");
         if (m_hProvider != nullptr)
         {
             ::FreeLibrary(m_hProvider);
@@ -37,11 +41,13 @@ namespace NetworkDirect
         {
             ::HeapFree(ghHeap, 0, m_Path);
         }
+        LOG("Exiting Provider::~Provider -> void");
     }
 
 
     HRESULT Provider::Init(GUID& ProviderGuid)
     {
+        LOG("Entering Provider::Init");
         INT pathLen;
         INT ret, err;
         WCHAR* pPath;
@@ -52,7 +58,9 @@ namespace NetworkDirect
             );
         if (pPath == nullptr)
         {
-            return ND_NO_MEMORY;
+            HRESULT hr = ND_NO_MEMORY;
+            LOG("Exiting Provider::Init -> %08X", hr);
+            return hr;
         }
 
         pathLen = MAX_PATH;
@@ -60,14 +68,18 @@ namespace NetworkDirect
         if (ret != 0)
         {
             ::HeapFree(ghHeap, 0, pPath);
-            return HRESULT_FROM_WIN32(err);
+            HRESULT hr = HRESULT_FROM_WIN32(err);
+            LOG("Exiting Provider::Init -> %08X", hr);
+            return hr;
         }
 
         pathLen = ::ExpandEnvironmentStringsW(pPath, nullptr, 0);
         if (pathLen == 0)
         {
             ::HeapFree(ghHeap, 0, pPath);
-            return HRESULT_FROM_WIN32(::GetLastError());
+            HRESULT hr = HRESULT_FROM_WIN32(::GetLastError());
+            LOG("Exiting Provider::Init -> %08X", hr);
+            return hr;
         }
 
         m_Path = static_cast<WCHAR*>(
@@ -76,7 +88,9 @@ namespace NetworkDirect
         if (m_Path == nullptr)
         {
             ::HeapFree(ghHeap, 0, pPath);
-            return ND_NO_MEMORY;
+            HRESULT hr = ND_NO_MEMORY;
+            LOG("Exiting Provider::Init -> %08X", hr);
+            return hr;
         }
 
         ret = ::ExpandEnvironmentStringsW(pPath, m_Path, pathLen);
@@ -86,11 +100,15 @@ namespace NetworkDirect
 
         if (ret != pathLen)
         {
-            return ND_UNSUCCESSFUL;
+            HRESULT hr = ND_UNSUCCESSFUL;
+            LOG("Exiting Provider::Init -> %08X", hr);
+            return hr;
         }
 
         m_Guid = ProviderGuid;
-        return S_OK;
+        HRESULT hr = S_OK;
+        LOG("Exiting Provider::Init -> %08X", hr);
+        return hr;
     }
 
 
@@ -103,13 +121,16 @@ namespace NetworkDirect
         _Out_ void** ppInterface
     )
     {
+        LOG("Entering Provider::GetClassObject");
         if (m_hProvider == nullptr)
         {
             HMODULE hProvider;
             hProvider = ::LoadLibraryExW(m_Path, nullptr, 0);
             if (hProvider == nullptr)
             {
-                return HRESULT_FROM_WIN32(::GetLastError());
+                HRESULT hr = HRESULT_FROM_WIN32(::GetLastError());
+                LOG("Exiting Provider::GetClassObject -> %08X", hr);
+                return hr;
             }
 
             m_pfnDllGetClassObject = reinterpret_cast<DLLGETCLASSOBJECT>(
@@ -118,7 +139,9 @@ namespace NetworkDirect
             if (!m_pfnDllGetClassObject)
             {
                 ::FreeLibrary(hProvider);
-                return HRESULT_FROM_WIN32(::GetLastError());
+                HRESULT hr = HRESULT_FROM_WIN32(::GetLastError());
+                LOG("Exiting Provider::GetClassObject -> %08X", hr);
+                return hr;
             }
 
             m_pfnDllCanUnloadNow = reinterpret_cast<DLLCANUNLOADNOW>(
@@ -127,7 +150,9 @@ namespace NetworkDirect
             if (!m_pfnDllCanUnloadNow)
             {
                 ::FreeLibrary(hProvider);
-                return HRESULT_FROM_WIN32(::GetLastError());
+                HRESULT hr =HRESULT_FROM_WIN32(::GetLastError());
+                LOG("Exiting Provider::GetClassObject -> %08X", hr);
+                return hr;
             }
 
             HMODULE hCurrentProvider = static_cast<HMODULE>(
@@ -147,6 +172,7 @@ namespace NetworkDirect
             ppInterface
         );
 
+        LOG("Exiting Provider::GetClassObject -> %08X", hr);
         return hr;
     }
 
@@ -156,8 +182,10 @@ namespace NetworkDirect
     //
     bool Provider::TryUnload(void)
     {
+        LOG("Entering Provider::TryUnload");
         if (m_hProvider == nullptr)
         {
+            LOG("Exiting Provider::TryUnload -> true");
             return true;
         }
 
@@ -166,12 +194,14 @@ namespace NetworkDirect
         HRESULT hr = m_pfnDllCanUnloadNow();
         if (hr != S_OK)
         {
+            LOG("Exiting Provider::TryUnload -> false");
             return false;
         }
 
         ::FreeLibrary(m_hProvider);
         m_hProvider = nullptr;
 
+        LOG("Exiting Provider::TryUnload -> true");
         return true;
     }
 
@@ -179,6 +209,8 @@ namespace NetworkDirect
     NdV1Provider::NdV1Provider() :
         Provider(ND_VERSION_1)
     {
+        LOG("Entering NdV1Provider::NdV1Provider");
+        LOG("Exiting NdV1Provider::NdV1Provider -> void");
     }
 
 
@@ -188,6 +220,7 @@ namespace NetworkDirect
     //
     HRESULT NdV1Provider::GetProvider(INDProvider** ppIProvider)
     {
+        LOG("Entering NdV1Provider::GetProvider");
         IClassFactory* pClassFactory;
         HRESULT hr = GetClassObject(
             IID_IClassFactory,
@@ -195,6 +228,7 @@ namespace NetworkDirect
         );
         if (FAILED(hr))
         {
+            LOG("Exiting NdV1Provider::GetProvider -> %08X", hr);
             return hr;
         }
 
@@ -206,6 +240,7 @@ namespace NetworkDirect
 
         // Now that we asked for the provider, we don't need the class factory.
         pClassFactory->Release();
+        LOG("Exiting NdV1Provider::GetProvider -> %08X", hr);
         return hr;
     }
 
@@ -218,9 +253,12 @@ namespace NetworkDirect
             _Deref_out_ VOID** ppIAdapter
         )
     {
+        LOG("Entering NdV1Provider::OpenAdapter");
         if (iid != IID_INDAdapter)
         {
-            return E_NOINTERFACE;
+            HRESULT hr = E_NOINTERFACE;
+            LOG("Exiting NdV1Provider::OpenAdapter -> %08X", hr);
+            return hr;
         }
 
         INDProvider* pIProvider;
@@ -228,7 +266,9 @@ namespace NetworkDirect
         if (FAILED(hr))
         {
             TryUnload();
-            return ND_INVALID_ADDRESS;
+            hr = ND_INVALID_ADDRESS;
+            LOG("Exiting NdV1Provider::OpenAdapter -> %08X", hr);
+            return hr;
         }
 
         hr = pIProvider->OpenAdapter(
@@ -240,6 +280,7 @@ namespace NetworkDirect
         pIProvider->Release();
         TryUnload();
 
+        LOG("Exiting NdV1Provider::OpenAdapter -> %08X", hr);
         return hr;
     }
 
@@ -250,11 +291,13 @@ namespace NetworkDirect
             _Inout_ ULONG* pcbAddressList
         )
     {
+        LOG("Entering NdV1Provider::QueryAddressList");
         INDProvider *pIProvider;
         HRESULT hr = GetProvider(&pIProvider);
         if (FAILED(hr))
         {
             TryUnload();
+            LOG("Exiting NdV1Provider::QueryAddressList -> %08X", ND_DEVICE_NOT_READY);
             return ND_DEVICE_NOT_READY;
         }
 
@@ -265,6 +308,7 @@ namespace NetworkDirect
         pIProvider->Release();
         TryUnload();
 
+        LOG("Exiting NdV1Provider::QueryAddressList -> %08X", hr);
         return hr;
     }
 
@@ -272,6 +316,8 @@ namespace NetworkDirect
     NdProvider::NdProvider() :
         Provider(ND_VERSION_2)
     {
+        LOG("Entering NdProvider::NdProvider");
+        LOG("Exiting NdProvider::NdProvider -> void");
     }
 
 
@@ -286,6 +332,7 @@ namespace NetworkDirect
         _Deref_out_ VOID** ppIAdapter
     )
     {
+        LOG("Entering NdProvider::OpenAdapter");
         IND2Provider* pIProvider;
         HRESULT hr = GetClassObject(
             IID_IND2Provider,
@@ -294,6 +341,7 @@ namespace NetworkDirect
         if (FAILED(hr))
         {
             TryUnload();
+            LOG("Exiting NdProvider::OpenAdapter -> %08X", ND_INVALID_ADDRESS);
             return ND_INVALID_ADDRESS;
         }
 
@@ -303,6 +351,7 @@ namespace NetworkDirect
         {
             pIProvider->Release();
             TryUnload();
+            LOG("Exiting NdProvider::OpenAdapter -> %08X", ND_INVALID_ADDRESS);
             return ND_INVALID_ADDRESS;
         }
 
@@ -311,6 +360,7 @@ namespace NetworkDirect
         pIProvider->Release();
         TryUnload();
 
+        LOG("Exiting NdProvider::OpenAdapter -> %08X", hr);
         return hr;
     }
 
@@ -321,6 +371,7 @@ namespace NetworkDirect
             _Inout_ ULONG* pcbAddressList
         )
     {
+        LOG("Entering NdProvider::QueryAddressList");
         IND2Provider *pIProvider;
         HRESULT hr = GetClassObject(
             IID_IND2Provider,
@@ -329,6 +380,7 @@ namespace NetworkDirect
         if (FAILED(hr))
         {
             TryUnload();
+            LOG("Exiting NdProvider::QueryAddressList -> %08X", ND_DEVICE_NOT_READY);
             return ND_DEVICE_NOT_READY;
         }
 
@@ -337,6 +389,7 @@ namespace NetworkDirect
         pIProvider->Release();
         TryUnload();
 
+        LOG("Exiting NdProvider::QueryAddressList -> %08X", hr);
         return hr;
     }
 

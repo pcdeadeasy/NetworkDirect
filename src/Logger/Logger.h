@@ -32,19 +32,15 @@ public:
     {
       LoggerWorker::Stream = stdout;
     }
-#ifdef _LOGGING
     fprintf(LoggerWorker::Stream, "[\n");
-#endif
   }
 
   ~Logger()
   {
-#ifdef _LOGGING
     fprintf(LoggerWorker::Stream, "]\n");
-#endif
     if (m_isFile)
     {
-      int rc = fclose(LoggerWorker::Stream);
+      fclose(LoggerWorker::Stream);
       LoggerWorker::Stream = 0;
     }
   }
