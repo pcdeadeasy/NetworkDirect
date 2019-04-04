@@ -73,7 +73,11 @@ int Win::WSACleanup()
 int Win::WSCEnumProtocols(LPINT lpiProtocols, LPWSAPROTOCOL_INFOW lpProtocolBuffer, LPDWORD lpdwBufferLength, LPINT lpErrno) 
 {
   int const ans = ::WSCEnumProtocols(lpiProtocols, lpProtocolBuffer, lpdwBufferLength, lpErrno);
-  LOG("WSCEnumProtocols %p %p %p %p -> %d", lpiProtocols, lpProtocolBuffer, lpdwBufferLength, lpErrno, ans);
+  LOG(
+    "WSCEnumProtocols %p %p %p %p -> %d\n"
+    "BufferLength <- %u\n"
+    "Errno <- %d", 
+    lpiProtocols, lpProtocolBuffer, lpdwBufferLength, lpErrno, ans, *lpdwBufferLength, *lpErrno);
   if (ans == SOCKET_ERROR) 
   {
     LOG_LAST_ERROR();
@@ -85,7 +89,11 @@ int Win::WSCEnumProtocols(LPINT lpiProtocols, LPWSAPROTOCOL_INFOW lpProtocolBuff
 int Win::WSCGetProiderPath(LPGUID lpProviderId, WCHAR *lpszProviderDllPath, LPINT lpProviderDllPathLen, LPINT lpErrno) 
 {
   int const ans = ::WSCGetProviderPath(lpProviderId, lpszProviderDllPath, lpProviderDllPathLen, lpErrno);
-  LOG("WSCGetProviderPath %p %p %p %p -> %d", lpProviderId, lpszProviderDllPath, lpProviderDllPathLen, lpErrno, ans);
+  LOG(
+    "WSCGetProviderPath %p %p %p %p -> %d\n"
+    "ProviderDllPathLen <- %d\n"
+    "Errno <- %d", 
+    lpProviderId, lpszProviderDllPath, lpProviderDllPathLen, lpErrno, ans, *lpProviderDllPathLen, *lpErrno);
   if (ans == SOCKET_ERROR) 
   {
     LOG_LAST_ERROR();
