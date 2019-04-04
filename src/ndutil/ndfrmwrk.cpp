@@ -222,7 +222,7 @@ namespace NetworkDirect
         if (nV4 == 0 && nV6 == 0)
         {
             *pcbAddressList = 0;
-            LOG("Framework::QueryAddressList -> %08X", ND_SUCCESS);
+            LOG("Exiting Framework::QueryAddressList -> %08X", ND_SUCCESS);
             return ND_SUCCESS;
         }
 
@@ -233,7 +233,7 @@ namespace NetworkDirect
         if (pAddressList == nullptr || cbRequired > *pcbAddressList)
         {
             *pcbAddressList = cbRequired;
-            LOG("Framework::QueryAddressList -> %08X", ND_BUFFER_OVERFLOW);
+            LOG("Exiting Framework::QueryAddressList -> %08X", ND_BUFFER_OVERFLOW);
             return ND_BUFFER_OVERFLOW;
         }
 
@@ -254,7 +254,7 @@ namespace NetworkDirect
             CopyAddressList(m_NdV1AddrList, pAddressList, &pBuf, &cbRemaining);
         }
 
-        LOG("Framework::QueryAddressList -> %08X", S_OK);
+        LOG("Exiting Framework::QueryAddressList -> %08X", S_OK);
         return S_OK;
     }
 
@@ -535,7 +535,7 @@ namespace NetworkDirect
             _Inout_ SIZE_T* pnV6
         )
     {
-        LOG("Exiting Framework::CountAddresses");
+        LOG("Entering Framework::CountAddresses");
         for (List<Address>::iterator pAddr = list.begin();
             pAddr != list.end() && (*pnV4 + *pnV6) < INT_MAX;
             ++pAddr)
@@ -563,7 +563,7 @@ namespace NetworkDirect
             _Inout_ List<Address>* pList
         )
     {
-        LOG("Exiting Framework::BuildAddressList");
+        LOG("Entering Framework::BuildAddressList");
         for (int i = 0; i < addrList.iAddressCount; i++)
         {
             // We only handle IPv4 and IPv6 addresses.
