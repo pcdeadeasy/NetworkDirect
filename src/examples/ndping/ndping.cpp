@@ -8,6 +8,7 @@
 #include "ndcommon.h"
 #include "ndtestutil.h"
 #include <logging.h>
+#include <Logger.h>
 
 const USHORT x_DefaultPort = 54324;
 const SIZE_T x_MaxXfer = (4 * 1024 * 1024);
@@ -41,14 +42,19 @@ public:
     NdPingServer(char *pBuf, bool useEvents) :
         m_pBuf(pBuf),
         m_bUseEvents(useEvents)
-    {}
+    {
+        LOG("Entering %s", __FUNCTION__);
+        LOG("Exiting %s -> void", __FUNCTION__);
+    }
 
     ~NdPingServer()
     {
+        LOG("Entering %s", __FUNCTION__);
         if (m_sgl != nullptr)
         {
             delete[] m_sgl;
         }
+        LOG("Exiting %s -> void", __FUNCTION__);
     }
 
     void RunTest(
@@ -56,6 +62,7 @@ public:
         _In_ DWORD queueDepth,
         _In_ DWORD nSge)
     {
+        LOG("Entering %s", __FUNCTION__);
         NdPingServer::Init(v4Src);
         NdTestBase::CreateMR();
         NdTestBase::RegisterDataBuffer(m_pBuf, x_MaxXfer + x_HdrLen, ND_MR_FLAG_ALLOW_LOCAL_WRITE);
@@ -93,10 +100,12 @@ public:
 
         //tear down
         NdTestBase::Shutdown();
+        LOG("Exiting %s -> void", __FUNCTION__);
     }
 
     void ReceivePings()
     {
+        LOG("Entering %s", __FUNCTION__);
         // Prepare an SGE for sending credit updates.
         ND2_SGE creditSge;
         creditSge.Buffer = m_pBuf;
@@ -143,12 +152,14 @@ public:
                 break;
 
             default:
+                LOG("Exiting %s -> exit", __FUNCTION__);
                 LOG_FAILURE_HRESULT_AND_EXIT(
                     hr,
                     L"INDCompletionQueue::GetResults returned result with %08x.",
                     __LINE__);
             }
         } while (hr == ND_SUCCESS);
+        LOG("Exiting %s -> void", __FUNCTION__);
     }
 
 private:
@@ -167,10 +178,15 @@ public:
         m_pBuf(pBuf),
         m_bUseEvents(bUseEvents),
         m_maxOutSends(nPipeline)
-    {}
+    {
+        LOG("Entering %s", __FUNCTION__);
+        LOG("Exiting %s -> void", __FUNCTION__);
+    }
 
     ~NdPingClient()
     {
+        LOG("Entering %s", __FUNCTION__);
+
         if (m_sendSgl != nullptr)
         {
             delete[] m_sendSgl;
@@ -179,6 +195,7 @@ public:
         {
             delete[] m_recvSgl;
         }
+        LOG("Exiting %s -> void", __FUNCTION__);
     }
 
     void RunTest(
@@ -187,6 +204,7 @@ public:
         _In_ DWORD queueDepth,
         _In_ DWORD nMaxSge)
     {
+        LOG("Entering %s", __FUNCTION__);
         NdTestBase::Init(v4Src);
 
         NdTestBase::CreateMR();
@@ -210,12 +228,14 @@ public:
         ULONG len = 0;
         if (m_pConnector->GetPrivateData(nullptr, &len) != ND_BUFFER_OVERFLOW)
         {
+            LOG("Exiting %s -> exit", __FUNCTION__);
             LOG_FAILURE_AND_EXIT(L"GetPrivateData failed\n", __LINE__);
         }
 
         void *tmpBuf = malloc(len);
         if (tmpBuf == nullptr)
         {
+            LOG("Exiting %s -> exit", __FUNCTION__);
             LOG_FAILURE_AND_EXIT(L"Failed to allocate memory\n", __LINE__);
         }
 
@@ -223,6 +243,7 @@ public:
         if (ND_SUCCESS != hr)
         {
             free(tmpBuf);
+            LOG("Exiting %s -> exit", __FUNCTION__);
             LOG_FAILURE_AND_EXIT(L"Failed to GetPrivateData\n", __LINE__);
         }
 
@@ -239,6 +260,7 @@ public:
         m_recvSgl = new (std::nothrow) ND2_SGE[nMaxSge];
         if (m_sendSgl == nullptr || m_recvSgl == nullptr)
         {
+            LOG("Exiting %s -> exit", __FUNCTION__);
             LOG_FAILURE_AND_EXIT(L"Failed to allocate sgl.", __LINE__);
         }
 
@@ -276,6 +298,7 @@ public:
             HRESULT hr = SendPings(iterations, numSendSges, szXfer);
             if (FAILED(hr))
             {
+                LOG("Exiting %s -> exit", __FUNCTION__);
                 LOG_FAILURE_AND_EXIT(L"Connection unexpectedly aborted.", __LINE__);
             }
 
@@ -294,10 +317,12 @@ public:
 
         //tear down
         NdTestBase::Shutdown();
+        LOG("Exiting %s -> void", __FUNCTION__);
     }
 
     HRESULT SendPings(size_t iters, DWORD nSge, DWORD msgSize)
     {
+        LOG("Entering %s", __FUNCTION__);
         HRESULT hr = ND_SUCCESS;
         bool bGotSyncAck = false, bSyncSent = false;
 
@@ -367,6 +392,7 @@ public:
                     break;
 
                 default:
+                    LOG("Exiting %s -> %08X exit", __FUNCTION__, hr);
                     LOG_FAILURE_HRESULT_AND_EXIT(
                         hr,
                         L"INDCompletionQueue::GetResults returned result with %08x.",
@@ -375,11 +401,13 @@ public:
             } while (nResults != 0);
 
         } while ((!bGotSyncAck) && hr == ND_SUCCESS);
+        LOG("Exiting %s -> %08X", __FUNCTION__, hr);
         return hr;
     }
 
     size_t BlastSend(size_t iters, size_t maxOutSends, DWORD nSge, DWORD msgSize)
     {
+        LOG("Entering %s", __FUNCTION__);
         size_t numSent = 0;
         while (m_nCredits != 0 && iters > 0 && m_numOutSends < maxOutSends)
         {
@@ -387,6 +415,7 @@ public:
             m_nCredits--; iters--;
             numSent++; m_numOutSends++;
         }
+        LOG("Exiting %s -> %zu\n", __FUNCTION__, numSent);
         return numSent;
     }
 
@@ -405,157 +434,172 @@ private:
 
 int __cdecl _tmain(int argc, TCHAR* argv[])
 {
-    bool bServer = false;
-    bool bClient = false;
-    struct sockaddr_in v4Server = { 0 };
-    DWORD nSge = 1;
-    bool bPolling = false;
-    bool bBlocking = false;
-    SIZE_T nPipeline = 128;
-
-    INIT_LOG(TESTNAME);
-
-    WSADATA wsaData;
-    int ret = ::WSAStartup(MAKEWORD(2, 2), &wsaData);
-    if (ret != 0)
     {
-        printf("Failed to initialize Windows Sockets: %d\n", ret);
-        exit(__LINE__);
-    }
+        Logger logger("log.json");
+        LOG("Entering %s", __FUNCTION__);
+        bool bServer = false;
+        bool bClient = false;
+        struct sockaddr_in v4Server = { 0 };
+        DWORD nSge = 1;
+        bool bPolling = false;
+        bool bBlocking = false;
+        SIZE_T nPipeline = 128;
 
-    for (int i = 1; i < argc; i++)
-    {
-        TCHAR *arg = argv[i];
-        if ((wcscmp(arg, L"-s") == 0) || (wcscmp(arg, L"-S") == 0))
+        INIT_LOG(TESTNAME);
+
+        WSADATA wsaData;
+        int ret = ::WSAStartup(MAKEWORD(2, 2), &wsaData);
+        if (ret != 0)
         {
-            bServer = true;
+            printf("Failed to initialize Windows Sockets: %d\n", ret);
+            LOG("Exiting %s -> %d", __FUNCTION__, __LINE__ + 1);
+            exit(__LINE__);
         }
-        else if ((wcscmp(arg, L"-c") == 0) || (wcscmp(arg, L"-C") == 0))
+
+        for (int i = 1; i < argc; i++)
         {
-            bClient = true;
-        }
-        else if ((wcscmp(arg, L"-p") == 0) || (wcscmp(arg, L"-P") == 0))
-        {
-            bPolling = true;
-        }
-        else if ((wcscmp(arg, L"-b") == 0) || (wcscmp(arg, L"-B") == 0))
-        {
-            bBlocking = true;
-        }
-        else if ((wcscmp(arg, L"-n") == 0) || (wcscmp(arg, L"-N") == 0))
-        {
-            if (i == argc - 2)
+            TCHAR *arg = argv[i];
+            if ((wcscmp(arg, L"-s") == 0) || (wcscmp(arg, L"-S") == 0))
+            {
+                bServer = true;
+            }
+            else if ((wcscmp(arg, L"-c") == 0) || (wcscmp(arg, L"-C") == 0))
+            {
+                bClient = true;
+            }
+            else if ((wcscmp(arg, L"-p") == 0) || (wcscmp(arg, L"-P") == 0))
+            {
+                bPolling = true;
+            }
+            else if ((wcscmp(arg, L"-b") == 0) || (wcscmp(arg, L"-B") == 0))
+            {
+                bBlocking = true;
+            }
+            else if ((wcscmp(arg, L"-n") == 0) || (wcscmp(arg, L"-N") == 0))
+            {
+                if (i == argc - 2)
+                {
+                    ShowUsage();
+                    exit(-1);
+                }
+                nSge = _ttol(argv[++i]);
+            }
+            else if ((wcscmp(arg, L"-q") == 0) || (wcscmp(arg, L"-Q") == 0))
+            {
+                if (i == argc - 2)
+                {
+                    ShowUsage();
+                    exit(-1);
+                }
+                nPipeline = _ttol(argv[++i]);
+            }
+            else if ((wcscmp(arg, L"-l") == 0) || (wcscmp(arg, L"--logFile") == 0))
+            {
+                RedirectLogsToFile(argv[++i]);
+            }
+            else if ((wcscmp(arg, L"-h") == 0) || (wcscmp(arg, L"--help") == 0))
             {
                 ShowUsage();
-                exit(-1);
+                LOG("Exiting wmain -> %d", __LINE__ + 1);
+                exit(0);
             }
-            nSge = _ttol(argv[++i]);
         }
-        else if ((wcscmp(arg, L"-q") == 0) || (wcscmp(arg, L"-Q") == 0))
+
+        // ip address is last parameter
+        int len = sizeof(v4Server);
+        WSAStringToAddress(argv[argc - 1], AF_INET, nullptr,
+            reinterpret_cast<struct sockaddr*>(&v4Server), &len);
+
+        if ((bClient && bServer) || (!bClient && !bServer))
         {
-            if (i == argc - 2)
-            {
-                ShowUsage();
-                exit(-1);
-            }
-            nPipeline = _ttol(argv[++i]);
-        }
-        else if ((wcscmp(arg, L"-l") == 0) || (wcscmp(arg, L"--logFile") == 0))
-        {
-            RedirectLogsToFile(argv[++i]);
-        }
-        else if ((wcscmp(arg, L"-h") == 0) || (wcscmp(arg, L"--help") == 0))
-        {
+            printf("Exactly one of client (c or "
+                "server (s) must be specified.\n");
             ShowUsage();
-            exit(0);
+            LOG("Exiting wmain -> %d", __LINE__ + 1);
+            exit(__LINE__);
         }
-    }
 
-    // ip address is last parameter
-    int len = sizeof(v4Server);
-    WSAStringToAddress(argv[argc - 1], AF_INET, nullptr,
-        reinterpret_cast<struct sockaddr*>(&v4Server), &len);
+        if (v4Server.sin_addr.s_addr == 0)
+        {
+            printf("Bad address.\n\n");
+            ShowUsage();
+            LOG("Exiting wmain -> %d", __LINE__ + 1);
+            exit(__LINE__);
+        }
 
-    if ((bClient && bServer) || (!bClient && !bServer))
-    {
-        printf("Exactly one of client (c or "
-            "server (s) must be specified.\n");
-        ShowUsage();
-        exit(__LINE__);
-    }
+        if (v4Server.sin_port == 0)
+        {
+            v4Server.sin_port = htons(x_DefaultPort);
+        }
 
-    if (v4Server.sin_addr.s_addr == 0)
-    {
-        printf("Bad address.\n\n");
-        ShowUsage();
-        exit(__LINE__);
-    }
+        if (bPolling && bBlocking)
+        {
+            printf("Exactly one of blocking (b or polling (p) must be specified.\n\n");
+            ShowUsage();
+            LOG("Exiting wmain -> %d", __LINE__ + 1);
+            exit(__LINE__);
+        }
 
-    if (v4Server.sin_port == 0)
-    {
-        v4Server.sin_port = htons(x_DefaultPort);
-    }
+        if (nSge == 0)
+        {
+            printf("Invalid or missing SGE length.\n\n");
+            ShowUsage();
+            LOG("Exiting wmain -> %d", __LINE__ + 1);
+            exit(__LINE__);
+        }
 
-    if (bPolling && bBlocking)
-    {
-        printf("Exactly one of blocking (b or polling (p) must be specified.\n\n");
-        ShowUsage();
-        exit(__LINE__);
-    }
-
-    if (nSge == 0)
-    {
-        printf("Invalid or missing SGE length.\n\n");
-        ShowUsage();
-        exit(__LINE__);
-    }
-
-    HRESULT hr = NdStartup();
-    if (FAILED(hr))
-    {
-        LOG_FAILURE_HRESULT_AND_EXIT(hr, L"NdStartup failed with %08x", __LINE__);
-    }
-
-    char *pBuf = static_cast<char *>(HeapAlloc(GetProcessHeap(), 0, x_MaxXfer + x_HdrLen));
-    if (!pBuf)
-    {
-        LOG_FAILURE_AND_EXIT(L"Failed to allocate data buffer.", __LINE__);
-    }
-    if (bServer)
-    {
-#pragma warning (suppress: 6001) // ignore unitialized memory warning for pBuf
-        NdPingServer server(pBuf, bBlocking);
-        server.RunTest(v4Server, 0, nSge);
-    }
-    else
-    {
-        struct sockaddr_in v4Src;
-        SIZE_T len = sizeof(v4Src);
-        HRESULT hr = NdResolveAddress(
-            (const struct sockaddr*)&v4Server,
-            sizeof(v4Server),
-            (struct sockaddr*)&v4Src,
-            &len);
+        HRESULT hr = NdStartup();
         if (FAILED(hr))
         {
-            HeapFree(GetProcessHeap(), 0, pBuf);
-            LOG_FAILURE_HRESULT_AND_EXIT(hr, L"NdResolveAddress failed with %08x", __LINE__);
+            LOG("Exiting wmain -> %d", __LINE__ + 1);
+            LOG_FAILURE_HRESULT_AND_EXIT(hr, L"NdStartup failed with %08x", __LINE__);
         }
 
+        char *pBuf = static_cast<char *>(HeapAlloc(GetProcessHeap(), 0, x_MaxXfer + x_HdrLen));
+        if (!pBuf)
+        {
+            LOG("Exiting wmain -> %d", __LINE__ + 1);
+            LOG_FAILURE_AND_EXIT(L"Failed to allocate data buffer.", __LINE__);
+        }
+        if (bServer)
+        {
 #pragma warning (suppress: 6001) // ignore unitialized memory warning for pBuf
-        NdPingClient client(pBuf, bBlocking, nPipeline);
-        client.RunTest(v4Src, v4Server, 0, nSge);
-    }
+            NdPingServer server(pBuf, bBlocking);
+            server.RunTest(v4Server, 0, nSge);
+        }
+        else
+        {
+            struct sockaddr_in v4Src;
+            SIZE_T len = sizeof(v4Src);
+            HRESULT hr = NdResolveAddress(
+                (const struct sockaddr*)&v4Server,
+                sizeof(v4Server),
+                (struct sockaddr*)&v4Src,
+                &len);
+            if (FAILED(hr))
+            {
+                HeapFree(GetProcessHeap(), 0, pBuf);
+                LOG("Exiting wmain -> %d", __LINE__ + 1);
+                LOG_FAILURE_HRESULT_AND_EXIT(hr, L"NdResolveAddress failed with %08x", __LINE__);
+            }
 
-    HeapFree(GetProcessHeap(), 0, pBuf);
-    hr = NdCleanup();
-    if (FAILED(hr))
-    {
-        LOG_FAILURE_HRESULT_AND_EXIT(hr, L"NdCleanup failed with %08x", __LINE__);
-    }
+#pragma warning (suppress: 6001) // ignore unitialized memory warning for pBuf
+            NdPingClient client(pBuf, bBlocking, nPipeline);
+            client.RunTest(v4Src, v4Server, 0, nSge);
+        }
 
-    END_LOG(TESTNAME);
+        HeapFree(GetProcessHeap(), 0, pBuf);
+        hr = NdCleanup();
+        if (FAILED(hr))
+        {
+            LOG("Exiting wmain -> %d", __LINE__ + 1);
+            LOG_FAILURE_HRESULT_AND_EXIT(hr, L"NdCleanup failed with %08x", __LINE__);
+        }
+
+        END_LOG(TESTNAME);
+        WSACleanup();
+        LOG("Exiting wmain -> 0");
+    }
     _fcloseall();
-    WSACleanup();
     return 0;
 }

@@ -276,6 +276,7 @@ namespace NetworkDirect
             cbAddress,
             reinterpret_cast<INDAdapter**>(ppIAdapter)
         );
+        LOG("INDProvider::OpenAdapter -> %08X", hr);
 
         pIProvider->Release();
         TryUnload();
@@ -347,6 +348,7 @@ namespace NetworkDirect
 
         UINT64 id;
         hr = pIProvider->ResolveAddress(pAddress, cbAddress, &id);
+        LOG("IND2Provider::ResolveAddress -> %08X", hr);
         if (FAILED(hr))
         {
             pIProvider->Release();
@@ -356,6 +358,7 @@ namespace NetworkDirect
         }
 
         hr = pIProvider->OpenAdapter(iid, id, ppIAdapter);
+        LOG("IND2Provider::OpenAdapter -> %08X", hr);
 
         pIProvider->Release();
         TryUnload();
