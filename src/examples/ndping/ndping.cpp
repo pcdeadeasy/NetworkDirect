@@ -415,7 +415,7 @@ public:
             m_nCredits--; iters--;
             numSent++; m_numOutSends++;
         }
-        LOG("Exiting %s -> %zu\n", __FUNCTION__, numSent);
+        LOG("Exiting %s -> %zu", __FUNCTION__, numSent);
         return numSent;
     }
 
