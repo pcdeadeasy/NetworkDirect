@@ -352,7 +352,7 @@ DWORD NdTestBase::PrepareSge(
     {
         pSge[currSge - 1].BufferLength += buffSize;
     }
-    LOG("Exiting %s -> %08X", currSge);
+    LOG("Exiting %s -> %08X", __FUNCTION__, currSge);
     return currSge;
 }
 
@@ -363,14 +363,14 @@ void NdTestBase::DisconnectConnector()
     {
         m_pConnector->Disconnect(&m_Ov);
     }
-    LOG("Exiting %s -> void");
+    LOG("Exiting %s -> void", __FUNCTION__);
 }
 
 void NdTestBase::DeregisterMemory()
 {
     LOG("Entering %s", __FUNCTION__);
     m_pMr->Deregister(&m_Ov);
-    LOG("Exiting %s -> void");
+    LOG("Exiting %s -> void", __FUNCTION__);
 }
 
 void NdTestBase::GetResult(HRESULT expectedResult, const char* errorMessage)
