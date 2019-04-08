@@ -70,12 +70,12 @@ static std::string TranslateAdapterInfoFlags(ULONG flags)
 int __cdecl _tmain(int argc, TCHAR* argv[])
 {
     {
-        Logger logger("log.json");
+        LOG_ENTER();
         LOG("Entering wmain");
         if (argc < 2)
         {
             ShowUsage();
-            LOG("Exiting wmain -> -1");
+            LOG_INT_RETURN(-1);
             return -1;
         }
 
@@ -84,7 +84,7 @@ int __cdecl _tmain(int argc, TCHAR* argv[])
         if (ret != 0)
         {
             printf("Failed to initialize Windows Sockets: %d\n", ret);
-            LOG("Exiting wmain -> %d", __LINE__ + 1);
+            LOG_ERROR_RETURN();
             exit(__LINE__);
         }
 
@@ -99,7 +99,7 @@ int __cdecl _tmain(int argc, TCHAR* argv[])
             else if ((wcscmp(arg, L"-h") == 0) || (wcscmp(arg, L"--help") == 0))
             {
                 ShowUsage();
-                LOG("Exiting wmain -> 0");
+                LOG_ERROR_RETURN();
                 exit(0);
             }
         }
@@ -119,21 +119,21 @@ int __cdecl _tmain(int argc, TCHAR* argv[])
         {
             printf("Bad address.\n");
             ShowUsage();
-            LOG("Exiting wmain -> %d", __LINE__ + 1);
+            LOG_ERROR_RETURN();
             exit(__LINE__);
         }
 
         HRESULT hr = NdStartup();
         if (FAILED(hr))
         {
-            LOG("Exiting wmain -> %d", __LINE__ + 1);
+            LOG_ERROR_RETURN();
             LOG_FAILURE_HRESULT_AND_EXIT(hr, L"NdStartup failed with %08x", __LINE__);
         }
 
         hr = NdCheckAddress(reinterpret_cast<const struct sockaddr*>(&v4), sizeof(v4));
         if (FAILED(hr))
         {
-            LOG("Exiting wmain -> %d", __LINE__ + 1);
+            LOG_ERROR_RETURN();
             LOG_FAILURE_HRESULT_AND_EXIT(hr, L"NdCheckAddress for input address returned %08x", __LINE__);
         }
 
@@ -146,7 +146,7 @@ int __cdecl _tmain(int argc, TCHAR* argv[])
         );
         if (FAILED(hr))
         {
-            LOG("Exiting wmain -> %d", __LINE__ + 1);
+            LOG_ERROR_RETURN();
             LOG_FAILURE_HRESULT_AND_EXIT(hr, L"Failed open adapter: %08x\n", __LINE__);
         }
 
@@ -157,7 +157,7 @@ int __cdecl _tmain(int argc, TCHAR* argv[])
         hr = pAdapter->Query(&adapterInfo, &adapterInfoSize);
         if (FAILED(hr))
         {
-            LOG("Exiting wmain -> %d", __LINE__ + 1);
+            LOG_ERROR_RETURN();
             LOG_FAILURE_HRESULT_AND_EXIT(hr, L"IND2Adapter::GetAdapterInfo failed: %08x", __LINE__);
         }
 
@@ -188,12 +188,12 @@ int __cdecl _tmain(int argc, TCHAR* argv[])
         hr = NdCleanup();
         if (FAILED(hr))
         {
-            LOG("Exiting wmain -> %d", __LINE__ + 1);
+            LOG_ERROR_RETURN();
             LOG_FAILURE_HRESULT_AND_EXIT(hr, L"NdCleanup failed with %08x", __LINE__);
         }
 
         WSACleanup();
-        LOG("Exiting wmain -> 0"); 
+        LOG_INT_RETURN(0);
     }
     _fcloseall();
     return 0;

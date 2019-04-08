@@ -43,18 +43,18 @@ public:
         m_pBuf(pBuf),
         m_bUseEvents(useEvents)
     {
-        LOG("Entering %s", __FUNCTION__);
-        LOG("Exiting %s -> void", __FUNCTION__);
+        LOG_ENTER();
+        LOG_VOID_RETURN();
     }
 
     ~NdPingServer()
     {
-        LOG("Entering %s", __FUNCTION__);
+        LOG_ENTER();
         if (m_sgl != nullptr)
         {
             delete[] m_sgl;
         }
-        LOG("Exiting %s -> void", __FUNCTION__);
+        LOG_VOID_RETURN();
     }
 
     void RunTest(
@@ -62,7 +62,7 @@ public:
         _In_ DWORD queueDepth,
         _In_ DWORD nSge)
     {
-        LOG("Entering %s", __FUNCTION__);
+        LOG_ENTER();
         NdPingServer::Init(v4Src);
         NdTestBase::CreateMR();
         NdTestBase::RegisterDataBuffer(m_pBuf, x_MaxXfer + x_HdrLen, ND_MR_FLAG_ALLOW_LOCAL_WRITE);
@@ -83,6 +83,8 @@ public:
         m_sgl = new (std::nothrow) ND2_SGE[nSge];
         if (m_sgl == nullptr)
         {
+            LOG("m_sgl == nullptr");
+            LOG_VOID_RETURN();
             LOG_FAILURE_AND_EXIT(L"Failed to allocate sgl.", __LINE__);
         }
 
@@ -100,12 +102,12 @@ public:
 
         //tear down
         NdTestBase::Shutdown();
-        LOG("Exiting %s -> void", __FUNCTION__);
+        LOG_VOID_RETURN();
     }
 
     void ReceivePings()
     {
-        LOG("Entering %s", __FUNCTION__);
+        LOG_ENTER();
         // Prepare an SGE for sending credit updates.
         ND2_SGE creditSge;
         creditSge.Buffer = m_pBuf;
@@ -152,7 +154,7 @@ public:
                 break;
 
             default:
-                LOG("Exiting %s -> exit", __FUNCTION__);
+                LOG_ERROR_RETURN();
                 LOG_FAILURE_HRESULT_AND_EXIT(
                     hr,
                     L"INDCompletionQueue::GetResults returned result with %08x.",
@@ -179,13 +181,13 @@ public:
         m_bUseEvents(bUseEvents),
         m_maxOutSends(nPipeline)
     {
-        LOG("Entering %s", __FUNCTION__);
-        LOG("Exiting %s -> void", __FUNCTION__);
+        LOG_ENTER();
+        LOG_VOID_RETURN();
     }
 
     ~NdPingClient()
     {
-        LOG("Entering %s", __FUNCTION__);
+        LOG_ENTER();
 
         if (m_sendSgl != nullptr)
         {
@@ -195,7 +197,7 @@ public:
         {
             delete[] m_recvSgl;
         }
-        LOG("Exiting %s -> void", __FUNCTION__);
+        LOG_VOID_RETURN();
     }
 
     void RunTest(
@@ -204,7 +206,7 @@ public:
         _In_ DWORD queueDepth,
         _In_ DWORD nMaxSge)
     {
-        LOG("Entering %s", __FUNCTION__);
+        LOG_ENTER();
         NdTestBase::Init(v4Src);
 
         NdTestBase::CreateMR();
@@ -228,14 +230,14 @@ public:
         ULONG len = 0;
         if (m_pConnector->GetPrivateData(nullptr, &len) != ND_BUFFER_OVERFLOW)
         {
-            LOG("Exiting %s -> exit", __FUNCTION__);
+            LOG_ERROR_RETURN();
             LOG_FAILURE_AND_EXIT(L"GetPrivateData failed\n", __LINE__);
         }
 
         void *tmpBuf = malloc(len);
         if (tmpBuf == nullptr)
         {
-            LOG("Exiting %s -> exit", __FUNCTION__);
+            LOG_ERROR_RETURN();
             LOG_FAILURE_AND_EXIT(L"Failed to allocate memory\n", __LINE__);
         }
 
@@ -243,7 +245,7 @@ public:
         if (ND_SUCCESS != hr)
         {
             free(tmpBuf);
-            LOG("Exiting %s -> exit", __FUNCTION__);
+            LOG_ERROR_RETURN();
             LOG_FAILURE_AND_EXIT(L"Failed to GetPrivateData\n", __LINE__);
         }
 
@@ -260,7 +262,7 @@ public:
         m_recvSgl = new (std::nothrow) ND2_SGE[nMaxSge];
         if (m_sendSgl == nullptr || m_recvSgl == nullptr)
         {
-            LOG("Exiting %s -> exit", __FUNCTION__);
+            LOG_ERROR_RETURN();
             LOG_FAILURE_AND_EXIT(L"Failed to allocate sgl.", __LINE__);
         }
 
@@ -298,7 +300,7 @@ public:
             HRESULT hr = SendPings(iterations, numSendSges, szXfer);
             if (FAILED(hr))
             {
-                LOG("Exiting %s -> exit", __FUNCTION__);
+                LOG_ERROR_RETURN();
                 LOG_FAILURE_AND_EXIT(L"Connection unexpectedly aborted.", __LINE__);
             }
 
@@ -317,12 +319,12 @@ public:
 
         //tear down
         NdTestBase::Shutdown();
-        LOG("Exiting %s -> void", __FUNCTION__);
+        LOG_VOID_RETURN();
     }
 
     HRESULT SendPings(size_t iters, DWORD nSge, DWORD msgSize)
     {
-        LOG("Entering %s", __FUNCTION__);
+        LOG_ENTER();
         HRESULT hr = ND_SUCCESS;
         bool bGotSyncAck = false, bSyncSent = false;
 
@@ -392,7 +394,7 @@ public:
                     break;
 
                 default:
-                    LOG("Exiting %s -> %08X exit", __FUNCTION__, hr);
+                    LOG_ERROR_RETURN();
                     LOG_FAILURE_HRESULT_AND_EXIT(
                         hr,
                         L"INDCompletionQueue::GetResults returned result with %08x.",
@@ -401,13 +403,13 @@ public:
             } while (nResults != 0);
 
         } while ((!bGotSyncAck) && hr == ND_SUCCESS);
-        LOG("Exiting %s -> %08X", __FUNCTION__, hr);
+        LOG_HRESULT_RETURN(hr);
         return hr;
     }
 
     size_t BlastSend(size_t iters, size_t maxOutSends, DWORD nSge, DWORD msgSize)
     {
-        LOG("Entering %s", __FUNCTION__);
+        LOG_ENTER();
         size_t numSent = 0;
         while (m_nCredits != 0 && iters > 0 && m_numOutSends < maxOutSends)
         {
@@ -452,7 +454,7 @@ int __cdecl _tmain(int argc, TCHAR* argv[])
         if (ret != 0)
         {
             printf("Failed to initialize Windows Sockets: %d\n", ret);
-            LOG("Exiting %s -> %d", __FUNCTION__, __LINE__ + 1);
+            LOG_ERROR_RETURN();
             exit(__LINE__);
         }
 
@@ -500,7 +502,7 @@ int __cdecl _tmain(int argc, TCHAR* argv[])
             else if ((wcscmp(arg, L"-h") == 0) || (wcscmp(arg, L"--help") == 0))
             {
                 ShowUsage();
-                LOG("Exiting wmain -> %d", __LINE__ + 1);
+                LOG_ERROR_RETURN();
                 exit(0);
             }
         }
@@ -515,7 +517,7 @@ int __cdecl _tmain(int argc, TCHAR* argv[])
             printf("Exactly one of client (c or "
                 "server (s) must be specified.\n");
             ShowUsage();
-            LOG("Exiting wmain -> %d", __LINE__ + 1);
+            LOG_ERROR_RETURN();
             exit(__LINE__);
         }
 
@@ -523,7 +525,7 @@ int __cdecl _tmain(int argc, TCHAR* argv[])
         {
             printf("Bad address.\n\n");
             ShowUsage();
-            LOG("Exiting wmain -> %d", __LINE__ + 1);
+            LOG_ERROR_RETURN();
             exit(__LINE__);
         }
 
@@ -536,7 +538,7 @@ int __cdecl _tmain(int argc, TCHAR* argv[])
         {
             printf("Exactly one of blocking (b or polling (p) must be specified.\n\n");
             ShowUsage();
-            LOG("Exiting wmain -> %d", __LINE__ + 1);
+            LOG_ERROR_RETURN();
             exit(__LINE__);
         }
 
@@ -544,21 +546,21 @@ int __cdecl _tmain(int argc, TCHAR* argv[])
         {
             printf("Invalid or missing SGE length.\n\n");
             ShowUsage();
-            LOG("Exiting wmain -> %d", __LINE__ + 1);
+            LOG_ERROR_RETURN();
             exit(__LINE__);
         }
 
         HRESULT hr = NdStartup();
         if (FAILED(hr))
         {
-            LOG("Exiting wmain -> %d", __LINE__ + 1);
+            LOG_ERROR_RETURN();
             LOG_FAILURE_HRESULT_AND_EXIT(hr, L"NdStartup failed with %08x", __LINE__);
         }
 
         char *pBuf = static_cast<char *>(HeapAlloc(GetProcessHeap(), 0, x_MaxXfer + x_HdrLen));
         if (!pBuf)
         {
-            LOG("Exiting wmain -> %d", __LINE__ + 1);
+            LOG_ERROR_RETURN();
             LOG_FAILURE_AND_EXIT(L"Failed to allocate data buffer.", __LINE__);
         }
         if (bServer)
@@ -579,7 +581,7 @@ int __cdecl _tmain(int argc, TCHAR* argv[])
             if (FAILED(hr))
             {
                 HeapFree(GetProcessHeap(), 0, pBuf);
-                LOG("Exiting wmain -> %d", __LINE__ + 1);
+                LOG_ERROR_RETURN();
                 LOG_FAILURE_HRESULT_AND_EXIT(hr, L"NdResolveAddress failed with %08x", __LINE__);
             }
 
@@ -592,13 +594,13 @@ int __cdecl _tmain(int argc, TCHAR* argv[])
         hr = NdCleanup();
         if (FAILED(hr))
         {
-            LOG("Exiting wmain -> %d", __LINE__ + 1);
+            LOG_ERROR_RETURN();
             LOG_FAILURE_HRESULT_AND_EXIT(hr, L"NdCleanup failed with %08x", __LINE__);
         }
 
         END_LOG(TESTNAME);
         WSACleanup();
-        LOG("Exiting wmain -> 0");
+        LOG_INT_RETURN(0);
     }
     _fcloseall();
     return 0;

@@ -17,15 +17,15 @@ NdTestBase::NdTestBase() :
     m_Buf(nullptr),
     m_pMw(nullptr)
 {
-    LOG("Entering %s", __FUNCTION__);
+    LOG_ENTER();
     RtlZeroMemory(&m_Ov, sizeof(m_Ov));
-    LOG("Exiting %s -> void", __FUNCTION__);
+    LOG_VOID_RETURN();
 }
 
 //tear down
 NdTestBase::~NdTestBase()
 {
-    LOG("Entering %s", __FUNCTION__);
+    LOG_ENTER();
     if (m_pMr != nullptr)
     {
         m_pMr->Release();
@@ -70,12 +70,12 @@ NdTestBase::~NdTestBase()
     {
         delete[] m_Buf;
     }
-    LOG("Exiting %s -> void", __FUNCTION__);
+    LOG_VOID_RETURN();
 }
 
 void NdTestBase::CreateMR(HRESULT expectedResult, const char* errorMessage)
 {
-    LOG("Entering %s", __FUNCTION__);
+    LOG_ENTER();
     HRESULT hr = m_pAdapter->CreateMemoryRegion(
         IID_IND2MemoryRegion,
         m_hAdapterFile,
@@ -84,7 +84,7 @@ void NdTestBase::CreateMR(HRESULT expectedResult, const char* errorMessage)
     LOG("IND2Adapter::CreateMemoryRegion -> %08X", hr);
 
     LogIfErrorExit(hr, expectedResult, errorMessage, __LINE__);
-    LOG("Exiting %s -> %08X", __FUNCTION__, hr);
+    LOG_VOID_RETURN();
 }
 
 void NdTestBase::RegisterDataBuffer(
@@ -93,18 +93,18 @@ void NdTestBase::RegisterDataBuffer(
     HRESULT expectedResult,
     const char* errorMessage)
 {
-    LOG("Entring %s", __FUNCTION__);
+    LOG_ENTER();
     m_Buf_Len = bufferLength;
     m_Buf = new (std::nothrow) char[m_Buf_Len];
     if (m_Buf == nullptr)
     {
         printf("Failed to allocate buffer.\n");
-        LOG("Exiting %s -> exit", __FUNCTION__);
+        LOG_ERROR_RETURN();
         exit(__LINE__);
     }
 
     RegisterDataBuffer(m_Buf, m_Buf_Len, type, expectedResult, errorMessage);
-    LOG("Exiting %s -> void", __FUNCTION__);
+    LOG_VOID_RETURN();
 }
 
 void NdTestBase::RegisterDataBuffer(
@@ -114,7 +114,7 @@ void NdTestBase::RegisterDataBuffer(
     HRESULT expectedResult,
     const char* errorMessage)
 {
-    LOG("Entering %s", __FUNCTION__);
+    LOG_ENTER();
 #pragma warning(suppress: 6001)
     HRESULT hr = m_pMr->Register(
         pBuf,
@@ -129,12 +129,12 @@ void NdTestBase::RegisterDataBuffer(
         LOG("IND2MemoryRegion::GetOverlappedResult -> %08X", hr);
     }
     LogIfErrorExit(hr, expectedResult, errorMessage, __LINE__);
-    LOG("Exiting %s -> void", __FUNCTION__);
+    LOG_VOID_RETURN();
 }
 
 void NdTestBase::CreateMW(HRESULT expectedResult, const char* errorMessage)
 {
-    LOG("Entering %s", __FUNCTION__);
+    LOG_ENTER();
     HRESULT hr = m_pAdapter->CreateMemoryWindow(
         IID_IND2MemoryWindow,
         reinterpret_cast<VOID**>(&m_pMw)
@@ -142,34 +142,35 @@ void NdTestBase::CreateMW(HRESULT expectedResult, const char* errorMessage)
     LOG("IND2Adapter::CreateMemoryWindow -> %08X", hr);
 
     LogIfErrorExit(hr, expectedResult, errorMessage, __LINE__);
-    LOG("Exiting %s -> void", __FUNCTION__);
+    LOG_VOID_RETURN();
 }
 
 void NdTestBase::InvalidateMW(HRESULT expectedResult, const char* errorMessage)
 {
-    LOG("Entering %s", __FUNCTION__);
+    LOG_ENTER();
     HRESULT hr;
     hr = m_pQp->Invalidate(nullptr, m_pMw, 0);
     LOG("IND2QueuePair::Invalidate -> %08X", hr);
     LogIfErrorExit(hr, expectedResult, errorMessage, __LINE__);
-    LOG("Exiting %s -> void", __FUNCTION__);
+    LOG_VOID_RETURN();
 }
 
 void NdTestBase::Bind(DWORD bufferLength, ULONG flags, void *context, HRESULT expectedResult, const char* errorMessage)
 {
-    LOG("Entering %s", __FUNCTION__);
+    LOG_ENTER();
     Bind(m_Buf, bufferLength, flags, context, expectedResult, errorMessage);
-    LOG("Exiting %s -> void", __FUNCTION__);
+    LOG_VOID_RETURN();
 }
 
 void NdTestBase::Bind(const void *pBuf, DWORD bufferLength, ULONG flags, void *context, HRESULT expectedResult, const char* errorMessage)
 {
-    LOG("Entering %s", __FUNCTION__);
+    LOG_ENTER();
 #pragma warning(suppress: 6001)
     HRESULT hr = m_pQp->Bind(context, m_pMr, m_pMw, pBuf, bufferLength, flags);
     LOG("IND2QueuePair::Bind -> %08X", hr);
     if (hr != ND_SUCCESS)
     {
+        LOG_ERROR_RETURN();
         LogErrorExit("Bind failed\n", __LINE__);
     }
 
@@ -178,14 +179,15 @@ void NdTestBase::Bind(const void *pBuf, DWORD bufferLength, ULONG flags, void *c
     LogIfErrorExit(ndRes.Status, expectedResult, errorMessage, -1);
     if (ndRes.Status == ND_SUCCESS && ndRes.RequestContext != context)
     {
+        LOG_ERROR_RETURN();
         LogErrorExit("Invalid context", __LINE__);
     }
-    LOG("Exiting %s -> void", __FUNCTION__);
+    LOG_VOID_RETURN();
 }
 
 void NdTestBase::CreateCQ(DWORD depth, HRESULT expectedResult, const char* errorMessage)
 {
-    LOG("Entering %s", __FUNCTION__);
+    LOG_ENTER();
     HRESULT hr = m_pAdapter->CreateCompletionQueue(
         IID_IND2CompletionQueue,
         m_hAdapterFile,
@@ -196,12 +198,12 @@ void NdTestBase::CreateCQ(DWORD depth, HRESULT expectedResult, const char* error
     );
     LOG("IND2Adapter::CreateCompletionQueue -> %08X", hr);
     LogIfErrorExit(hr, expectedResult, errorMessage, __LINE__);
-    LOG("Exiting %s -> void", __FUNCTION__);
+    LOG_VOID_RETURN();
 }
 
 void NdTestBase::CreateCQ(IND2CompletionQueue **pCq, DWORD depth, HRESULT expectedResult, const char* errorMessage)
 {
-    LOG("Entering %s", __FUNCTION__);
+    LOG_ENTER();
     HRESULT hr = m_pAdapter->CreateCompletionQueue(
         IID_IND2CompletionQueue,
         m_hAdapterFile,
@@ -212,12 +214,12 @@ void NdTestBase::CreateCQ(IND2CompletionQueue **pCq, DWORD depth, HRESULT expect
     );
     LOG("IND2Adapter::CreateCompletionQueue -> %08X", hr);
     LogIfErrorExit(hr, expectedResult, errorMessage, __LINE__);
-    LOG("Exiting %s -> void", __FUNCTION__);
+    LOG_VOID_RETURN();
 }
 
 void NdTestBase::CreateConnector(HRESULT expectedResult, const char* errorMessage)
 {
-    LOG("Entering %s", __FUNCTION__);
+    LOG_ENTER();
     HRESULT hr = m_pAdapter->CreateConnector(
         IID_IND2Connector,
         m_hAdapterFile,
@@ -225,13 +227,13 @@ void NdTestBase::CreateConnector(HRESULT expectedResult, const char* errorMessag
     );
     LOG("IND2Adapter::CreateConnector -> %08X", hr);
     LogIfErrorExit(hr, expectedResult, errorMessage, __LINE__);
-    LOG("Exiting %s -> void", __FUNCTION__);
+    LOG_VOID_RETURN();
 }
 
 void NdTestBase::CreateQueuePair(DWORD queueDepth, DWORD nSge, DWORD inlineDataSize,
     HRESULT expectedResult, const char* errorMessage)
 {
-    LOG("Entering %s", __FUNCTION__);
+    LOG_ENTER();
     HRESULT hr = m_pAdapter->CreateQueuePair(
         IID_IND2QueuePair,
         m_pCq,
@@ -246,7 +248,7 @@ void NdTestBase::CreateQueuePair(DWORD queueDepth, DWORD nSge, DWORD inlineDataS
     );
     LOG("IND2Adapter::CreateQueuePair -> %08X", hr);
     LogIfErrorExit(hr, expectedResult, errorMessage, __LINE__);
-    LOG("Exiting %s -> void", __FUNCTION__);
+    LOG_VOID_RETURN();
 }
 
 
@@ -258,8 +260,7 @@ void NdTestBase::CreateQueuePair(
     HRESULT expectedResult,
     const char* errorMessage)
 {
-    LOG("Entering %s", __FUNCTION__);
-
+    LOG_ENTER();
     HRESULT hr = m_pAdapter->CreateQueuePair(
         IID_IND2QueuePair,
         m_pCq,
@@ -275,12 +276,12 @@ void NdTestBase::CreateQueuePair(
     LOG("IND2Adapter::CreateQueuePair -> %08X", hr);
     LogIfErrorExit(hr, expectedResult, errorMessage, __LINE__);
     UNUSED(receiveQueueDepth);
-    LOG("Exiting %s -> void", __FUNCTION__);
+    LOG_VOID_RETURN();
 }
 
 void NdTestBase::Init(_In_ const struct sockaddr_in& v4Src)
 {
-    LOG("Entering %s", __FUNCTION__);
+    LOG_ENTER();
     HRESULT hr = NdOpenAdapter(
         IID_IND2Adapter,
         reinterpret_cast<const struct sockaddr*>(&v4Src),
@@ -289,12 +290,14 @@ void NdTestBase::Init(_In_ const struct sockaddr_in& v4Src)
     );
     if (FAILED(hr))
     {
+        LOG_ERROR_RETURN();
         LogErrorExit("Failed open adapter.\n", __LINE__);
     }
 
     m_Ov.hEvent = CreateEvent(nullptr, FALSE, FALSE, nullptr);
     if (m_Ov.hEvent == nullptr)
     {
+        LOG_ERROR_RETURN();
         LogErrorExit("Failed to allocate event for overlapped operations.\n", __LINE__);
     }
 
@@ -303,15 +306,16 @@ void NdTestBase::Init(_In_ const struct sockaddr_in& v4Src)
     LOG("IND2Adpater::CreateOverlappedFile -> %08X", hr);
     if (FAILED(hr))
     {
+        LOG_ERROR_RETURN();
         LogErrorExit(hr, "IND2Adapter::CreateOverlappedFile failed", __LINE__);
     }
-    LOG("Exiting %s -> void", __FUNCTION__);
+    LOG_VOID_RETURN();
 }
 
 
 void NdTestBase::GetAdapterInfo(ND2_ADAPTER_INFO *pAdapterInfo)
 {
-    LOG("Entering %s", __FUNCTION__);
+    LOG_ENTER();
     memset(pAdapterInfo, 0, sizeof(*pAdapterInfo));
     pAdapterInfo->InfoVersion = ND_VERSION_2;
     ULONG adapterInfoSize = sizeof(*pAdapterInfo);
@@ -319,9 +323,10 @@ void NdTestBase::GetAdapterInfo(ND2_ADAPTER_INFO *pAdapterInfo)
     LOG("IND2Adapter::Query -> %08X", hr);
     if (FAILED(hr))
     {
+        LOG_ERROR_RETURN();
         LogErrorExit(hr, "IND2Adapter::GetAdapterInfo failed", __LINE__);
     }
-    LOG("Exiting %s -> void", __FUNCTION__);
+    LOG_VOID_RETURN();
 }
 
 
@@ -333,7 +338,7 @@ DWORD NdTestBase::PrepareSge(
     ULONG headerSize,
     UINT32 memoryToken)
 {
-    LOG("Entering %s", __FUNCTION__);
+    LOG_ENTER();
     DWORD currSge = 0;
     ULONG buffIdx = 0;
     ULONG currLen = 0;
@@ -352,41 +357,41 @@ DWORD NdTestBase::PrepareSge(
     {
         pSge[currSge - 1].BufferLength += buffSize;
     }
-    LOG("Exiting %s -> %08X", __FUNCTION__, currSge);
+    LOG_ULONG_RETURN(currSge);
     return currSge;
 }
 
 void NdTestBase::DisconnectConnector()
 {
-    LOG("Entering %s", __FUNCTION__);
+    LOG_ENTER();
     if (m_pConnector != nullptr)
     {
         m_pConnector->Disconnect(&m_Ov);
     }
-    LOG("Exiting %s -> void", __FUNCTION__);
+    LOG_VOID_RETURN();
 }
 
 void NdTestBase::DeregisterMemory()
 {
-    LOG("Entering %s", __FUNCTION__);
+    LOG_ENTER();
     m_pMr->Deregister(&m_Ov);
-    LOG("Exiting %s -> void", __FUNCTION__);
+    LOG_VOID_RETURN();
 }
 
 void NdTestBase::GetResult(HRESULT expectedResult, const char* errorMessage)
 {
-    LOG("Entering %s", __FUNCTION__);
+    LOG_ENTER();
     HRESULT hr = m_pCq->GetOverlappedResult(&m_Ov, TRUE);
     LogIfErrorExit(hr, expectedResult, errorMessage, __LINE__);
-    LOG("Exiting %s -> void");
+    LOG_VOID_RETURN();
 }
 
 void NdTestBase::Shutdown()
 {
-    LOG("Entering %s", __FUNCTION__);
+    LOG_ENTER();
     NdTestBase::DisconnectConnector();
     NdTestBase::DeregisterMemory();
-    LOG("Exiting %s -> void", __FUNCTION__);
+    LOG_VOID_RETURN();
 }
 
 void NdTestBase::PostReceive(
@@ -396,11 +401,11 @@ void NdTestBase::PostReceive(
     HRESULT expectedResult,
     const char* errorMessage)
 {
-    LOG("Entering %s", __FUNCTION__);
+    LOG_ENTER();
     HRESULT hr = m_pQp->Receive(requestContext, Sge, nSge);
     LOG("IND2QueuePair::Receive -> %08X", hr);
     LogIfErrorExit(hr, expectedResult, errorMessage, __LINE__);
-    LOG("Exiting %s -> void", __FUNCTION__);
+    LOG_VOID_RETURN();
 }
 
 void NdTestBase::Write(
@@ -413,14 +418,12 @@ void NdTestBase::Write(
     HRESULT expectedResult,
     const char* errorMessage)
 {
-    LOG("Entering %s", __FUNCTION__);
-
+    LOG_ENTER();
     HRESULT hr;
     hr = m_pQp->Write(requestContext, Sge, nSge, remoteAddress, remoteToken, flag);
     LOG("IND2QueuePair::Write -> %08X", hr);
     LogIfErrorExit(hr, expectedResult, errorMessage, __LINE__);
-
-    LOG("Exiting %s -> void", __FUNCTION__);
+    LOG_VOID_RETURN();
 }
 
 void NdTestBase::Read(
@@ -433,14 +436,12 @@ void NdTestBase::Read(
     HRESULT expectedResult,
     const char* errorMessage)
 {
-    LOG("Entering %s", __FUNCTION__);
-
+    LOG_ENTER();
     HRESULT hr;
     hr = m_pQp->Read(requestContext, Sge, nSge, remoteAddress, remoteToken, flag);
     LOG("IND2QueuePair::Read -> %08X", hr);
     LogIfErrorExit(hr, expectedResult, errorMessage, __LINE__);
-
-    LOG("Exiting %s -> void", __FUNCTION__);
+    LOG_VOID_RETURN();
 }
 
 void NdTestBase::Send(
@@ -451,11 +452,11 @@ void NdTestBase::Send(
     HRESULT expectedResult,
     const char* errorMessage)
 {
-    LOG("Entering %s", __FUNCTION__);
+    LOG_ENTER();
     HRESULT hr = m_pQp->Send(requestContext, Sge, nSge, flags);
     LOG("IND2QueuePair::Send -> %08X", hr);
     LogIfErrorExit(hr, expectedResult, errorMessage, __LINE__);
-    LOG("Exiting %s -> void", __FUNCTION__);
+    LOG_VOID_RETURN();
 }
 
 void NdTestBase::Send(
@@ -466,8 +467,7 @@ void NdTestBase::Send(
     void* requestContext,
     const char* errorMessage)
 {
-    LOG("Entering %s", __FUNCTION__);
-
+    LOG_ENTER();
     HRESULT hr = m_pQp->Send(requestContext, Sge, nSge, flags);
     LOG("IND2QueuePair::Send -> %08X", hr);
 
@@ -479,13 +479,12 @@ void NdTestBase::Send(
     {
         LogErrorExit(hr, errorMessage, __LINE__);
     }
-    LOG("Exiting %s -> void", __FUNCTION__);
+    LOG_VOID_RETURN();
 }
 
 void NdTestBase::WaitForEventNotification()
 {
-    LOG("Entering %s", __FUNCTION__);
-
+    LOG_ENTER();
     HRESULT hr = m_pCq->Notify(ND_CQ_NOTIFY_ANY, &m_Ov);
     LOG("IND2QueuePaor::Notify -> %08X", hr);
     if (hr == ND_PENDING)
@@ -493,15 +492,14 @@ void NdTestBase::WaitForEventNotification()
         hr = m_pCq->GetOverlappedResult(&m_Ov, TRUE);
         LOG("IND2QueuePair::GetOverlappedResult -> %08X");
     }
-    LOG("Exiting %s -> void", __FUNCTION__);
+    LOG_VOID_RETURN();
 }
 
 void NdTestBase::WaitForCompletion(
     const std::function<void(ND2_RESULT *)>& processCompletionFn,
     bool bBlocking)
 {
-    LOG("Entering %s", __FUNCTION__);
-
+    LOG_ENTER();
     for (;;)
     {
         ND2_RESULT ndRes;
@@ -517,14 +515,13 @@ void NdTestBase::WaitForCompletion(
             WaitForEventNotification();
         }
     };
-    LOG("Exiting %s -> void", __FUNCTION__);
+    LOG_VOID_RETURN();
 }
 
 // wait for CQ entry and check context
 void NdTestBase::WaitForCompletionAndCheckContext(void *expectedContext)
 {
-    LOG("Entering %s", __FUNCTION__);
-
+    LOG_ENTER();
     WaitForCompletion([&expectedContext](ND2_RESULT *pComp)
     {
         if (ND_SUCCESS != pComp->Status)
@@ -533,47 +530,41 @@ void NdTestBase::WaitForCompletionAndCheckContext(void *expectedContext)
         }
         if (expectedContext != pComp->RequestContext)
         {
+            LOG_ERROR_RETURN();
             LogErrorExit("Unexpected completion\n", __LINE__);
         }
     }, true);
-
-    LOG("Exiting %s -> void", __FUNCTION__);
+    LOG_VOID_RETURN();
 }
 
 // wait for CQ entry and get the result
 void NdTestBase::WaitForCompletion(ND2_RESULT *pResult, bool bBlocking)
 {
-    LOG("Entering %s", __FUNCTION__);
-
+    LOG_ENTER();
     WaitForCompletion([&pResult](ND2_RESULT *pCompRes)
     {
         *pResult = *pCompRes;
     }, bBlocking);
-
-    LOG("Exiting %s -> void", __FUNCTION__);
+    LOG_VOID_RETURN();
 }
 
 // wait for CQ entry
 void NdTestBase::WaitForCompletion(HRESULT expectedResult, const char* errorMessage)
 {
-    LOG("Entering %s", __FUNCTION__);
-
+    LOG_ENTER();
     ND2_RESULT ndRes;
     WaitForCompletion(&ndRes, true);
     LogIfErrorExit(ndRes.Status, expectedResult, errorMessage, __LINE__);
-
-    LOG("Exiting %s -> void", __FUNCTION__);
+    LOG_VOID_RETURN();
 }
 
 void NdTestBase::FlushQP(HRESULT expectedResult, const char* errorMessage)
 {
-    LOG("Entering %s", __FUNCTION__);
-
+    LOG_ENTER();
     HRESULT hr = m_pQp->Flush();
     LOG("IND2QueuePair::Flush -> %08X", hr);
     LogIfErrorExit(hr, expectedResult, errorMessage, __LINE__);
-
-    LOG("Exiting %s -> void", __FUNCTION__);
+    LOG_VOID_RETURN();
 }
 
 void NdTestBase::Reject(
@@ -582,36 +573,32 @@ void NdTestBase::Reject(
     HRESULT expectedResult,
     const char* errorMessage)
 {
-    LOG("Entering %s", __FUNCTION__);
-
+    LOG_ENTER();
     HRESULT hr = m_pConnector->Reject(pPrivateData, cbPrivateData);
     LOG("IND2Connector::Reject -> %08X", hr);
     LogIfErrorExit(hr, expectedResult, errorMessage, __LINE__);
-    LOG("Exiting %s -> void", __FUNCTION__);
+    LOG_VOID_RETURN();
 }
 NdTestServerBase::NdTestServerBase() :
     m_pListen(nullptr)
 {
-    LOG("Entering %s", __FUNCTION__);
-    LOG("Exiting %s -> void", __FUNCTION__);
+    LOG_ENTER();
+    LOG_VOID_RETURN();
 }
 
 NdTestServerBase::~NdTestServerBase()
 {
-    LOG("Entering %s", __FUNCTION__);
-
+    LOG_ENTER();
     if (m_pListen != nullptr)
     {
         m_pListen->Release();
     }
-
-    LOG("Exiting %s -> void", __FUNCTION__);
+    LOG_VOID_RETURN();
 }
 
 void NdTestServerBase::CreateListener(HRESULT expectedResult, const char* errorMessage)
 {
-    LOG("Entering %s", __FUNCTION__);
-
+    LOG_ENTER();
     HRESULT hr = m_pAdapter->CreateListener(
         IID_IND2Listener,
         m_hAdapterFile,
@@ -619,7 +606,7 @@ void NdTestServerBase::CreateListener(HRESULT expectedResult, const char* errorM
     );
     LOG("IND2Adapter::CreateListener -> %08X", hr);
     LogIfErrorExit(hr, expectedResult, errorMessage, __LINE__);
-    LOG("Exiting %s -> void", __FUNCTION__);
+    LOG_VOID_RETURN();
 }
 
 void NdTestServerBase::Listen(
@@ -627,8 +614,7 @@ void NdTestServerBase::Listen(
     HRESULT expectedResult,
     const char* errorMessage)
 {
-    LOG("Entering %s", __FUNCTION__);
-
+    LOG_ENTER();
     HRESULT hr = m_pListen->Bind(
         reinterpret_cast<const sockaddr*>(&v4Src),
         sizeof(v4Src)
@@ -638,14 +624,12 @@ void NdTestServerBase::Listen(
     hr = m_pListen->Listen(0);
     LOG("IND2Listner::Listen -> %08X", hr);
     LogIfErrorExit(hr, expectedResult, errorMessage, __LINE__);
-
-    LOG("Exiting %s -> void", __FUNCTION__);
+    LOG_VOID_RETURN();
 }
 
 void NdTestServerBase::GetConnectionRequest(HRESULT expectedResult, const char* errorMessage)
 {
-    LOG("Entering %s", __FUNCTION__);
-
+    LOG_ENTER();
     HRESULT hr = m_pListen->GetConnectionRequest(m_pConnector, &m_Ov);
     LOG("IND2Listener::GetConnectionRequest -> %08X", hr);
     if (hr == ND_PENDING)
@@ -654,7 +638,7 @@ void NdTestServerBase::GetConnectionRequest(HRESULT expectedResult, const char* 
         LOG("IND2Listener::GetOverlappedResult -> %08X", hr);
     }
     LogIfErrorExit(hr, expectedResult, errorMessage, __LINE__);
-    LOG("Exiting %s -> void", __FUNCTION__);
+    LOG_VOID_RETURN();
 }
 
 void NdTestServerBase::Accept(
@@ -665,8 +649,7 @@ void NdTestServerBase::Accept(
     HRESULT expectedResult,
     const char* errorMessage)
 {
-    LOG("Entering %s", __FUNCTION__);
-
+    LOG_ENTER();
     //
     // Accept the connection.
     //
@@ -685,8 +668,7 @@ void NdTestServerBase::Accept(
         LOG("IND2Connector::GetOverlappedResult -> %08X", hr);
     }
     LogIfErrorExit(hr, expectedResult, errorMessage, __LINE__);
-
-    LOG("Exiting %s -> void", __FUNCTION__);
+    LOG_VOID_RETURN();
 }
 
 
@@ -703,8 +685,7 @@ void NdTestClientBase::Connect(
     HRESULT expectedResult,
     const char* errorMessage)
 {
-    LOG("Entering %s", __FUNCTION__);
-
+    LOG_ENTER();
     HRESULT hr = m_pConnector->Bind(
         reinterpret_cast<const sockaddr*>(&v4Src),
         sizeof(v4Src)
@@ -733,7 +714,7 @@ void NdTestClientBase::Connect(
         LOG("IND2Connector::GetOverlappedResult -> %08X", hr);
     }
     LogIfErrorExit(hr, expectedResult, errorMessage, __LINE__);
-    LOG("Exiting %s -> void", __FUNCTION__);
+    LOG_VOID_RETURN();
 }
 
 //
@@ -741,8 +722,7 @@ void NdTestClientBase::Connect(
 //
 void NdTestClientBase::CompleteConnect(HRESULT expectedResult, const char* errorMessage)
 {
-    LOG("Entering %s", __FUNCTION__);
-
+    LOG_ENTER();
     HRESULT hr = m_pConnector->CompleteConnect(&m_Ov);
     LOG("IND2Connector::CompleteConnect -> %08X");
     if (hr == ND_PENDING)
@@ -751,6 +731,5 @@ void NdTestClientBase::CompleteConnect(HRESULT expectedResult, const char* error
         LOG("IND2Connector::GetOverlappedResult -> %08X");
     }
     LogIfErrorExit(hr, expectedResult, errorMessage, __LINE__);
-
-    LOG("Exiting %s -> void", __FUNCTION__);
+    LOG_VOID_RETURN();
 }
