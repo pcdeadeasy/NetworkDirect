@@ -83,6 +83,7 @@ void NdTestBase::CreateMR(HRESULT expectedResult, const char* errorMessage)
     );
     LOG("IND2Adapter::CreateMemoryRegion -> %08X", hr);
 
+    LOG_ERROR_UNEQUAL(hr, expectedResult);
     LogIfErrorExit(hr, expectedResult, errorMessage, __LINE__);
     LOG_VOID_RETURN();
 }
@@ -128,6 +129,7 @@ void NdTestBase::RegisterDataBuffer(
         hr = m_pMr->GetOverlappedResult(&m_Ov, TRUE);
         LOG("IND2MemoryRegion::GetOverlappedResult -> %08X", hr);
     }
+    LOG_ERROR_UNEQUAL(hr, expectedResult);
     LogIfErrorExit(hr, expectedResult, errorMessage, __LINE__);
     LOG_VOID_RETURN();
 }
@@ -141,6 +143,7 @@ void NdTestBase::CreateMW(HRESULT expectedResult, const char* errorMessage)
     );
     LOG("IND2Adapter::CreateMemoryWindow -> %08X", hr);
 
+    LOG_ERROR_UNEQUAL(hr, expectedResult);
     LogIfErrorExit(hr, expectedResult, errorMessage, __LINE__);
     LOG_VOID_RETURN();
 }
@@ -151,6 +154,7 @@ void NdTestBase::InvalidateMW(HRESULT expectedResult, const char* errorMessage)
     HRESULT hr;
     hr = m_pQp->Invalidate(nullptr, m_pMw, 0);
     LOG("IND2QueuePair::Invalidate -> %08X", hr);
+    LOG_ERROR_UNEQUAL(hr, expectedResult);
     LogIfErrorExit(hr, expectedResult, errorMessage, __LINE__);
     LOG_VOID_RETURN();
 }
@@ -176,6 +180,7 @@ void NdTestBase::Bind(const void *pBuf, DWORD bufferLength, ULONG flags, void *c
 
     ND2_RESULT ndRes;
     NdTestBase::WaitForCompletion(&ndRes);
+    LOG_ERROR_UNEQUAL(hr, expectedResult);
     LogIfErrorExit(ndRes.Status, expectedResult, errorMessage, -1);
     if (ndRes.Status == ND_SUCCESS && ndRes.RequestContext != context)
     {
@@ -197,6 +202,7 @@ void NdTestBase::CreateCQ(DWORD depth, HRESULT expectedResult, const char* error
         reinterpret_cast<VOID**>(&m_pCq)
     );
     LOG("IND2Adapter::CreateCompletionQueue -> %08X", hr);
+    LOG_ERROR_UNEQUAL(hr, expectedResult);
     LogIfErrorExit(hr, expectedResult, errorMessage, __LINE__);
     LOG_VOID_RETURN();
 }
@@ -213,6 +219,7 @@ void NdTestBase::CreateCQ(IND2CompletionQueue **pCq, DWORD depth, HRESULT expect
         reinterpret_cast<VOID**>(pCq)
     );
     LOG("IND2Adapter::CreateCompletionQueue -> %08X", hr);
+    LOG_ERROR_UNEQUAL(hr, expectedResult);
     LogIfErrorExit(hr, expectedResult, errorMessage, __LINE__);
     LOG_VOID_RETURN();
 }
@@ -226,6 +233,7 @@ void NdTestBase::CreateConnector(HRESULT expectedResult, const char* errorMessag
         reinterpret_cast<VOID**>(&m_pConnector)
     );
     LOG("IND2Adapter::CreateConnector -> %08X", hr);
+    LOG_ERROR_UNEQUAL(hr, expectedResult);
     LogIfErrorExit(hr, expectedResult, errorMessage, __LINE__);
     LOG_VOID_RETURN();
 }
@@ -247,6 +255,7 @@ void NdTestBase::CreateQueuePair(DWORD queueDepth, DWORD nSge, DWORD inlineDataS
         reinterpret_cast<VOID**>(&m_pQp)
     );
     LOG("IND2Adapter::CreateQueuePair -> %08X", hr);
+    LOG_ERROR_UNEQUAL(hr, expectedResult);
     LogIfErrorExit(hr, expectedResult, errorMessage, __LINE__);
     LOG_VOID_RETURN();
 }
@@ -274,6 +283,7 @@ void NdTestBase::CreateQueuePair(
         reinterpret_cast<VOID**>(&m_pQp)
     );
     LOG("IND2Adapter::CreateQueuePair -> %08X", hr);
+    LOG_ERROR_UNEQUAL(hr, expectedResult);
     LogIfErrorExit(hr, expectedResult, errorMessage, __LINE__);
     UNUSED(receiveQueueDepth);
     LOG_VOID_RETURN();
@@ -382,6 +392,7 @@ void NdTestBase::GetResult(HRESULT expectedResult, const char* errorMessage)
 {
     LOG_ENTER();
     HRESULT hr = m_pCq->GetOverlappedResult(&m_Ov, TRUE);
+    LOG_ERROR_UNEQUAL(hr, expectedResult);
     LogIfErrorExit(hr, expectedResult, errorMessage, __LINE__);
     LOG_VOID_RETURN();
 }
@@ -404,6 +415,7 @@ void NdTestBase::PostReceive(
     LOG_ENTER();
     HRESULT hr = m_pQp->Receive(requestContext, Sge, nSge);
     LOG("IND2QueuePair::Receive -> %08X", hr);
+    LOG_ERROR_UNEQUAL(hr, expectedResult);
     LogIfErrorExit(hr, expectedResult, errorMessage, __LINE__);
     LOG_VOID_RETURN();
 }
@@ -422,6 +434,7 @@ void NdTestBase::Write(
     HRESULT hr;
     hr = m_pQp->Write(requestContext, Sge, nSge, remoteAddress, remoteToken, flag);
     LOG("IND2QueuePair::Write -> %08X", hr);
+    LOG_ERROR_UNEQUAL(hr, expectedResult);
     LogIfErrorExit(hr, expectedResult, errorMessage, __LINE__);
     LOG_VOID_RETURN();
 }
@@ -440,6 +453,7 @@ void NdTestBase::Read(
     HRESULT hr;
     hr = m_pQp->Read(requestContext, Sge, nSge, remoteAddress, remoteToken, flag);
     LOG("IND2QueuePair::Read -> %08X", hr);
+    LOG_ERROR_UNEQUAL(hr, expectedResult);
     LogIfErrorExit(hr, expectedResult, errorMessage, __LINE__);
     LOG_VOID_RETURN();
 }
@@ -455,6 +469,7 @@ void NdTestBase::Send(
     LOG_ENTER();
     HRESULT hr = m_pQp->Send(requestContext, Sge, nSge, flags);
     LOG("IND2QueuePair::Send -> %08X", hr);
+    LOG_ERROR_UNEQUAL(hr, expectedResult);
     LogIfErrorExit(hr, expectedResult, errorMessage, __LINE__);
     LOG_VOID_RETURN();
 }
@@ -473,10 +488,12 @@ void NdTestBase::Send(
 
     if (expectFail && !FAILED(hr))
     {
+        LOG_ERROR_RETURN();
         LogErrorExit(hr, errorMessage, __LINE__);
     }
     else if (!expectFail && FAILED(hr))
     {
+        LOG_ERROR_RETURN();
         LogErrorExit(hr, errorMessage, __LINE__);
     }
     LOG_VOID_RETURN();
@@ -526,6 +543,7 @@ void NdTestBase::WaitForCompletionAndCheckContext(void *expectedContext)
     {
         if (ND_SUCCESS != pComp->Status)
         {
+            LOG_ERROR_UNEQUAL(pComp->Status, ND_SUCCESS);
             LogIfErrorExit(pComp->Status, ND_SUCCESS, "Unexpected completion status", __LINE__);
         }
         if (expectedContext != pComp->RequestContext)
@@ -554,6 +572,8 @@ void NdTestBase::WaitForCompletion(HRESULT expectedResult, const char* errorMess
     LOG_ENTER();
     ND2_RESULT ndRes;
     WaitForCompletion(&ndRes, true);
+    if (ndRes.Status != expectedResult) LOG_ERROR_RETURN();
+    LOG_ERROR_UNEQUAL(ndRes.Status, expectedResult);
     LogIfErrorExit(ndRes.Status, expectedResult, errorMessage, __LINE__);
     LOG_VOID_RETURN();
 }
@@ -563,6 +583,7 @@ void NdTestBase::FlushQP(HRESULT expectedResult, const char* errorMessage)
     LOG_ENTER();
     HRESULT hr = m_pQp->Flush();
     LOG("IND2QueuePair::Flush -> %08X", hr);
+    LOG_ERROR_UNEQUAL(hr, expectedResult);
     LogIfErrorExit(hr, expectedResult, errorMessage, __LINE__);
     LOG_VOID_RETURN();
 }
@@ -576,6 +597,7 @@ void NdTestBase::Reject(
     LOG_ENTER();
     HRESULT hr = m_pConnector->Reject(pPrivateData, cbPrivateData);
     LOG("IND2Connector::Reject -> %08X", hr);
+    LOG_ERROR_UNEQUAL(hr, expectedResult);
     LogIfErrorExit(hr, expectedResult, errorMessage, __LINE__);
     LOG_VOID_RETURN();
 }
@@ -605,6 +627,7 @@ void NdTestServerBase::CreateListener(HRESULT expectedResult, const char* errorM
         reinterpret_cast<VOID**>(&m_pListen)
     );
     LOG("IND2Adapter::CreateListener -> %08X", hr);
+    LOG_ERROR_UNEQUAL(hr, expectedResult);
     LogIfErrorExit(hr, expectedResult, errorMessage, __LINE__);
     LOG_VOID_RETURN();
 }
@@ -620,9 +643,11 @@ void NdTestServerBase::Listen(
         sizeof(v4Src)
     );
     LOG("IND2Listener::Bind -> %08X", hr);
+    LOG_ERROR_UNEQUAL(hr, expectedResult);
     LogIfErrorExit(hr, expectedResult, "Bind failed", __LINE__);
     hr = m_pListen->Listen(0);
     LOG("IND2Listner::Listen -> %08X", hr);
+    LOG_ERROR_UNEQUAL(hr, expectedResult);
     LogIfErrorExit(hr, expectedResult, errorMessage, __LINE__);
     LOG_VOID_RETURN();
 }
@@ -637,6 +662,7 @@ void NdTestServerBase::GetConnectionRequest(HRESULT expectedResult, const char* 
         hr = m_pListen->GetOverlappedResult(&m_Ov, TRUE);
         LOG("IND2Listener::GetOverlappedResult -> %08X", hr);
     }
+    LOG_ERROR_UNEQUAL(hr, expectedResult);
     LogIfErrorExit(hr, expectedResult, errorMessage, __LINE__);
     LOG_VOID_RETURN();
 }
@@ -667,6 +693,7 @@ void NdTestServerBase::Accept(
         hr = m_pConnector->GetOverlappedResult(&m_Ov, TRUE);
         LOG("IND2Connector::GetOverlappedResult -> %08X", hr);
     }
+    LOG_ERROR_UNEQUAL(hr, expectedResult);
     LogIfErrorExit(hr, expectedResult, errorMessage, __LINE__);
     LOG_VOID_RETURN();
 }
@@ -713,6 +740,7 @@ void NdTestClientBase::Connect(
         hr = m_pConnector->GetOverlappedResult(&m_Ov, TRUE);
         LOG("IND2Connector::GetOverlappedResult -> %08X", hr);
     }
+    LOG_ERROR_UNEQUAL(hr, expectedResult);
     LogIfErrorExit(hr, expectedResult, errorMessage, __LINE__);
     LOG_VOID_RETURN();
 }
@@ -730,6 +758,7 @@ void NdTestClientBase::CompleteConnect(HRESULT expectedResult, const char* error
         hr = m_pConnector->GetOverlappedResult(&m_Ov, TRUE);
         LOG("IND2Connector::GetOverlappedResult -> %08X");
     }
+    LOG_ERROR_UNEQUAL(hr, expectedResult);
     LogIfErrorExit(hr, expectedResult, errorMessage, __LINE__);
     LOG_VOID_RETURN();
 }

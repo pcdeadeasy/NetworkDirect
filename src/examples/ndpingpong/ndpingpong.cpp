@@ -138,6 +138,7 @@ public:
         bool bCancelled = false;
         const std::function<void(ND2_RESULT *)> processCompletionFn = [&bCancelled](ND2_RESULT *pComp)
         {
+            LOG("Entering Pong.processCompletionFn");
             if (pComp->Status == ND_SUCCESS)
             {
                 *(reinterpret_cast<bool *>(pComp->RequestContext)) = true;
@@ -148,9 +149,11 @@ public:
             }
             else
             {
+                LOG("Exiting Pong.processCompletionFn");
                 LOG_VOID_RETURN();
                 LOG_FAILURE_HRESULT_AND_EXIT(pComp->Status, L"unexpected event: %08x\n", __LINE__);
             }
+            LOG("Exiting Pong.processCompletionFn");
         };
 
         for (DWORD i = 0; i < nIters; i++)
@@ -310,6 +313,7 @@ public:
         bool bCancelled = false;
         const std::function<void(ND2_RESULT *)> processCompletionFn = [&bCancelled](ND2_RESULT *pComp)
         {
+            LOG("Entering Ping.proccessCompletionFn");
             if (pComp->Status == ND_SUCCESS)
             {
                 *(reinterpret_cast<bool *>(pComp->RequestContext)) = true;
@@ -320,9 +324,11 @@ public:
             }
             else
             {
+                LOG("Exiting Ping.processCompletionFn");
                 LOG_VOID_RETURN();
                 LOG_FAILURE_HRESULT_AND_EXIT(pComp->Status, L"unexpected event: %08x\n", __LINE__);
             }
+            LOG("Exiting Ping.processCompletionFn");
         };
 
         for (DWORD i = 0; i < nIters; i++)

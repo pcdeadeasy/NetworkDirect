@@ -62,4 +62,5 @@ public:
 #define LOG_INT_RETURN(_i) LOG_RETURN("%d", _i)
 #define LOG_SIZET_RETURN(_zu) LOG_RETURN("%zu", _zu)
 #define LOG_ERROR_RETURN() LOG_RETURN("%s", "Error")
+#define LOG_ERROR_UNEQUAL(_a, _b) if (_a != _b) LOG_ERROR_RETURN()
 #define LOG_BOOLEAN_RETURN(_b) LOG_RETURN("%s", _b ? "true" : "false")
