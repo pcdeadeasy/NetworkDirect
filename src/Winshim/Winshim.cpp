@@ -251,6 +251,7 @@ void Win::FreeLibrary(HMODULE hModule)
   }
 }
 
+
 DWORD Win::ExpandEnvironmentStringsW(LPCWSTR src, LPWSTR dst, DWORD dstCount) 
 {
   if (src == NULL) 
@@ -289,4 +290,81 @@ FARPROC Win::GetProcAddress(HMODULE hModule, LPCSTR  lpProcName)
     throw Win::Error();
   }
   return ans;
+}
+
+HANDLE Win::CreateFileA(
+    LPCSTR                lpFileName,
+    DWORD                 dwDesiredAccess,
+    DWORD                 dwShareMode,
+    LPSECURITY_ATTRIBUTES lpSecurityAttributes,
+    DWORD                 dwCreationDisposition,
+    DWORD                 dwFlagsAndAttributes,
+    HANDLE                hTemplateFile
+)
+{
+    HANDLE ans = ::CreateFileA(lpFileName, dwDesiredAccess, dwShareMode, lpSecurityAttributes, dwCreationDisposition, dwFlagsAndAttributes, hTemplateFile);
+    LOG("CreateFileA \"%s\" %08X %08X %p %08X %08X %p -> %p", lpFileName, dwDesiredAccess, dwShareMode, lpSecurityAttributes, dwCreationDisposition, dwFlagsAndAttributes, hTemplateFile, ans);
+    if (ans == INVALID_HANDLE_VALUE)
+    {
+        LOG_LAST_ERROR();
+        throw Win::Error();
+    }
+    return ans;
+}
+
+BOOL Win::CloseHandle(HANDLE hObject)
+{
+    BOOL ans = ::CloseHandle(hObject);
+    LOG("CloseHandle %p -> %d", hObject, ans);
+    return ans;
+}
+
+void Win::ReadFileEx(
+    HANDLE                          hFile,
+    LPVOID                          lpBuffer,
+    DWORD                           nNumberOfBytesToRead,
+    LPOVERLAPPED                    lpOverlapped,
+    LPOVERLAPPED_COMPLETION_ROUTINE lpCompletionRoutine
+)
+{
+    BOOL rc = ::ReadFileEx(hFile, lpBuffer, nNumberOfBytesToRead, lpOverlapped, lpCompletionRoutine);
+    LOG("ReadFileEx %p %p %08X %p %p -> %d", hFile, lpBuffer, nNumberOfBytesToRead, lpOverlapped, lpCompletionRoutine, rc);
+    if (rc == FALSE)
+    {
+        LOG_LAST_ERROR();
+        throw Win::Error();
+    }
+}
+
+void Win::ReadFile(
+    HANDLE       hFile,
+    LPVOID       lpBuffer,
+    DWORD        nNumberOfBytesToRead,
+    LPDWORD      lpNumberOfBytesRead,
+    LPOVERLAPPED lpOverlapped
+)
+{
+    BOOL rc = ::ReadFile(hFile, lpBuffer, nNumberOfBytesToRead, lpNumberOfBytesRead, lpOverlapped);
+    LOG("ReadFile %p %p %08X %p %p -> %d", hFile, lpBuffer, nNumberOfBytesToRead, lpNumberOfBytesRead, lpOverlapped, rc);
+    if (rc == FALSE)
+    {
+        LOG_LAST_ERROR();
+        throw Win::Error();
+    }
+}
+
+
+size_t Win::GetFileSize(HANDLE hFile)
+{
+    size_t ans = 0;
+    LARGE_INTEGER FileSize = { 0 };
+    BOOL b = ::GetFileSizeEx(hFile, &FileSize);
+    ans = (size_t)FileSize.QuadPart;
+    LOG("GetFileSize %p -> %d", hFile, b);
+    if (b == FALSE)
+    {
+        LOG_LAST_ERROR();
+        throw Win::Error();
+    }
+    return ans;
 }

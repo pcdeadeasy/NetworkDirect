@@ -23,7 +23,7 @@ void print_provider_id(const WSAPROTOCOL_INFOW *pInfo);
 int main()
 {
     LOG_ENTER();
-    CWsa wsa;
+    WSA wsa;
     WSAPROTOCOL_INFOW infos[N_PROTOCOLS] = { 0 };
 
     int ErrorNo = 0;

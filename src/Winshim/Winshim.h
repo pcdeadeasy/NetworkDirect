@@ -206,6 +206,45 @@ public:
     HMODULE hModule,
     LPCSTR  lpProcName
   );
+
+    /**
+    @fn CreateFileA
+    @brief Creates or opens a file
+    */
+    static HANDLE CreateFileA(
+      LPCSTR                lpFileName,
+      DWORD                 dwDesiredAccess,
+      DWORD                 dwShareMode,
+      LPSECURITY_ATTRIBUTES lpSecurityAttributes,
+      DWORD                 dwCreationDisposition,
+      DWORD                 dwFlagsAndAttributes,
+      HANDLE                hTemplateFile
+    );
+
+    /**
+    @fn CloseHandle
+    @brief Closes an open object handle
+    */
+    static BOOL CloseHandle(
+        HANDLE hObject
+    );
+
+    static void ReadFileEx(
+        HANDLE                          hFile,
+        LPVOID                          lpBuffer,
+        DWORD                           nNumberOfBytesToRead,
+        LPOVERLAPPED                    lpOverlapped,
+        LPOVERLAPPED_COMPLETION_ROUTINE lpCompletionRoutine
+    );
+
+    static void ReadFile(
+        HANDLE       hFile,
+        LPVOID       lpBuffer,
+        DWORD        nNumberOfBytesToRead,
+        LPDWORD      lpNumberOfBytesRead,
+        LPOVERLAPPED lpOverlapped
+    );
+    static size_t GetFileSize(HANDLE hFile);
 };
 
 /**
@@ -227,15 +266,15 @@ public:
 /**
 * @brief Makes sure Windows socket support is enabled and destroyed
 **/
-class CWsa 
+class WSA 
 {
 public:
-  CWsa() 
+  WSA() 
   {
     WSADATA data;
     Win::WSAStartup(MAKEWORD(2, 2), &data);
   }
-  ~CWsa() 
+  ~WSA() 
   {
     Win::WSACleanup();
   }

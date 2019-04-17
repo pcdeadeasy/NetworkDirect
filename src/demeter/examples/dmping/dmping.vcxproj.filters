@@ -15,31 +15,33 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="stdafx.h">
+    <ClInclude Include="pch.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="targetver.h">
+    <ClInclude Include="json.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Winshim.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="error_strings.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="WinHeap.h">
+    <ClInclude Include="Args.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="stdafx.cpp">
+    <ClCompile Include="pch.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Winshim.cpp">
+    <ClCompile Include="dmping.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="error_strings.cpp">
+    <ClCompile Include="json.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Args.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="test.json">
+      <Filter>Source Files</Filter>
+    </None>
   </ItemGroup>
 </Project>
