@@ -21,7 +21,7 @@
     <ClInclude Include="json.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Args.h">
+    <ClInclude Include="csv.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -35,13 +35,8 @@
     <ClCompile Include="json.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Args.cpp">
+    <ClCompile Include="csv.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="test.json">
-      <Filter>Source Files</Filter>
-    </None>
   </ItemGroup>
 </Project>

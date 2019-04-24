@@ -54,7 +54,8 @@ public:
      **/
     void Free(DWORD flags, void* pv) 
     {
-        Win::HeapFree(m_h, flags, pv);
+        if (pv)
+            Win::HeapFree(m_h, flags, pv);
     }
 
     /**
@@ -91,17 +92,27 @@ public:
   into the buffer object. Reallocation of memory is supported too.
  */
 template<typename T> class BUFFER {
-    HEAP* const m_heap;
+    HEAP* m_heap;
     size_t m_count; // count of objects in buffer
     size_t m_size;  // in bytes
     void* m_pv;     // pointer to object
-    BUFFER() = delete;
 
 public:
 
+    BUFFER() : m_heap(0), m_count(0), m_size(0), m_pv(0)
+    {}
+
     ~BUFFER() 
     {
-        m_heap->Free(0, m_pv);
+        destroy();
+    }
+
+    void destroy()
+    {
+        if (m_heap)
+        {
+            m_heap->Free(0, m_pv);
+        }
     }
 
     /**
@@ -113,6 +124,14 @@ public:
         m_size(count * sizeof(T)), 
         m_pv(heap->Alloc(flags, m_size)) 
     { }
+
+    void Init(HEAP* heap, DWORD flags, SIZE_T count)
+    {
+        m_heap = heap;
+        m_count = count;
+        m_size = count * sizeof(T);
+        m_pv = heap->Alloc(flags, m_size);
+    }
 
     /**
      * \brief Returns the address of the start of the array of objects of type T

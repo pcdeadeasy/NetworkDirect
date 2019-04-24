@@ -152,12 +152,12 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="Args.h" />
+    <ClInclude Include="csv.h" />
     <ClInclude Include="json.h" />
     <ClInclude Include="pch.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Args.cpp" />
+    <ClCompile Include="csv.cpp" />
     <ClCompile Include="dmping.cpp" />
     <ClCompile Include="json.c">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
@@ -182,9 +182,6 @@
     <ProjectReference Include="..\..\..\Winshim\Winshim.vcxproj">
       <Project>{75037cb5-0e8a-4d18-94c1-6a506452a9d4}</Project>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="test.json" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

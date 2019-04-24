@@ -70,6 +70,27 @@ int Win::WSACleanup()
   return ans;
 }
 
+int Win::WSAStringToAddressA(
+    LPSTR AddressString,
+    INT AddressFamily,
+    LPWSAPROTOCOL_INFOA lpProtocolInfo,
+    LPSOCKADDR lpAddress,
+    LPINT lpAddressLength
+)
+{
+#pragma warning(disable : 4996) // WSAStringToAddressA has been deprecated for the unicode version; disable the warning
+    int const ans = ::WSAStringToAddressA(AddressString, AddressFamily, lpProtocolInfo, lpAddress, lpAddressLength);
+#pragma warning(enable : 4996)
+    LOG("WSAStringToAddressA \"%s\" %d %p %p %p -> %d", AddressString, AddressFamily, lpProtocolInfo, lpAddress, lpAddressLength, ans);
+    if (ans != 0)
+    {
+        LOG_LAST_ERROR();
+        throw Win::Error();
+    }
+    return ans;
+}
+
+
 int Win::WSCEnumProtocols(LPINT lpiProtocols, LPWSAPROTOCOL_INFOW lpProtocolBuffer, LPDWORD lpdwBufferLength, LPINT lpErrno) 
 {
   int const ans = ::WSCEnumProtocols(lpiProtocols, lpProtocolBuffer, lpdwBufferLength, lpErrno);

@@ -169,6 +169,42 @@ public:
   static int WSACleanup();
 
   /**
+    @brief Converts a network address in its standard text representation
+        into its binary form in a sockaddr structure.
+
+    @param AddressString
+        A pointer to a zero terminated string that contains the network address
+        in standard text form (to be converted)
+
+    @param AddressFamily
+        The address family of the network address pointed to by the AddressString parameter.
+
+    @param lpProtocolInfo
+        The WSAPROTOCOL_INFO structure associated with the provider to be used.
+        If this is NULL, the call is routed to the provider of the first
+        protocol supporting the indicated AddressFamily.
+
+    @param lpAddress
+        A pointer to a buffer that is filled with a sockaddr structure for the
+        address string if the function succeeds.
+
+    @param lpAddressLength
+        A pointer to the length, in bytes, of the buffer pointed to
+        by the lpAddress parameter.
+        If the function call is successful, this parameter returns a pointer
+        to the size of the sockaddr structure returned in the lpAddress parameter.
+        If the specified buffer is not large enough, the function fails with a specific error
+        of WSAEFAULT and this parameter is updated with the required size in bytes.
+  **/
+  static int WSAStringToAddressA(
+      LPSTR AddressString,
+      INT AddressFamily,
+      LPWSAPROTOCOL_INFOA lpProtocolInfo,
+      LPSOCKADDR lpAddress,
+      LPINT lpAddressLength
+  );
+
+  /**
   * \brief Loads the specified module into the address space of the calling process
   *
   * The specified module may cause other modules to be loaded
