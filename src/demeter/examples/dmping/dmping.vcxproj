@@ -153,15 +153,11 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="csv.h" />
-    <ClInclude Include="json.h" />
     <ClInclude Include="pch.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="csv.cpp" />
     <ClCompile Include="dmping.cpp" />
-    <ClCompile Include="json.c">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
-    </ClCompile>
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
