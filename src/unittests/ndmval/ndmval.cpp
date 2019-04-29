@@ -219,6 +219,7 @@ private:
 
 int __cdecl _tmain(int argc, TCHAR* argv[])
 {
+    {
     Logger logger("log.json");
     LOG_ENTER();
     bool bServer = false;
@@ -331,7 +332,8 @@ int __cdecl _tmain(int argc, TCHAR* argv[])
 
     END_LOG(TESTNAME);
     LOG_INT_RETURN(0);
-    _fcloseall();
     WSACleanup();
+    }
+    _fcloseall();
     return 0;
 }

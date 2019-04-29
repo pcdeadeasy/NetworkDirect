@@ -18,7 +18,10 @@ def main(path: str) -> None:
     '''
     indent = '|   '
     with open(path, 'r') as fobj:
-        log = json.load(fobj)
+        buf = fobj.read()
+    if not buf.endswith(']\n'):
+        buf += ']\n'
+    log = json.loads(buf)
     level = 0
     for entry in log:
         comment = entry['comment']

@@ -517,11 +517,13 @@ void NdTestBase::WaitForCompletion(
     bool bBlocking)
 {
     LOG_ENTER();
+    unsigned int call_count = 0;
+    size_t ul;
     for (;;)
     {
         ND2_RESULT ndRes;
-        ULONG ul = m_pCq->GetResults(&ndRes, 1);
-        LOG("IND2QueuePair::GetResults -> %08X", ul);
+        call_count += 1;
+        ul = m_pCq->GetResults(&ndRes, 1);
         if (ul == 1)
         {
             processCompletionFn(&ndRes);
@@ -532,6 +534,8 @@ void NdTestBase::WaitForCompletion(
             WaitForEventNotification();
         }
     };
+    LOG("IND2QueuePair::GetResults -> 0 (%zu times)", call_count-1);
+    LOG("IND2QueuePair::GetResults -> %08X", ul);
     LOG_VOID_RETURN();
 }
 
