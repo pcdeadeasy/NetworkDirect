@@ -22,6 +22,7 @@
 #define WIN32_NO_STATUS
 #include "ndcommon.h"
 #include <logging.h>
+#include <Logger.h>
 #include <ndtestutil.h>
 
 const USHORT x_DefaultPort = 54331;
@@ -48,10 +49,12 @@ class NdMValClient : public NdTestClientBase
 public:
     ~NdMValClient()
     {
+        LOG_ENTER();
         if (m_pBuf != nullptr)
         {
             HeapFree(GetProcessHeap(), 0, m_pBuf);
         }
+        LOG_VOID_RETURN();
     }
 
     void RunTest(
@@ -60,6 +63,7 @@ public:
         _In_ DWORD queueDepth,
         _In_ DWORD nMaxSge)
     {
+        LOG_ENTER();
         UNREFERENCED_PARAMETER(queueDepth);
         UNREFERENCED_PARAMETER(nMaxSge);
 
@@ -70,6 +74,7 @@ public:
         m_pBuf = HeapAlloc(GetProcessHeap(), 0, x_SufficientXfer);
         if (!m_pBuf)
         {
+            LOG_ERROR_RETURN();
             LOG_FAILURE_AND_EXIT(L"Failed to allocate data buffer.", __LINE__);
         }
         NdTestBase::RegisterDataBuffer(m_pBuf, x_SufficientXfer,
@@ -108,9 +113,11 @@ public:
                 break;
             case STATUS_BUFFER_OVERFLOW:
             case STATUS_DATA_OVERRUN:
+                LOG_ERROR_RETURN();
                 LOG_FAILURE_HRESULT(ndRes.Status, L"Warning: INDEndpoint::Send expecting ND_SUCCESS or STATUS_DATA_ERROR because receiver doesn't have enough buffer, but got errors %08x", __LINE__);
                 break;
             default:
+                LOG_ERROR_RETURN();
                 LOG_FAILURE_HRESULT_AND_EXIT(ndRes.Status, L"INDEndpoint::Send expecting ND_SUCCESS or STATUS_DATA_ERROR because receiver doesn't have enough buffer, but got errors %08x", __LINE__);
                 break;
             }
@@ -120,6 +127,7 @@ public:
 
         //tear down
         NdTestBase::Shutdown();
+        LOG_VOID_RETURN();
     }
 
 private:
@@ -131,10 +139,12 @@ class NdMValServer : public NdTestServerBase
 public:
     ~NdMValServer()
     {
+        LOG_ENTER();
         if (m_pBuf != nullptr)
         {
             HeapFree(GetProcessHeap(), 0, m_pBuf);
         }
+        LOG_VOID_RETURN();
     }
 
     void RunTest(
@@ -142,6 +152,7 @@ public:
         _In_ DWORD queueDepth,
         _In_ DWORD nSge)
     {
+        LOG_ENTER();
         UNREFERENCED_PARAMETER(queueDepth);
         UNREFERENCED_PARAMETER(nSge);
 
@@ -152,6 +163,7 @@ public:
         m_pBuf = HeapAlloc(GetProcessHeap(), 0, x_InsufficientXfer);
         if (!m_pBuf)
         {
+            LOG_ERROR_RETURN();
             LOG_FAILURE_AND_EXIT(L"Failed to allocate data buffer.", __LINE__);
         }
         NdTestBase::RegisterDataBuffer(m_pBuf, x_InsufficientXfer, ND_MR_FLAG_ALLOW_LOCAL_WRITE);
@@ -183,12 +195,14 @@ public:
         {
             if (ndRes.Status == ND_SUCCESS)
             {
+                LOG_ERROR_RETURN();
                 LOG_FAILURE_AND_EXIT(
                     L"INDEndpoint::Recv expected to fail with ND_DATA_OVERRUN, but got ND_SUCCESS",
                     __LINE__
                 );
             }
             // If we get the wrong error code, treat this as a warning
+
             LOG_FAILURE_HRESULT(
                 ndRes.Status,
                 L"Warning: INDEndpoint::Recv expected to fail with ND_DATA_OVERRUN, but got %08x",
@@ -196,6 +210,7 @@ public:
             );
         }
         printf("Test complete.\n");
+        LOG_VOID_RETURN();
     }
 
 private:
@@ -204,15 +219,19 @@ private:
 
 int __cdecl _tmain(int argc, TCHAR* argv[])
 {
+    Logger logger("log.json");
+    LOG_ENTER();
     bool bServer = false;
     bool bClient = false;
     struct sockaddr_in v4Server = { 0 };
 
     WSADATA wsaData;
     int ret = ::WSAStartup(MAKEWORD(2, 2), &wsaData);
+    LOG("WSAStartup -> %d", ret);
     if (ret != 0)
     {
         printf("Failed to initialize Windows Sockets: %d\n", ret);
+        LOG_INT_RETURN(__LINE__);
         exit(__LINE__);
     }
 
@@ -235,20 +254,23 @@ int __cdecl _tmain(int argc, TCHAR* argv[])
         else if ((wcscmp(arg, L"-h") == 0) || (wcscmp(arg, L"--help") == 0))
         {
             ShowUsage();
+            LOG_INT_RETURN(0);
             exit(0);
         }
     }
 
     // ip address is last parameter
     int len = sizeof(v4Server);
-    WSAStringToAddress(argv[argc - 1], AF_INET, nullptr,
+    int rc = WSAStringToAddress(argv[argc - 1], AF_INET, nullptr,
         reinterpret_cast<struct sockaddr*>(&v4Server), &len);
+    LOG("WSAStringToAddress -> %d", rc);
 
     if ((bClient && bServer) || (!bClient && !bServer))
     {
         printf("Exactly one of client (c or "
             "server (s) must be specified.\n");
         ShowUsage();
+        LOG_INT_RETURN(__LINE__);
         exit(__LINE__);
     }
 
@@ -256,6 +278,7 @@ int __cdecl _tmain(int argc, TCHAR* argv[])
     {
         printf("Bad address.\n\n");
         ShowUsage();
+        LOG_INT_RETURN(__LINE__);
         exit(__LINE__);
     }
 
@@ -267,6 +290,7 @@ int __cdecl _tmain(int argc, TCHAR* argv[])
     HRESULT hr = NdStartup();
     if (FAILED(hr))
     {
+        LOG_INT_RETURN(__LINE__);
         LOG_FAILURE_HRESULT_AND_EXIT(hr, L"NdStartup failed with %08x", __LINE__);
     }
 
@@ -288,6 +312,7 @@ int __cdecl _tmain(int argc, TCHAR* argv[])
             &len);
         if (FAILED(hr))
         {
+            LOG_INT_RETURN(__LINE__);
             LOG_FAILURE_HRESULT_AND_EXIT(hr, L"NdResolveAddress failed with %08x", __LINE__);
         }
 
@@ -300,10 +325,12 @@ int __cdecl _tmain(int argc, TCHAR* argv[])
     hr = NdCleanup();
     if (FAILED(hr))
     {
+        LOG_INT_RETURN(__LINE__);
         LOG_FAILURE_HRESULT_AND_EXIT(hr, L"NdCleanup failed with %08x", __LINE__);
     }
 
     END_LOG(TESTNAME);
+    LOG_INT_RETURN(0);
     _fcloseall();
     WSACleanup();
     return 0;
