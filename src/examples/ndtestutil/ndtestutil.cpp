@@ -756,11 +756,11 @@ void NdTestClientBase::CompleteConnect(HRESULT expectedResult, const char* error
 {
     LOG_ENTER();
     HRESULT hr = m_pConnector->CompleteConnect(&m_Ov);
-    LOG("IND2Connector::CompleteConnect -> %08X");
+    LOG("IND2Connector::CompleteConnect -> %08X", hr);
     if (hr == ND_PENDING)
     {
         hr = m_pConnector->GetOverlappedResult(&m_Ov, TRUE);
-        LOG("IND2Connector::GetOverlappedResult -> %08X");
+        LOG("IND2Connector::GetOverlappedResult -> %08X", hr);
     }
     LOG_ERROR_UNEQUAL(hr, expectedResult);
     LogIfErrorExit(hr, expectedResult, errorMessage, __LINE__);
