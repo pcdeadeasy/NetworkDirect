@@ -517,8 +517,8 @@ void NdTestBase::WaitForCompletion(
     bool bBlocking)
 {
     LOG_ENTER();
-    unsigned int call_count = 0;
-    size_t ul;
+    size_t call_count = 0;
+    ULONG ul;
     for (;;)
     {
         ND2_RESULT ndRes;
