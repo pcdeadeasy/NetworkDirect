@@ -106,7 +106,7 @@ static void read_char_file(HEAP &heap, BUFFER<char> &csv, const char *csv_path)
     LOG_VOID_RETURN();
 }
 
-static size_t add(BUFFER<KVP> &kvps, char *line, size_t len, size_t index, size_t increment)
+static size_t add_kvp(BUFFER<KVP> &kvps, char *line, size_t len, size_t index, size_t increment)
 {
     LOG_ENTER();
     size_t ans = index;
@@ -158,7 +158,7 @@ static size_t fill_kvp_buffer(BUFFER<KVP> &kvps, BUFFER<char> &csvs, size_t incr
             }
             else
             {
-                ans = add(kvps, start, len, ans, increment);
+                ans = add_kvp(kvps, start, len, ans, increment);
                 state = 2;
             }
             break;
@@ -177,7 +177,7 @@ static size_t fill_kvp_buffer(BUFFER<KVP> &kvps, BUFFER<char> &csvs, size_t incr
     }
     if (state == 1)
     {
-        ans = add(kvps, start, len, ans, increment);
+        ans = add_kvp(kvps, start, len, ans, increment);
     }
     LOG_SIZET_RETURN(ans);
     return ans;
