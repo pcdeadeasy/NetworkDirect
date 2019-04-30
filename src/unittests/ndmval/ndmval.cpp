@@ -28,6 +28,8 @@
 const USHORT x_DefaultPort = 54331;
 const SIZE_T x_InsufficientXfer = (1023u);
 const SIZE_T x_SufficientXfer = (1024u);
+const SIZE_T ServerSize = x_SufficientXfer;
+const SIZE_T ClientSize = x_SufficientXfer;
 
 const LPCWSTR TESTNAME = L"ndmval.exe";
 
@@ -71,13 +73,13 @@ public:
         NdTestBase::CreateMR();
 
         // Allocate and register the data buffer.
-        m_pBuf = HeapAlloc(GetProcessHeap(), 0, x_SufficientXfer);
+        m_pBuf = HeapAlloc(GetProcessHeap(), 0, ServerSize);
         if (!m_pBuf)
         {
             LOG_ERROR_RETURN();
             LOG_FAILURE_AND_EXIT(L"Failed to allocate data buffer.", __LINE__);
         }
-        NdTestBase::RegisterDataBuffer(m_pBuf, x_SufficientXfer,
+        NdTestBase::RegisterDataBuffer(m_pBuf, ClientSize,
             ND_MR_FLAG_ALLOW_LOCAL_WRITE, ND_SUCCESS, "Register memory failed");
 
         ND2_ADAPTER_INFO adapterInfo;
@@ -94,7 +96,7 @@ public:
 
         ND2_SGE sge;
         sge.Buffer = m_pBuf;
-        sge.BufferLength = x_SufficientXfer;
+        sge.BufferLength = ClientSize;
         sge.MemoryRegionToken = m_pMr->GetLocalToken();
 
         NdTestBase::Send(&sge, 1, 0);
@@ -160,13 +162,13 @@ public:
         NdTestBase::CreateMR();
 
         // Allocate and register the data buffer.
-        m_pBuf = HeapAlloc(GetProcessHeap(), 0, x_InsufficientXfer);
+        m_pBuf = HeapAlloc(GetProcessHeap(), 0, ServerSize);
         if (!m_pBuf)
         {
             LOG_ERROR_RETURN();
             LOG_FAILURE_AND_EXIT(L"Failed to allocate data buffer.", __LINE__);
         }
-        NdTestBase::RegisterDataBuffer(m_pBuf, x_InsufficientXfer, ND_MR_FLAG_ALLOW_LOCAL_WRITE);
+        NdTestBase::RegisterDataBuffer(m_pBuf, ServerSize, ND_MR_FLAG_ALLOW_LOCAL_WRITE);
 
         ND2_ADAPTER_INFO adapterInfo = { 0 };
         NdTestBase::GetAdapterInfo(&adapterInfo);
