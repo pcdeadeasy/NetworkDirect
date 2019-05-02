@@ -90,6 +90,22 @@ int Win::WSAStringToAddressA(
     return ans;
 }
 
+int Win::WSAAddresToStringA(
+    LPSOCKADDR lpsaAddress,
+    DWORD dwAddressLength,
+    LPWSAPROTOCOL_INFOA lpProtocolInfo,
+    LPSTR lpszAddressString,
+    LPDWORD lpdwAddressStringLength)
+{
+    int const ans = ::WSAAddressToStringA(lpsaAddress, dwAddressLength, lpProtocolInfo, lpszAddressString, lpdwAddressStringLength);
+    LOG("WSAAddressToStringA %p %08X %p %p %p -> %d", lpsaAddress, dwAddressLength, lpProtocolInfo, lpszAddressString, lpdwAddressStringLength, ans);
+    if (ans != 0)
+    {
+        LOG_LAST_ERROR();
+        throw Win::Error();
+    }
+    return ans;
+}
 
 int Win::WSCEnumProtocols(LPINT lpiProtocols, LPWSAPROTOCOL_INFOW lpProtocolBuffer, LPDWORD lpdwBufferLength, LPINT lpErrno) 
 {

@@ -46,6 +46,7 @@ void work1(Params& params)
         if FAILED(NdResolveAddress((const struct sockaddr*)&v4Svr, sizeof(v4Svr), (struct sockaddr*)&v4Src, &len))
             throw "NdResolveAddress";
         Client client(params);
+        client.RunTest(v4Src, v4Svr, 0, (DWORD)params.nSge);
     }
     LOG_VOID_RETURN();
 }

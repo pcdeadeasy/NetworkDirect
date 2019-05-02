@@ -205,6 +205,31 @@ public:
   );
 
   /**
+    @brief converts all components of a sockaddr structure into a human-readable string representation of the address
+
+    @param lpsaAddress
+        A pointer to the sockaddr structure to translate into a string.
+
+    @param dwAddressLength
+        The length, in bytes, of the address in the sockaddr structure pointed to by the lpsaAddress parameter. The dwAddressLength parameter may vary in size with different protocols.
+
+    @param lpProtocolInfo
+        A pointer to the WSAPROTOCOL_INFO structure for a particular provider. If this is parameter is NULL, the call is routed to the provider of the first protocol supporting the address family indicated in the lpsaAddress parameter.
+
+    @param lpdwAddressStringLength
+        On input, this parameter specifies the length of the buffer pointed to by the lpszAddressString parameter. The length is represented in bytes for ANSI strings, and in WCHARs for Unicode strings. On output, this parameter returns the length of the string including the NULL terminator actually copied into the buffer pointed to by the lpszAddressString parameter. If the specified buffer is not large enough, the function fails with a specific error of WSAEFAULT and this parameter is updated with the required size.
+
+    @retrurns
+        If no error occurs, WSAAddressToString returns a value of zero. Otherwise, the value SOCKET_ERROR is returned, and a specific error number can be retrieved by calling WSAGetLastError.
+  **/
+  static int WSAAddresToStringA(
+      LPSOCKADDR lpsaAddress,
+      DWORD dwAddressLength,
+      LPWSAPROTOCOL_INFOA lpProtocolInfo,
+      LPSTR lpszAddressString,
+      LPDWORD lpdwAddressStringLength);
+
+  /**
   * \brief Loads the specified module into the address space of the calling process
   *
   * The specified module may cause other modules to be loaded
