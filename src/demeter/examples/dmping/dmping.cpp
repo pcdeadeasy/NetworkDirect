@@ -221,7 +221,7 @@ static void test_client(HEAP &heap, PARAM_INPUT &input)
 static void work(const char *csv_file_path)
 {
     LOG_ENTER();
-    WSA wsa;                            // enable socket functions
+    WsaScope wsa;                            // enable socket functions
 	NetworkDirectEnvironment ndv;		// enable NetworkDirect stuff
     HEAP heap(0, 0, 0);                 // create the heap for memory allocations
     PARAM_INPUT input = GetInput(heap, csv_file_path);

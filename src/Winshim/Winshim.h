@@ -302,15 +302,15 @@ public:
 /**
 * @brief Makes sure Windows socket support is enabled and destroyed
 **/
-class WSA 
+class WsaScope 
 {
 public:
-  WSA() 
+  WsaScope() 
   {
     WSADATA data;
     Win::WSAStartup(MAKEWORD(2, 2), &data);
   }
-  ~WSA() 
+  ~WsaScope() 
   {
     Win::WSACleanup();
   }

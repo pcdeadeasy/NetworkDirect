@@ -25,7 +25,7 @@ int main()
 {
     Logger logger("log.json");
     LOG_ENTER();
-    WSA wsa;
+    WsaScope wsa;
     WSAPROTOCOL_INFOW infos[N_PROTOCOLS] = { 0 };
 
     int ErrorNo = 0;
