@@ -68,6 +68,7 @@ int main(int argc, char **argv)
     {
         Params params(argc, argv);
         params.Print();
+        params.Save("params.json");
         work0(params);
         rc = 0;
     }

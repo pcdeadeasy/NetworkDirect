@@ -13,6 +13,7 @@
 #include "ndcommon.h"
 #include "ndtestutil.h"
 #include <logging.h>
+#include <Logger/Logger.h>
 
 const USHORT x_DefaultPort = 54326;
 const SIZE_T x_MaxXfer = (4 * 1024 * 1024);
@@ -463,38 +464,40 @@ int __cdecl _tmain(int argc, TCHAR* argv[])
         exit(__LINE__);
     }
 
-    HRESULT hr = NdStartup();
-    if (FAILED(hr))
     {
-        LOG_FAILURE_HRESULT_AND_EXIT(hr, L"NdStartup failed with %08x", __LINE__);
-    }
-
-    if (bServer)
-    {
-        NdrPingServer server(bOpRead);
-        server.RunTest(v4Server, 0, nSge);
-    }
-    else
-    {
-        struct sockaddr_in v4Src;
-        SIZE_T len = sizeof(v4Src);
-        HRESULT hr = NdResolveAddress((const struct sockaddr*)&v4Server,
-            sizeof(v4Server), (struct sockaddr*)&v4Src, &len);
+        Logger logger("log.json");
+        HRESULT hr = NdStartup();
         if (FAILED(hr))
         {
-            LOG_FAILURE_HRESULT_AND_EXIT(hr, L"NdResolveAddress failed with %08x", __LINE__);
+            LOG_FAILURE_HRESULT_AND_EXIT(hr, L"NdStartup failed with %08x", __LINE__);
         }
 
-        NdrPingClient client(bBlocking, bOpRead);
-        client.RunTest(v4Src, v4Server, 0, nSge);
-    }
+        if (bServer)
+        {
+            NdrPingServer server(bOpRead);
+            server.RunTest(v4Server, 0, nSge);
+        }
+        else
+        {
+            struct sockaddr_in v4Src;
+            SIZE_T len = sizeof(v4Src);
+            HRESULT hr = NdResolveAddress((const struct sockaddr*)&v4Server,
+                sizeof(v4Server), (struct sockaddr*)&v4Src, &len);
+            if (FAILED(hr))
+            {
+                LOG_FAILURE_HRESULT_AND_EXIT(hr, L"NdResolveAddress failed with %08x", __LINE__);
+            }
 
-    hr = NdCleanup();
-    if (FAILED(hr))
-    {
-        LOG_FAILURE_HRESULT_AND_EXIT(hr, L"NdCleanup failed with %08x", __LINE__);
-    }
+            NdrPingClient client(bBlocking, bOpRead);
+            client.RunTest(v4Src, v4Server, 0, nSge);
+        }
 
+        hr = NdCleanup();
+        if (FAILED(hr))
+        {
+            LOG_FAILURE_HRESULT_AND_EXIT(hr, L"NdCleanup failed with %08x", __LINE__);
+        }
+    }
     END_LOG(TESTNAME);
     _fcloseall();
     WSACleanup();

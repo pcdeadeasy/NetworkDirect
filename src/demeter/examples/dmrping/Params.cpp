@@ -113,7 +113,6 @@ void Params::ShowUsage()
 
 void Params::Print(FILE* file)
 {
-    fprintf(file, "Params:\n");
     fprintf(file, "{\n");
     fprintf(file, "    \"Server\": %d,\n", Server);
     fprintf(file, "    \"Client\": %d,\n", Client);
@@ -131,4 +130,14 @@ void Params::Print(FILE* file)
     fprintf(file, "    \"Ip\": \"%s\",\n", Ip);
     fprintf(file, "    \"Port\": %u\n", Port);
     fprintf(file, "}\n");
+}
+
+void Params::Save(const char *file_path)
+{
+    FILE *file = 0;
+    if (fopen_s(&file, file_path, "w") == 0)
+    {
+        Print(file);
+        fclose(file);
+    }
 }

@@ -28,4 +28,5 @@ public:
     unsigned short Port;
 
     void Print(FILE* file = stdout);
+    void Save(const char *file_path);
 };

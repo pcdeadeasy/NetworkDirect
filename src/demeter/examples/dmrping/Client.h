@@ -14,7 +14,10 @@ public:
 private:
 
     void Work(const struct sockaddr_in& v4Src, const struct sockaddr_in &v4Dst, DWORD queueDepth, DWORD nSge);
+    void register_data_buffer(BUFFER<char> &buf);
     Params &m_params;
     ULONG m_availCredits;
+    ND2_ADAPTER_INFO const get_adapter_info();
+    void post_receive(BUFFER<char> &buf);
 };
 
