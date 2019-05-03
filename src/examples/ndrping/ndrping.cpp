@@ -280,6 +280,7 @@ public:
 
         m_availCredits = m_queueDepth;
 
+#if 0
         // warmup
         DWORD nSgesUsed = NdTestBase::PrepareSge(m_Sgl, m_nMaxSge, m_pBuf, x_HdrLen, x_HdrLen, m_pMr->GetLocalToken());
         DoPings(x_HdrLen, 1000, nSgesUsed, m_opRead, m_bUseBlocking);
@@ -314,7 +315,7 @@ public:
                 (double) szXfer * iterations / (timer.Report() / 1000000)
             );
         }
-
+#endif
         // send terminate message
         NdTestBase::Send(nullptr, 0, 0);
         WaitForCompletion();
