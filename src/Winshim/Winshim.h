@@ -222,7 +222,7 @@ public:
     @retrurns
         If no error occurs, WSAAddressToString returns a value of zero. Otherwise, the value SOCKET_ERROR is returned, and a specific error number can be retrieved by calling WSAGetLastError.
   **/
-  static int WSAAddresToStringA(
+  static int WSAAddressToStringA(
       LPSOCKADDR lpsaAddress,
       DWORD dwAddressLength,
       LPWSAPROTOCOL_INFOA lpProtocolInfo,

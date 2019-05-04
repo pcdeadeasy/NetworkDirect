@@ -8,11 +8,15 @@
 #include "Server.h"
 #include "Client.h"
 
-struct sockaddr_in GetSocketAddress(LPSTR ip)
+struct sockaddr_in GetSocketAddress(LPSTR ip, USHORT Port)
 {
     struct sockaddr_in v4Svr = { 0 };
     int AddressLength = (int)sizeof(v4Svr);
+#pragma warning( push )
+#pragma warning( disable : 4996 ) // suppress deprecation warning
     Win::WSAStringToAddressA(ip, AF_INET, 0, (sockaddr*)&v4Svr, &AddressLength);
+#pragma warning( pop )
+    v4Svr.sin_port = htons(Port);
     return v4Svr;
 }
 
@@ -33,7 +37,7 @@ public:
 void work1(Params& params)
 {
     LOG_ENTER();
-    struct sockaddr_in v4Svr = GetSocketAddress(params.Ip);
+    struct sockaddr_in v4Svr = GetSocketAddress(params.Ip, params.Port);
     if (params.Server)
     {
         Server server(params);

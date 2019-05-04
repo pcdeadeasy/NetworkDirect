@@ -28,6 +28,19 @@ const LPCWSTR TESTNAME = L"ndrping.exe";
 #define READ_CTXT ((void *) 0x3000)
 #define WRITE_CTXT ((void *) 0x4000)
 
+static void print_ip_address(const struct sockaddr_in& addr, const char *name)
+{
+    char buffer[100];
+    DWORD dwAddressStringLength;
+    dwAddressStringLength = (DWORD)sizeof(buffer);
+#pragma warning( push ) // suppress deprecation warning
+#pragma warning( disable : 4996 )
+    WSAAddressToStringA((LPSOCKADDR)&addr, (DWORD)sizeof(addr), 0, buffer, &dwAddressStringLength);
+#pragma warning( pop )
+    printf("%s: %s\n", name, buffer);
+}
+
+
 void ShowUsage()
 {
     printf("nrdping [options] <ip>[:<port>]\n"
@@ -53,6 +66,16 @@ struct PeerInfo
     DWORD  m_nIncomingReadLimit;
     UINT64 m_remoteAddress;
 };
+
+void print_peerinfo(const struct PeerInfo &info, FILE* file)
+{
+    fprintf(file, "{\n");
+    fprintf(file, "    \"m_remoteToken\":\"%08X\",\n", info.m_remoteToken);
+    fprintf(file, "    \"m_nIncommingReadLimit\":\"%08X\",\n", info.m_nIncomingReadLimit);
+    fprintf(file, "    \"m_remoteAddress\":\"%zX\"\n", info.m_remoteAddress);
+    fprintf(file, "}\n");
+}
+
 
 class NdrPingServer : public NdTestServerBase
 {
@@ -111,6 +134,8 @@ public:
         pInfo->m_remoteToken = m_pMw->GetRemoteToken();
         pInfo->m_nIncomingReadLimit = m_maxIncomingReads;
         pInfo->m_remoteAddress = reinterpret_cast<UINT64>(m_pBuf);
+
+        print_peerinfo(*pInfo, stdout);
         NdTestBase::Send(&sge, 1, 0, SEND_CTXT);
 
         // wait for send completion
@@ -255,7 +280,13 @@ public:
         sge.Buffer = m_pBuf;
         sge.BufferLength = x_MaxXfer + x_HdrLen;
         sge.MemoryRegionToken = m_pMr->GetLocalToken();
+        LOG("IND2MemoryRegion::GetLocalToken -> %08X", sge.MemoryRegionToken);
         NdTestBase::PostReceive(&sge, 1, RECV_CTXT);
+
+        printf("m_queueDepth: %u\n", m_queueDepth);
+        printf("m_opRead: %d\n", m_opRead);
+        print_ip_address(v4Src, "v4Src");
+        print_ip_address(v4Dst, "v4Dst");
 
         NdTestClientBase::Connect(v4Src, v4Dst, 0, m_opRead ? m_queueDepth : 0);
         NdTestClientBase::CompleteConnect();

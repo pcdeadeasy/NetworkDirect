@@ -26,7 +26,7 @@ Params::Params(int argc, char **argv)
         ("hdrlen", "Header length", cxxopts::value<size_t>()->default_value("40"))
         ("logfile", "log file path", cxxopts::value<std::string>()->default_value("log.json"))
         ("ip", "ip address", cxxopts::value<std::string>())
-        ("port", "port number", cxxopts::value<unsigned short>()->default_value("54331"));
+        ("port", "port number", cxxopts::value<unsigned short>()->default_value("54326"));
 
     auto result = options.parse(argc, argv);
 

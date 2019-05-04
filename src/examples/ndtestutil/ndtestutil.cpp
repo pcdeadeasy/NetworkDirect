@@ -503,7 +503,7 @@ void NdTestBase::WaitForEventNotification()
 {
     LOG_ENTER();
     HRESULT hr = m_pCq->Notify(ND_CQ_NOTIFY_ANY, &m_Ov);
-    LOG("IND2QueuePaor::Notify -> %08X", hr);
+    LOG("IND2QueuePair::Notify -> %08X", hr);
     if (hr == ND_PENDING)
     {
         hr = m_pCq->GetOverlappedResult(&m_Ov, TRUE);

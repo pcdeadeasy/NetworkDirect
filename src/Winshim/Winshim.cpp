@@ -90,7 +90,7 @@ int Win::WSAStringToAddressA(
     return ans;
 }
 
-int Win::WSAAddresToStringA(
+int Win::WSAAddressToStringA(
     LPSOCKADDR lpsaAddress,
     DWORD dwAddressLength,
     LPWSAPROTOCOL_INFOA lpProtocolInfo,

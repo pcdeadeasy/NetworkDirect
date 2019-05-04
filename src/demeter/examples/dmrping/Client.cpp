@@ -4,6 +4,7 @@
 #include <WinHeap.h>
 #include "Client.h"
 #include "ctxt.h"
+#include "PeerInfo.h"
 
 Client::Client(Params &params) : m_params(params), m_availCredits(0)
 {
@@ -22,15 +23,13 @@ static void print_address(const struct sockaddr_in& addr, const char *name)
     char buffer[100];
     DWORD dwAddressStringLength;
     dwAddressStringLength = (DWORD)sizeof(buffer);
-    Win::WSAAddresToStringA((LPSOCKADDR)&addr, (DWORD)sizeof(addr), 0, buffer, &dwAddressStringLength);
+    Win::WSAAddressToStringA((LPSOCKADDR)&addr, (DWORD)sizeof(addr), 0, buffer, &dwAddressStringLength);
     printf("%s: %s\n", name, buffer);
 }
 
 void Client::RunTest(const struct sockaddr_in &v4Src, const struct sockaddr_in &v4Dst, DWORD queueDepth, DWORD nSge)
 {
     LOG_ENTER();
-    print_address(v4Src, "v4Src");
-    print_address(v4Dst, "v4Dst");
     NdTestBase::Init(v4Src);
     try
     {
@@ -146,5 +145,14 @@ void Client::Work(const struct sockaddr_in& v4Src, const struct sockaddr_in &v4D
     NdTestBase::CreateQueuePair(constants.queuePairDepth, nSge, constants.inlineThreshold);
     post_receive(buf);
     NdTestClientBase::Connect(v4Src, v4Dst, 0, m_params.Read ? constants.queueDepth : 0);
+    NdTestClientBase::CompleteConnect();
+    WaitForCompletionAndCheckContext(RECV_CTXT);
+
+    PeerInfo *pInfo = (PeerInfo*)((void*)buf);
+    print_peerinfo(*pInfo, stdout);
+
+    NdTestBase::Send(nullptr, 0, 0);
+    WaitForCompletion();
+
     LOG_VOID_RETURN();
 }
