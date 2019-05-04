@@ -19,5 +19,6 @@ private:
     ULONG m_availCredits;
     ND2_ADAPTER_INFO const get_adapter_info();
     void post_receive(BUFFER<char> &buf);
+    void send_terminate_message();
 };
 
