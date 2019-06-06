@@ -1,0 +1,912 @@
+[
+  {
+    "comment" : "WSAStartup 202 000000DEF4AFF290 -> 0",
+    "function" : "Win::WSAStartup",
+    "file" : "d:\\projects\\kirko\\networkdirect\\src\\winshim\\winshim.cpp",
+    "line" : 52,
+    "thread" : 12552
+  }
+  ,
+  {
+    "comment" : "Entering NdStartup",
+    "function" : "NdStartup",
+    "file" : "d:\\projects\\kirko\\networkdirect\\src\\ndutil\\ndfrmwrk.cpp",
+    "line" : 994,
+    "thread" : 12552
+  }
+  ,
+  {
+    "comment" : "Entering NetworkDirect::Framework::Framework",
+    "function" : "NetworkDirect::Framework::Framework",
+    "file" : "d:\\projects\\kirko\\networkdirect\\src\\ndutil\\ndfrmwrk.cpp",
+    "line" : 46,
+    "thread" : 12552
+  }
+  ,
+  {
+    "comment" : "Exiting NetworkDirect::Framework::Framework -> void",
+    "function" : "NetworkDirect::Framework::Framework",
+    "file" : "d:\\projects\\kirko\\networkdirect\\src\\ndutil\\ndfrmwrk.cpp",
+    "line" : 49,
+    "thread" : 12552
+  }
+  ,
+  {
+    "comment" : "Entering NetworkDirect::Framework::Init",
+    "function" : "NetworkDirect::Framework::Init",
+    "file" : "d:\\projects\\kirko\\networkdirect\\src\\ndutil\\ndfrmwrk.cpp",
+    "line" : 102,
+    "thread" : 12552
+  }
+  ,
+  {
+    "comment" : "Exiting NetworkDirect::Framework::Init -> 00000000",
+    "function" : "NetworkDirect::Framework::Init",
+    "file" : "d:\\projects\\kirko\\networkdirect\\src\\ndutil\\ndfrmwrk.cpp",
+    "line" : 188,
+    "thread" : 12552
+  }
+  ,
+  {
+    "comment" : "Entering NetworkDirect::Framework::AddRef",
+    "function" : "NetworkDirect::Framework::AddRef",
+    "file" : "d:\\projects\\kirko\\networkdirect\\src\\ndutil\\ndfrmwrk.cpp",
+    "line" : 196,
+    "thread" : 12552
+  }
+  ,
+  {
+    "comment" : "Exiting NetworkDirect::Framework::AddRef -> 00000001",
+    "function" : "NetworkDirect::Framework::AddRef",
+    "file" : "d:\\projects\\kirko\\networkdirect\\src\\ndutil\\ndfrmwrk.cpp",
+    "line" : 198,
+    "thread" : 12552
+  }
+  ,
+  {
+    "comment" : "Exiting NdStartup -> 00000000",
+    "function" : "NdStartup",
+    "file" : "d:\\projects\\kirko\\networkdirect\\src\\ndutil\\ndfrmwrk.cpp",
+    "line" : 1037,
+    "thread" : 12552
+  }
+  ,
+  {
+    "comment" : "Entering main1",
+    "function" : "main1",
+    "file" : "d:\\projects\\kirko\\networkdirect\\src\\demeter\\examples\\dmrpingpong\\main1.cpp",
+    "line" : 135,
+    "thread" : 12552
+  }
+  ,
+  {
+    "comment" : "Entering NdTestBase::NdTestBase",
+    "function" : "NdTestBase::NdTestBase",
+    "file" : "d:\\projects\\kirko\\networkdirect\\src\\examples\\ndtestutil\\ndtestutil.cpp",
+    "line" : 20,
+    "thread" : 12552
+  }
+  ,
+  {
+    "comment" : "Exiting NdTestBase::NdTestBase -> void",
+    "function" : "NdTestBase::NdTestBase",
+    "file" : "d:\\projects\\kirko\\networkdirect\\src\\examples\\ndtestutil\\ndtestutil.cpp",
+    "line" : 22,
+    "thread" : 12552
+  }
+  ,
+  {
+    "comment" : "Entering NdTestServerBase::NdTestServerBase",
+    "function" : "NdTestServerBase::NdTestServerBase",
+    "file" : "d:\\projects\\kirko\\networkdirect\\src\\examples\\ndtestutil\\ndtestutil.cpp",
+    "line" : 612,
+    "thread" : 12552
+  }
+  ,
+  {
+    "comment" : "Exiting NdTestServerBase::NdTestServerBase -> void",
+    "function" : "NdTestServerBase::NdTestServerBase",
+    "file" : "d:\\projects\\kirko\\networkdirect\\src\\examples\\ndtestutil\\ndtestutil.cpp",
+    "line" : 613,
+    "thread" : 12552
+  }
+  ,
+  {
+    "comment" : "Entering Server::Run",
+    "function" : "Server::Run",
+    "file" : "d:\\projects\\kirko\\networkdirect\\src\\demeter\\examples\\dmrpingpong\\main1.cpp",
+    "line" : 60,
+    "thread" : 12552
+  }
+  ,
+  {
+    "comment" : "Entering GetSocketAddress",
+    "function" : "GetSocketAddress",
+    "file" : "d:\\projects\\kirko\\networkdirect\\src\\demeter\\examples\\dmrpingpong\\main1.cpp",
+    "line" : 24,
+    "thread" : 12552
+  }
+  ,
+  {
+    "comment" : "Entering GetPlainSocketAddress",
+    "function" : "GetPlainSocketAddress",
+    "file" : "d:\\projects\\kirko\\networkdirect\\src\\demeter\\examples\\dmrpingpong\\main1.cpp",
+    "line" : 14,
+    "thread" : 12552
+  }
+  ,
+  {
+    "comment" : "WSAStringToAddressA \"10.10.1.4\" 2 0000000000000000 000000DEF4AFEE38 000000DEF4AFEE64 -> 0",
+    "function" : "Win::WSAStringToAddressA",
+    "file" : "d:\\projects\\kirko\\networkdirect\\src\\winshim\\winshim.cpp",
+    "line" : 84,
+    "thread" : 12552
+  }
+  ,
+  {
+    "comment" : "Exiting GetPlainSocketAddress -> \"struct sockaddr_in\"",
+    "function" : "GetPlainSocketAddress",
+    "file" : "d:\\projects\\kirko\\networkdirect\\src\\demeter\\examples\\dmrpingpong\\main1.cpp",
+    "line" : 18,
+    "thread" : 12552
+  }
+  ,
+  {
+    "comment" : "Exiting GetSocketAddress -> \"struct sockaddr_in\"",
+    "function" : "GetSocketAddress",
+    "file" : "d:\\projects\\kirko\\networkdirect\\src\\demeter\\examples\\dmrpingpong\\main1.cpp",
+    "line" : 27,
+    "thread" : 12552
+  }
+  ,
+  {
+    "comment" : "Entering NdTestBase::Init",
+    "function" : "NdTestBase::Init",
+    "file" : "d:\\projects\\kirko\\networkdirect\\src\\examples\\ndtestutil\\ndtestutil.cpp",
+    "line" : 294,
+    "thread" : 12552
+  }
+  ,
+  {
+    "comment" : "Entering NdOpenAdapter",
+    "function" : "NdOpenAdapter",
+    "file" : "d:\\projects\\kirko\\networkdirect\\src\\ndutil\\ndfrmwrk.cpp",
+    "line" : 1167,
+    "thread" : 12552
+  }
+  ,
+  {
+    "comment" : "Entering NetworkDirect::Framework::OpenAdapter",
+    "function" : "NetworkDirect::Framework::OpenAdapter",
+    "file" : "d:\\projects\\kirko\\networkdirect\\src\\ndutil\\ndfrmwrk.cpp",
+    "line" : 442,
+    "thread" : 12552
+  }
+  ,
+  {
+    "comment" : "Entering NetworkDirect::Framework::ValidateAddress",
+    "function" : "NetworkDirect::Framework::ValidateAddress",
+    "file" : "d:\\projects\\kirko\\networkdirect\\src\\ndutil\\ndfrmwrk.cpp",
+    "line" : 516,
+    "thread" : 12552
+  }
+  ,
+  {
+    "comment" : "Exiting NetworkDirect::Framework::ValidateAddress -> 00000000",
+    "function" : "NetworkDirect::Framework::ValidateAddress",
+    "file" : "d:\\projects\\kirko\\networkdirect\\src\\ndutil\\ndfrmwrk.cpp",
+    "line" : 552,
+    "thread" : 12552
+  }
+  ,
+  {
+    "comment" : "Entering NetworkDirect::Framework::ProcessUpdates",
+    "function" : "NetworkDirect::Framework::ProcessUpdates",
+    "file" : "d:\\projects\\kirko\\networkdirect\\src\\ndutil\\ndfrmwrk.cpp",
+    "line" : 674,
+    "thread" : 12552
+  }
+  ,
+  {
+    "comment" : "Entering NetworkDirect::Framework::ProcessProviderChange",
+    "function" : "NetworkDirect::Framework::ProcessProviderChange",
+    "file" : "d:\\projects\\kirko\\networkdirect\\src\\ndutil\\ndfrmwrk.cpp",
+    "line" : 737,
+    "thread" : 12552
+  }
+  ,
+  {
+    "comment" : "Entering NetworkDirect::Provider::Provider",
+    "function" : "NetworkDirect::Provider::Provider",
+    "file" : "d:\\projects\\kirko\\networkdirect\\src\\ndutil\\ndprov.cpp",
+    "line" : 25,
+    "thread" : 12552
+  }
+  ,
+  {
+    "comment" : "Exiting NetworkDirect::Provider::Provider -> void",
+    "function" : "NetworkDirect::Provider::Provider",
+    "file" : "d:\\projects\\kirko\\networkdirect\\src\\ndutil\\ndprov.cpp",
+    "line" : 28,
+    "thread" : 12552
+  }
+  ,
+  {
+    "comment" : "Entering NetworkDirect::NdV1Provider::NdV1Provider",
+    "function" : "NetworkDirect::NdV1Provider::NdV1Provider",
+    "file" : "d:\\projects\\kirko\\networkdirect\\src\\ndutil\\ndprov.cpp",
+    "line" : 212,
+    "thread" : 12552
+  }
+  ,
+  {
+    "comment" : "Exiting NetworkDirect::NdV1Provider::NdV1Provider -> void",
+    "function" : "NetworkDirect::NdV1Provider::NdV1Provider",
+    "file" : "d:\\projects\\kirko\\networkdirect\\src\\ndutil\\ndprov.cpp",
+    "line" : 213,
+    "thread" : 12552
+  }
+  ,
+  {
+    "comment" : "Entering NetworkDirect::Provider::Init",
+    "function" : "NetworkDirect::Provider::Init",
+    "file" : "d:\\projects\\kirko\\networkdirect\\src\\ndutil\\ndprov.cpp",
+    "line" : 50,
+    "thread" : 12552
+  }
+  ,
+  {
+    "comment" : "Exiting NetworkDirect::Provider::Init -> 00000000",
+    "function" : "NetworkDirect::Provider::Init",
+    "file" : "d:\\projects\\kirko\\networkdirect\\src\\ndutil\\ndprov.cpp",
+    "line" : 110,
+    "thread" : 12552
+  }
+  ,
+  {
+    "comment" : "Entering NetworkDirect::Provider::Provider",
+    "function" : "NetworkDirect::Provider::Provider",
+    "file" : "d:\\projects\\kirko\\networkdirect\\src\\ndutil\\ndprov.cpp",
+    "line" : 25,
+    "thread" : 12552
+  }
+  ,
+  {
+    "comment" : "Exiting NetworkDirect::Provider::Provider -> void",
+    "function" : "NetworkDirect::Provider::Provider",
+    "file" : "d:\\projects\\kirko\\networkdirect\\src\\ndutil\\ndprov.cpp",
+    "line" : 28,
+    "thread" : 12552
+  }
+  ,
+  {
+    "comment" : "Entering NetworkDirect::NdProvider::NdProvider",
+    "function" : "NetworkDirect::NdProvider::NdProvider",
+    "file" : "d:\\projects\\kirko\\networkdirect\\src\\ndutil\\ndprov.cpp",
+    "line" : 320,
+    "thread" : 12552
+  }
+  ,
+  {
+    "comment" : "Exiting NetworkDirect::NdProvider::NdProvider -> void",
+    "function" : "NetworkDirect::NdProvider::NdProvider",
+    "file" : "d:\\projects\\kirko\\networkdirect\\src\\ndutil\\ndprov.cpp",
+    "line" : 321,
+    "thread" : 12552
+  }
+  ,
+  {
+    "comment" : "Entering NetworkDirect::Provider::Init",
+    "function" : "NetworkDirect::Provider::Init",
+    "file" : "d:\\projects\\kirko\\networkdirect\\src\\ndutil\\ndprov.cpp",
+    "line" : 50,
+    "thread" : 12552
+  }
+  ,
+  {
+    "comment" : "Exiting NetworkDirect::Provider::Init -> 00000000",
+    "function" : "NetworkDirect::Provider::Init",
+    "file" : "d:\\projects\\kirko\\networkdirect\\src\\ndutil\\ndprov.cpp",
+    "line" : 110,
+    "thread" : 12552
+  }
+  ,
+  {
+    "comment" : "Entering NetworkDirect::Framework::ProcessAddressChange",
+    "function" : "NetworkDirect::Framework::ProcessAddressChange",
+    "file" : "d:\\projects\\kirko\\networkdirect\\src\\ndutil\\ndfrmwrk.cpp",
+    "line" : 886,
+    "thread" : 12552
+  }
+  ,
+  {
+    "comment" : "Entering NetworkDirect::NdV1Provider::QueryAddressList",
+    "function" : "NetworkDirect::NdV1Provider::QueryAddressList",
+    "file" : "d:\\projects\\kirko\\networkdirect\\src\\ndutil\\ndprov.cpp",
+    "line" : 295,
+    "thread" : 12552
+  }
+  ,
+  {
+    "comment" : "Entering NetworkDirect::NdV1Provider::GetProvider",
+    "function" : "NetworkDirect::NdV1Provider::GetProvider",
+    "file" : "d:\\projects\\kirko\\networkdirect\\src\\ndutil\\ndprov.cpp",
+    "line" : 223,
+    "thread" : 12552
+  }
+  ,
+  {
+    "comment" : "Entering NetworkDirect::Provider::GetClassObject",
+    "function" : "NetworkDirect::Provider::GetClassObject",
+    "file" : "d:\\projects\\kirko\\networkdirect\\src\\ndutil\\ndprov.cpp",
+    "line" : 124,
+    "thread" : 12552
+  }
+  ,
+  {
+    "comment" : "Exiting NetworkDirect::Provider::GetClassObject -> 00000000",
+    "function" : "NetworkDirect::Provider::GetClassObject",
+    "file" : "d:\\projects\\kirko\\networkdirect\\src\\ndutil\\ndprov.cpp",
+    "line" : 175,
+    "thread" : 12552
+  }
+  ,
+  {
+    "comment" : "Exiting NetworkDirect::NdV1Provider::GetProvider -> 00000000",
+    "function" : "NetworkDirect::NdV1Provider::GetProvider",
+    "file" : "d:\\projects\\kirko\\networkdirect\\src\\ndutil\\ndprov.cpp",
+    "line" : 243,
+    "thread" : 12552
+  }
+  ,
+  {
+    "comment" : "Entering NetworkDirect::Provider::TryUnload",
+    "function" : "NetworkDirect::Provider::TryUnload",
+    "file" : "d:\\projects\\kirko\\networkdirect\\src\\ndutil\\ndprov.cpp",
+    "line" : 185,
+    "thread" : 12552
+  }
+  ,
+  {
+    "comment" : "Exiting NetworkDirect::Provider::TryUnload -> true",
+    "function" : "NetworkDirect::Provider::TryUnload",
+    "file" : "d:\\projects\\kirko\\networkdirect\\src\\ndutil\\ndprov.cpp",
+    "line" : 204,
+    "thread" : 12552
+  }
+  ,
+  {
+    "comment" : "Exiting NetworkDirect::NdV1Provider::QueryAddressList -> 80000005",
+    "function" : "NetworkDirect::NdV1Provider::QueryAddressList",
+    "file" : "d:\\projects\\kirko\\networkdirect\\src\\ndutil\\ndprov.cpp",
+    "line" : 312,
+    "thread" : 12552
+  }
+  ,
+  {
+    "comment" : "Entering NetworkDirect::NdV1Provider::QueryAddressList",
+    "function" : "NetworkDirect::NdV1Provider::QueryAddressList",
+    "file" : "d:\\projects\\kirko\\networkdirect\\src\\ndutil\\ndprov.cpp",
+    "line" : 295,
+    "thread" : 12552
+  }
+  ,
+  {
+    "comment" : "Entering NetworkDirect::NdV1Provider::GetProvider",
+    "function" : "NetworkDirect::NdV1Provider::GetProvider",
+    "file" : "d:\\projects\\kirko\\networkdirect\\src\\ndutil\\ndprov.cpp",
+    "line" : 223,
+    "thread" : 12552
+  }
+  ,
+  {
+    "comment" : "Entering NetworkDirect::Provider::GetClassObject",
+    "function" : "NetworkDirect::Provider::GetClassObject",
+    "file" : "d:\\projects\\kirko\\networkdirect\\src\\ndutil\\ndprov.cpp",
+    "line" : 124,
+    "thread" : 12552
+  }
+  ,
+  {
+    "comment" : "Exiting NetworkDirect::Provider::GetClassObject -> 00000000",
+    "function" : "NetworkDirect::Provider::GetClassObject",
+    "file" : "d:\\projects\\kirko\\networkdirect\\src\\ndutil\\ndprov.cpp",
+    "line" : 175,
+    "thread" : 12552
+  }
+  ,
+  {
+    "comment" : "Exiting NetworkDirect::NdV1Provider::GetProvider -> 00000000",
+    "function" : "NetworkDirect::NdV1Provider::GetProvider",
+    "file" : "d:\\projects\\kirko\\networkdirect\\src\\ndutil\\ndprov.cpp",
+    "line" : 243,
+    "thread" : 12552
+  }
+  ,
+  {
+    "comment" : "Entering NetworkDirect::Provider::TryUnload",
+    "function" : "NetworkDirect::Provider::TryUnload",
+    "file" : "d:\\projects\\kirko\\networkdirect\\src\\ndutil\\ndprov.cpp",
+    "line" : 185,
+    "thread" : 12552
+  }
+  ,
+  {
+    "comment" : "Exiting NetworkDirect::Provider::TryUnload -> true",
+    "function" : "NetworkDirect::Provider::TryUnload",
+    "file" : "d:\\projects\\kirko\\networkdirect\\src\\ndutil\\ndprov.cpp",
+    "line" : 204,
+    "thread" : 12552
+  }
+  ,
+  {
+    "comment" : "Exiting NetworkDirect::NdV1Provider::QueryAddressList -> 00000000",
+    "function" : "NetworkDirect::NdV1Provider::QueryAddressList",
+    "file" : "d:\\projects\\kirko\\networkdirect\\src\\ndutil\\ndprov.cpp",
+    "line" : 312,
+    "thread" : 12552
+  }
+  ,
+  {
+    "comment" : "Entering NetworkDirect::Framework::BuildAddressList",
+    "function" : "NetworkDirect::Framework::BuildAddressList",
+    "file" : "d:\\projects\\kirko\\networkdirect\\src\\ndutil\\ndfrmwrk.cpp",
+    "line" : 592,
+    "thread" : 12552
+  }
+  ,
+  {
+    "comment" : "Entering NetworkDirect::Address::Address",
+    "function" : "NetworkDirect::Address::Address",
+    "file" : "d:\\projects\\kirko\\networkdirect\\src\\ndutil\\ndaddr.cpp",
+    "line" : 20,
+    "thread" : 12552
+  }
+  ,
+  {
+    "comment" : "Exiting NetworkDirect::Address::Address -> void",
+    "function" : "NetworkDirect::Address::Address",
+    "file" : "d:\\projects\\kirko\\networkdirect\\src\\ndutil\\ndaddr.cpp",
+    "line" : 39,
+    "thread" : 12552
+  }
+  ,
+  {
+    "comment" : "Entering NetworkDirect::Address::Address",
+    "function" : "NetworkDirect::Address::Address",
+    "file" : "d:\\projects\\kirko\\networkdirect\\src\\ndutil\\ndaddr.cpp",
+    "line" : 20,
+    "thread" : 12552
+  }
+  ,
+  {
+    "comment" : "Exiting NetworkDirect::Address::Address -> void",
+    "function" : "NetworkDirect::Address::Address",
+    "file" : "d:\\projects\\kirko\\networkdirect\\src\\ndutil\\ndaddr.cpp",
+    "line" : 39,
+    "thread" : 12552
+  }
+  ,
+  {
+    "comment" : "Exiting NetworkDirect::Framework::BuildAddressList -> void",
+    "function" : "NetworkDirect::Framework::BuildAddressList",
+    "file" : "d:\\projects\\kirko\\networkdirect\\src\\ndutil\\ndfrmwrk.cpp",
+    "line" : 630,
+    "thread" : 12552
+  }
+  ,
+  {
+    "comment" : "Entering NetworkDirect::NdProvider::QueryAddressList",
+    "function" : "NetworkDirect::NdProvider::QueryAddressList",
+    "file" : "d:\\projects\\kirko\\networkdirect\\src\\ndutil\\ndprov.cpp",
+    "line" : 377,
+    "thread" : 12552
+  }
+  ,
+  {
+    "comment" : "Entering NetworkDirect::Provider::GetClassObject",
+    "function" : "NetworkDirect::Provider::GetClassObject",
+    "file" : "d:\\projects\\kirko\\networkdirect\\src\\ndutil\\ndprov.cpp",
+    "line" : 124,
+    "thread" : 12552
+  }
+  ,
+  {
+    "comment" : "Exiting NetworkDirect::Provider::GetClassObject -> 00000000",
+    "function" : "NetworkDirect::Provider::GetClassObject",
+    "file" : "d:\\projects\\kirko\\networkdirect\\src\\ndutil\\ndprov.cpp",
+    "line" : 175,
+    "thread" : 12552
+  }
+  ,
+  {
+    "comment" : "Entering NetworkDirect::Provider::TryUnload",
+    "function" : "NetworkDirect::Provider::TryUnload",
+    "file" : "d:\\projects\\kirko\\networkdirect\\src\\ndutil\\ndprov.cpp",
+    "line" : 185,
+    "thread" : 12552
+  }
+  ,
+  {
+    "comment" : "Exiting NetworkDirect::Provider::TryUnload -> true",
+    "function" : "NetworkDirect::Provider::TryUnload",
+    "file" : "d:\\projects\\kirko\\networkdirect\\src\\ndutil\\ndprov.cpp",
+    "line" : 204,
+    "thread" : 12552
+  }
+  ,
+  {
+    "comment" : "Exiting NetworkDirect::NdProvider::QueryAddressList -> 00000000",
+    "function" : "NetworkDirect::NdProvider::QueryAddressList",
+    "file" : "d:\\projects\\kirko\\networkdirect\\src\\ndutil\\ndprov.cpp",
+    "line" : 395,
+    "thread" : 12552
+  }
+  ,
+  {
+    "comment" : "Entering NetworkDirect::Framework::BuildAddressList",
+    "function" : "NetworkDirect::Framework::BuildAddressList",
+    "file" : "d:\\projects\\kirko\\networkdirect\\src\\ndutil\\ndfrmwrk.cpp",
+    "line" : 592,
+    "thread" : 12552
+  }
+  ,
+  {
+    "comment" : "Entering NetworkDirect::Address::Address",
+    "function" : "NetworkDirect::Address::Address",
+    "file" : "d:\\projects\\kirko\\networkdirect\\src\\ndutil\\ndaddr.cpp",
+    "line" : 20,
+    "thread" : 12552
+  }
+  ,
+  {
+    "comment" : "Exiting NetworkDirect::Address::Address -> void",
+    "function" : "NetworkDirect::Address::Address",
+    "file" : "d:\\projects\\kirko\\networkdirect\\src\\ndutil\\ndaddr.cpp",
+    "line" : 39,
+    "thread" : 12552
+  }
+  ,
+  {
+    "comment" : "Entering NetworkDirect::Address::Address",
+    "function" : "NetworkDirect::Address::Address",
+    "file" : "d:\\projects\\kirko\\networkdirect\\src\\ndutil\\ndaddr.cpp",
+    "line" : 20,
+    "thread" : 12552
+  }
+  ,
+  {
+    "comment" : "Exiting NetworkDirect::Address::Address -> void",
+    "function" : "NetworkDirect::Address::Address",
+    "file" : "d:\\projects\\kirko\\networkdirect\\src\\ndutil\\ndaddr.cpp",
+    "line" : 39,
+    "thread" : 12552
+  }
+  ,
+  {
+    "comment" : "Exiting NetworkDirect::Framework::BuildAddressList -> void",
+    "function" : "NetworkDirect::Framework::BuildAddressList",
+    "file" : "d:\\projects\\kirko\\networkdirect\\src\\ndutil\\ndfrmwrk.cpp",
+    "line" : 630,
+    "thread" : 12552
+  }
+  ,
+  {
+    "comment" : "Exiting NetworkDirect::Framework::ProcessAddressChange -> void",
+    "function" : "NetworkDirect::Framework::ProcessAddressChange",
+    "file" : "d:\\projects\\kirko\\networkdirect\\src\\ndutil\\ndfrmwrk.cpp",
+    "line" : 955,
+    "thread" : 12552
+  }
+  ,
+  {
+    "comment" : "Exiting NetworkDirect::Framework::ProcessProviderChange -> void",
+    "function" : "NetworkDirect::Framework::ProcessProviderChange",
+    "file" : "d:\\projects\\kirko\\networkdirect\\src\\ndutil\\ndfrmwrk.cpp",
+    "line" : 879,
+    "thread" : 12552
+  }
+  ,
+  {
+    "comment" : "Entering NetworkDirect::Framework::FlushProviders",
+    "function" : "NetworkDirect::Framework::FlushProviders",
+    "file" : "d:\\projects\\kirko\\networkdirect\\src\\ndutil\\ndfrmwrk.cpp",
+    "line" : 962,
+    "thread" : 12552
+  }
+  ,
+  {
+    "comment" : "Entering NetworkDirect::Provider::TryUnload",
+    "function" : "NetworkDirect::Provider::TryUnload",
+    "file" : "d:\\projects\\kirko\\networkdirect\\src\\ndutil\\ndprov.cpp",
+    "line" : 185,
+    "thread" : 12552
+  }
+  ,
+  {
+    "comment" : "Exiting NetworkDirect::Provider::TryUnload -> true",
+    "function" : "NetworkDirect::Provider::TryUnload",
+    "file" : "d:\\projects\\kirko\\networkdirect\\src\\ndutil\\ndprov.cpp",
+    "line" : 188,
+    "thread" : 12552
+  }
+  ,
+  {
+    "comment" : "Entering NetworkDirect::Provider::TryUnload",
+    "function" : "NetworkDirect::Provider::TryUnload",
+    "file" : "d:\\projects\\kirko\\networkdirect\\src\\ndutil\\ndprov.cpp",
+    "line" : 185,
+    "thread" : 12552
+  }
+  ,
+  {
+    "comment" : "Exiting NetworkDirect::Provider::TryUnload -> true",
+    "function" : "NetworkDirect::Provider::TryUnload",
+    "file" : "d:\\projects\\kirko\\networkdirect\\src\\ndutil\\ndprov.cpp",
+    "line" : 188,
+    "thread" : 12552
+  }
+  ,
+  {
+    "comment" : "Exiting NetworkDirect::Framework::FlushProviders -> void",
+    "function" : "NetworkDirect::Framework::FlushProviders",
+    "file" : "d:\\projects\\kirko\\networkdirect\\src\\ndutil\\ndfrmwrk.cpp",
+    "line" : 978,
+    "thread" : 12552
+  }
+  ,
+  {
+    "comment" : "Exiting NetworkDirect::Framework::ProcessUpdates -> void",
+    "function" : "NetworkDirect::Framework::ProcessUpdates",
+    "file" : "d:\\projects\\kirko\\networkdirect\\src\\ndutil\\ndfrmwrk.cpp",
+    "line" : 729,
+    "thread" : 12552
+  }
+  ,
+  {
+    "comment" : "Entering NetworkDirect::Address::Matches",
+    "function" : "NetworkDirect::Address::Matches",
+    "file" : "d:\\projects\\kirko\\networkdirect\\src\\ndutil\\ndaddr.cpp",
+    "line" : 45,
+    "thread" : 12552
+  }
+  ,
+  {
+    "comment" : "Exiting NetworkDirect::Address::Matches -> true",
+    "function" : "NetworkDirect::Address::Matches",
+    "file" : "d:\\projects\\kirko\\networkdirect\\src\\ndutil\\ndaddr.cpp",
+    "line" : 52,
+    "thread" : 12552
+  }
+  ,
+  {
+    "comment" : "Entering NetworkDirect::NdProvider::OpenAdapter",
+    "function" : "NetworkDirect::NdProvider::OpenAdapter",
+    "file" : "d:\\projects\\kirko\\networkdirect\\src\\ndutil\\ndprov.cpp",
+    "line" : 336,
+    "thread" : 12552
+  }
+  ,
+  {
+    "comment" : "Entering NetworkDirect::Provider::GetClassObject",
+    "function" : "NetworkDirect::Provider::GetClassObject",
+    "file" : "d:\\projects\\kirko\\networkdirect\\src\\ndutil\\ndprov.cpp",
+    "line" : 124,
+    "thread" : 12552
+  }
+  ,
+  {
+    "comment" : "Exiting NetworkDirect::Provider::GetClassObject -> 00000000",
+    "function" : "NetworkDirect::Provider::GetClassObject",
+    "file" : "d:\\projects\\kirko\\networkdirect\\src\\ndutil\\ndprov.cpp",
+    "line" : 175,
+    "thread" : 12552
+  }
+  ,
+  {
+    "comment" : "IND2Provider::ResolveAddress -> 00000000",
+    "function" : "NetworkDirect::NdProvider::OpenAdapter",
+    "file" : "d:\\projects\\kirko\\networkdirect\\src\\ndutil\\ndprov.cpp",
+    "line" : 351,
+    "thread" : 12552
+  }
+  ,
+  {
+    "comment" : "IND2Provider::OpenAdapter -> 00000000",
+    "function" : "NetworkDirect::NdProvider::OpenAdapter",
+    "file" : "d:\\projects\\kirko\\networkdirect\\src\\ndutil\\ndprov.cpp",
+    "line" : 361,
+    "thread" : 12552
+  }
+  ,
+  {
+    "comment" : "Entering NetworkDirect::Provider::TryUnload",
+    "function" : "NetworkDirect::Provider::TryUnload",
+    "file" : "d:\\projects\\kirko\\networkdirect\\src\\ndutil\\ndprov.cpp",
+    "line" : 185,
+    "thread" : 12552
+  }
+  ,
+  {
+    "comment" : "Exiting NetworkDirect::Provider::TryUnload -> false",
+    "function" : "NetworkDirect::Provider::TryUnload",
+    "file" : "d:\\projects\\kirko\\networkdirect\\src\\ndutil\\ndprov.cpp",
+    "line" : 197,
+    "thread" : 12552
+  }
+  ,
+  {
+    "comment" : "Exiting NetworkDirect::NdProvider::OpenAdapter -> 00000000",
+    "function" : "NetworkDirect::NdProvider::OpenAdapter",
+    "file" : "d:\\projects\\kirko\\networkdirect\\src\\ndutil\\ndprov.cpp",
+    "line" : 366,
+    "thread" : 12552
+  }
+  ,
+  {
+    "comment" : "Exiting NetworkDirect::Framework::OpenAdapter -> 00000000",
+    "function" : "NetworkDirect::Framework::OpenAdapter",
+    "file" : "d:\\projects\\kirko\\networkdirect\\src\\ndutil\\ndfrmwrk.cpp",
+    "line" : 495,
+    "thread" : 12552
+  }
+  ,
+  {
+    "comment" : "Exiting NdOpenAdapter -> 00000000",
+    "function" : "NdOpenAdapter",
+    "file" : "d:\\projects\\kirko\\networkdirect\\src\\ndutil\\ndfrmwrk.cpp",
+    "line" : 1175,
+    "thread" : 12552
+  }
+  ,
+  {
+    "comment" : "IND2Adpater::CreateOverlappedFile -> 00000000",
+    "function" : "NdTestBase::Init",
+    "file" : "d:\\projects\\kirko\\networkdirect\\src\\examples\\ndtestutil\\ndtestutil.cpp",
+    "line" : 316,
+    "thread" : 12552
+  }
+  ,
+  {
+    "comment" : "Exiting NdTestBase::Init -> void",
+    "function" : "NdTestBase::Init",
+    "file" : "d:\\projects\\kirko\\networkdirect\\src\\examples\\ndtestutil\\ndtestutil.cpp",
+    "line" : 322,
+    "thread" : 12552
+  }
+  ,
+  {
+    "comment" : "Entering Server::RunWorker",
+    "function" : "Server::RunWorker",
+    "file" : "d:\\projects\\kirko\\networkdirect\\src\\demeter\\examples\\dmrpingpong\\main1.cpp",
+    "line" : 78,
+    "thread" : 12552
+  }
+  ,
+  {
+    "comment" : "Entering Server::GetAdapterInfo",
+    "function" : "Server::GetAdapterInfo",
+    "file" : "d:\\projects\\kirko\\networkdirect\\src\\demeter\\examples\\dmrpingpong\\main1.cpp",
+    "line" : 98,
+    "thread" : 12552
+  }
+  ,
+  {
+    "comment" : "Entering NdTestBase::GetAdapterInfo",
+    "function" : "NdTestBase::GetAdapterInfo",
+    "file" : "d:\\projects\\kirko\\networkdirect\\src\\examples\\ndtestutil\\ndtestutil.cpp",
+    "line" : 328,
+    "thread" : 12552
+  }
+  ,
+  {
+    "comment" : "IND2Adapter::Query -> 00000000",
+    "function" : "NdTestBase::GetAdapterInfo",
+    "file" : "d:\\projects\\kirko\\networkdirect\\src\\examples\\ndtestutil\\ndtestutil.cpp",
+    "line" : 333,
+    "thread" : 12552
+  }
+  ,
+  {
+    "comment" : "Exiting NdTestBase::GetAdapterInfo -> void",
+    "function" : "NdTestBase::GetAdapterInfo",
+    "file" : "d:\\projects\\kirko\\networkdirect\\src\\examples\\ndtestutil\\ndtestutil.cpp",
+    "line" : 339,
+    "thread" : 12552
+  }
+  ,
+  {
+    "comment" : "Exiting Server::GetAdapterInfo -> \"ND2_ADAPTER_INFO\"",
+    "function" : "Server::GetAdapterInfo",
+    "file" : "d:\\projects\\kirko\\networkdirect\\src\\demeter\\examples\\dmrpingpong\\main1.cpp",
+    "line" : 105,
+    "thread" : 12552
+  }
+  ,
+  {
+    "comment" : "queueDepth <- 8192",
+    "function" : "Server::RunWorker",
+    "file" : "d:\\projects\\kirko\\networkdirect\\src\\demeter\\examples\\dmrpingpong\\main1.cpp",
+    "line" : 85,
+    "thread" : 12552
+  }
+  ,
+  {
+    "comment" : "nMaxSge <- 1",
+    "function" : "Server::RunWorker",
+    "file" : "d:\\projects\\kirko\\networkdirect\\src\\demeter\\examples\\dmrpingpong\\main1.cpp",
+    "line" : 86,
+    "thread" : 12552
+  }
+  ,
+  {
+    "comment" : "inlineThreshold <- 172",
+    "function" : "Server::RunWorker",
+    "file" : "d:\\projects\\kirko\\networkdirect\\src\\demeter\\examples\\dmrpingpong\\main1.cpp",
+    "line" : 87,
+    "thread" : 12552
+  }
+  ,
+  {
+    "comment" : "queuePairDepth <- 8192",
+    "function" : "Server::RunWorker",
+    "file" : "d:\\projects\\kirko\\networkdirect\\src\\demeter\\examples\\dmrpingpong\\main1.cpp",
+    "line" : 88,
+    "thread" : 12552
+  }
+  ,
+  {
+    "comment" : "Entering NdTestBase::CreateCQ",
+    "function" : "NdTestBase::CreateCQ",
+    "file" : "d:\\projects\\kirko\\networkdirect\\src\\examples\\ndtestutil\\ndtestutil.cpp",
+    "line" : 195,
+    "thread" : 12552
+  }
+  ,
+  {
+    "comment" : "IND2Adapter::CreateCompletionQueue -> 00000000",
+    "function" : "NdTestBase::CreateCQ",
+    "file" : "d:\\projects\\kirko\\networkdirect\\src\\examples\\ndtestutil\\ndtestutil.cpp",
+    "line" : 204,
+    "thread" : 12552
+  }
+  ,
+  {
+    "comment" : "Exiting NdTestBase::CreateCQ -> void",
+    "function" : "NdTestBase::CreateCQ",
+    "file" : "d:\\projects\\kirko\\networkdirect\\src\\examples\\ndtestutil\\ndtestutil.cpp",
+    "line" : 207,
+    "thread" : 12552
+  }
+  ,
+  {
+    "comment" : "Entering NdTestBase::CreateConnector",
+    "function" : "NdTestBase::CreateConnector",
+    "file" : "d:\\projects\\kirko\\networkdirect\\src\\examples\\ndtestutil\\ndtestutil.cpp",
+    "line" : 229,
+    "thread" : 12552
+  }
+  ,
+  {
+    "comment" : "IND2Adapter::CreateConnector -> 00000000",
+    "function" : "NdTestBase::CreateConnector",
+    "file" : "d:\\projects\\kirko\\networkdirect\\src\\examples\\ndtestutil\\ndtestutil.cpp",
+    "line" : 235,
+    "thread" : 12552
+  }
+  ,
+  {
+    "comment" : "Exiting NdTestBase::CreateConnector -> void",
+    "function" : "NdTestBase::CreateConnector",
+    "file" : "d:\\projects\\kirko\\networkdirect\\src\\examples\\ndtestutil\\ndtestutil.cpp",
+    "line" : 238,
+    "thread" : 12552
+  }
+  ,
+  {
+    "comment" : "Entering NdTestBase::CreateQueuePair",
+    "function" : "NdTestBase::CreateQueuePair",
+    "file" : "d:\\projects\\kirko\\networkdirect\\src\\examples\\ndtestutil\\ndtestutil.cpp",
+    "line" : 244,
+    "thread" : 12552
+  }

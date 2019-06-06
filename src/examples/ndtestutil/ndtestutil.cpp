@@ -384,7 +384,8 @@ void NdTestBase::DisconnectConnector()
 void NdTestBase::DeregisterMemory()
 {
     LOG_ENTER();
-    m_pMr->Deregister(&m_Ov);
+    if (m_pMr)
+        m_pMr->Deregister(&m_Ov);
     LOG_VOID_RETURN();
 }
 
