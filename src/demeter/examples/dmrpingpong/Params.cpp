@@ -104,9 +104,9 @@ void Params::ShowUsage()
         "\n"
         "    Examples:\n"
         "\n"
-        "       dmrping --server --ip 10.10.1.4\n"
-        "       dmrping --client --ip 10.10.1.4\n"
-        "       dmrping --client --blocking --ip 10.10.1.4\n"
+        "       dmrpingpong --server --ip 10.10.1.4\n"
+        "       dmrpingpong --client --ip 10.10.1.4\n"
+        "       dmrpingpong --client --blocking --ip 10.10.1.4\n"
         ;
     printf("%s\n", usage);
 }
