@@ -150,9 +150,15 @@ void Client::Work(const struct sockaddr_in& v4Src, const struct sockaddr_in &v4D
 
     PeerInfo *pInfo = (PeerInfo*)((void*)buf);
     print_peerinfo(*pInfo, stdout);
+    send_terminate_message();
 
+    LOG_VOID_RETURN();
+}
+
+void Client::send_terminate_message()
+{
+    LOG_ENTER();
     NdTestBase::Send(nullptr, 0, 0);
     WaitForCompletion();
-
     LOG_VOID_RETURN();
 }
