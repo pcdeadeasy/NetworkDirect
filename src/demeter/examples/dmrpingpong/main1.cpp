@@ -33,7 +33,7 @@ static struct sockaddr_in GetPlainSocketAddress(const char* ip)
     struct sockaddr_in ans = { 0 };
     int len = sizeof(ans);
     Win::WSAStringToAddressA((char*)ip, AF_INET, 0, (sockaddr*)&ans, &len);
-    LOG_STRUCT_RETURN("struct sockaddr_in");
+    LOG_STRUCT_RETURN(struct sockaddr_in);
     return ans;
 }
 
@@ -42,7 +42,7 @@ static struct sockaddr_in GetSocketAddress(const Params& params)
     LOG_ENTER();
     struct sockaddr_in ans = GetPlainSocketAddress(params.Ip);
     ans.sin_port = params.Port;
-    LOG_STRUCT_RETURN("struct sockaddr_in");
+    LOG_STRUCT_RETURN(struct sockaddr_in);
     return ans;
 }
 
@@ -136,7 +136,7 @@ ND2_ADAPTER_INFO Server::GetAdapterInfo()
     {
         throw "Adapter does not support RDMA";
     }
-    LOG_STRUCT_RETURN("ND2_ADAPTER_INFO");
+    LOG_STRUCT_RETURN(ND2_ADAPTER_INFO);
     return info;
 }
 
@@ -149,7 +149,7 @@ ND2_ADAPTER_INFO Client::GetAdapterInfo()
     {
         throw "Adapter does not support RDMA";
     }
-    LOG_STRUCT_RETURN("ND2_ADAPTER_INFO");
+    LOG_STRUCT_RETURN(ND2_ADAPTER_INFO);
     return info;
 }
 
@@ -181,6 +181,31 @@ void Client::Run(const Params& params)
 void Client::RunWorker(const Params& params, const struct sockaddr_in& v4Src, const struct sockaddr_in &v4Server)
 {
     LOG_ENTER();
+    NdTestBase::CreateMR();
+    HEAP heap(0, 0, 0);
+    BUFFER<char> buffer(&heap, HEAP_ZERO_MEMORY, params.MaxXfer + params.HdrLen + 2 * sizeof(PeerInfo));
+    BUFFER<ND2_SGE> sges(&heap, HEAP_ZERO_MEMORY, 2);
+    {
+        ULONG const flags = ND_MR_FLAG_ALLOW_LOCAL_WRITE | ND_MR_FLAG_ALLOW_REMOTE_WRITE;
+        NdTestBase::RegisterDataBuffer(buffer, (DWORD)buffer.size(), flags);
+    }
+    {
+        ND2_ADAPTER_INFO info = GetAdapterInfo();
+        Utils::print_info(stdout, info);
+        ULONG const queueDepth = min(info.MaxCompletionQueueDepth, info.MaxInitiatorQueueDepth);
+        ULONG const nMaxSge = min((ULONG)params.nSge, info.MaxInitiatorSge);
+        ULONG const inlineThreshold = info.InlineRequestThreshold;
+        NdTestBase::CreateCQ(queueDepth);
+        NdTestBase::CreateConnector();
+        NdTestBase::CreateQueuePair(min(queueDepth, info.MaxReceiveQueueDepth), (DWORD)params.nSge, inlineThreshold);
+    }
+    {
+        ND2_SGE sge = { buffer + params.MaxXfer + params.HdrLen, sizeof(PeerInfo), m_pMr->GetLocalToken() };
+        NdTestBase::PostReceive(&sge, 1, Ctxt::Recv);
+    }
+    NdTestClientBase::Connect(v4Src, v4Server, 0, 0);
+    NdTestClientBase::CompleteConnect();
+
 
     LOG_VOID_RETURN();
 }
