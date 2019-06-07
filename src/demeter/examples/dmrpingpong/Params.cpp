@@ -113,7 +113,6 @@ void Params::ShowUsage()
 
 void Params::Print(FILE* file)
 {
-    fprintf(file, "Params:\n");
     fprintf(file, "{\n");
     fprintf(file, "    \"Server\": %d,\n", Server);
     fprintf(file, "    \"Client\": %d,\n", Client);

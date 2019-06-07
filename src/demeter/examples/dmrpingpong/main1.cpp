@@ -21,10 +21,19 @@ void* Ctxt::Send = (void*)0x2000;
 void* Ctxt::Read = (void*)0x3000;
 void* Ctxt::Write = (void*)0x4000;
 
-typedef struct _PeerInfo {
+typedef struct _PeerInfo 
+{
     UINT32 m_remoteToken;
     UINT64 m_remoteAddress;
 } PeerInfo;
+
+void print_PeerInfo(FILE *file, const PeerInfo& info)
+{
+    fprintf(file, "{\n");
+    fprintf(file, "  \"m_remoteToken\": %u,\n", info.m_remoteToken);
+    fprintf(file, "  \"m_remoteAddress\": %zu\n", info.m_remoteAddress);
+    fprintf(file, "}\n");
+}
 
 
 static struct sockaddr_in GetPlainSocketAddress(const char* ip)
@@ -200,12 +209,77 @@ void Client::RunWorker(const Params& params, const struct sockaddr_in& v4Src, co
         NdTestBase::CreateConnector();
         NdTestBase::CreateQueuePair(min(queueDepth, info.MaxReceiveQueueDepth), (DWORD)params.nSge, inlineThreshold);
     }
+    
+    LOG("post receive for PeerInfo message");
     {
-        ND2_SGE sge = { buffer + params.MaxXfer + params.HdrLen, sizeof(PeerInfo), m_pMr->GetLocalToken() };
+        PeerInfo *pInfo = (PeerInfo*)(buffer + params.MaxXfer + params.HdrLen);
+        ND2_SGE sge = { pInfo, sizeof(PeerInfo), m_pMr->GetLocalToken() };
+
+        fprintf(stdout, "\nPeerInfo located at %p before the send:\n", pInfo);
+        print_PeerInfo(stdout, *pInfo);
+        Utils::hexdumptofile(stdout, pInfo, sizeof(*pInfo));
+        fprintf(stdout, "\nPostReceive\nND2_SGE:\n");
+        Utils::print_sge(stdout, sge);
         NdTestBase::PostReceive(&sge, 1, Ctxt::Recv);
     }
+
     NdTestClientBase::Connect(v4Src, v4Server, 0, 0);
     NdTestClientBase::CompleteConnect();
+    NdTestBase::CreateMW();
+    NdTestBase::Bind(buffer, (DWORD)buffer.size(), ND_OP_FLAG_ALLOW_WRITE);
+
+    {
+        LOG("send remote token and address");
+        size_t const offset = params.MaxXfer + params.HdrLen + sizeof(PeerInfo);
+        PeerInfo *pPeerInfo = (PeerInfo*)(buffer + offset);
+        PeerInfo& peerInfo = *pPeerInfo;
+        peerInfo.m_remoteToken = m_pMw->GetRemoteToken();
+        peerInfo.m_remoteAddress = (UINT64)((char*)buffer);
+
+        fprintf(stdout, "\nsending PeerInfo:\n");
+        print_PeerInfo(stdout, peerInfo);
+
+        ND2_SGE sge = { &peerInfo, sizeof(peerInfo), m_pMr->GetLocalToken() };
+        DWORD const count = 1;
+        DWORD const flags = 0;
+
+        fprintf(stdout, "\nSend\nND2_SGE:\n");
+        Utils::print_sge(stdout, sge);
+        NdTestBase::Send(&sge, count, flags, Ctxt::Send);
+    }
+    {
+        LOG("wait for send completion and incomming peer info message");
+        bool gotSendCompletion = false;
+        bool gotPeerInfoMsg = false;
+        while (!(gotSendCompletion && gotPeerInfoMsg))
+        {
+            WaitForCompletion([&gotSendCompletion, &gotPeerInfoMsg](ND2_RESULT *pCompletion)
+            {
+                Utils::print_result(stdout, *pCompletion);
+                void* ctxt = pCompletion->RequestContext;
+                if (ctxt == Ctxt::Send)
+                {
+                    gotSendCompletion = true;
+                }
+                else if (ctxt == Ctxt::Recv)
+                {
+                    gotPeerInfoMsg = true;
+                }
+                else
+                {
+                    LOG("Unexpected Context");
+                    throw "Unexpected Context";
+                }
+            }, true);
+        }
+        {
+            size_t const offset = params.MaxXfer + params.HdrLen;
+            PeerInfo *pInfo = (PeerInfo*)(buffer + offset);
+            printf("\nReceived PeerInfo\n");
+            print_PeerInfo(stdout, *pInfo);
+        }
+    }
+
 
 
     LOG_VOID_RETURN();
