@@ -122,7 +122,8 @@ void Server::RunWorker(const Params& params)
         const struct sockaddr_in v4Src = GetSocketAddress(params);
         NdTestServerBase::Listen(v4Src);
     }
-    //NdTestServerBase::GetConnectionRequest();
+    NdTestServerBase::GetConnectionRequest();
+    NdTestServerBase::Accept(0, 0);
 
     LOG_VOID_RETURN();
 }
