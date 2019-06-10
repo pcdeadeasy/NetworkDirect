@@ -238,7 +238,6 @@ void Client::RunWorker(const Params& params, const struct sockaddr_in& v4Src, co
     }
     {
         ND2_ADAPTER_INFO info = GetAdapterInfo();
-        Utils::print_adapter_info(stdout, info);
         ULONG const queueDepth = min(info.MaxCompletionQueueDepth, info.MaxInitiatorQueueDepth);
         ULONG const nMaxSge = min((ULONG)params.nSge, info.MaxInitiatorSge);
         ULONG const inlineThreshold = info.InlineRequestThreshold;
@@ -249,8 +248,7 @@ void Client::RunWorker(const Params& params, const struct sockaddr_in& v4Src, co
     
     LOG("post receive for PeerInfo message");
     {
-        PeerInfo *pInfo = (PeerInfo*)(buffer + params.MaxXfer + params.HdrLen);
-        ND2_SGE sge = { pInfo, sizeof(PeerInfo), m_pMr->GetLocalToken() };
+        ND2_SGE sge = { pServerInfo, sizeof(*pServerInfo), m_pMr->GetLocalToken() };
         NdTestBase::PostReceive(&sge, 1, Ctxt::Recv);
     }
 
@@ -263,7 +261,6 @@ void Client::RunWorker(const Params& params, const struct sockaddr_in& v4Src, co
         LOG("send client remote token and address to the server");
         pClientInfo->m_remoteToken = m_pMw->GetRemoteToken();
         pClientInfo->m_remoteAddress = (UINT64)((char*)buffer);
-
 
         ND2_SGE sge = { pClientInfo, sizeof(*pClientInfo), m_pMr->GetLocalToken() };
         DWORD const count = 1;
@@ -280,7 +277,6 @@ void Client::RunWorker(const Params& params, const struct sockaddr_in& v4Src, co
         {
             WaitForCompletion([&gotSendCompletion, &gotPeerInfoMsg](ND2_RESULT *pCompletion)
             {
-                Utils::print_result(stdout, *pCompletion);
                 void* ctxt = pCompletion->RequestContext;
                 if (ctxt == Ctxt::Send)
                 {
@@ -302,16 +298,12 @@ void Client::RunWorker(const Params& params, const struct sockaddr_in& v4Src, co
             print_PeerInfo(stdout, *pServerInfo);
         }
     }
-
-
-
     LOG_VOID_RETURN();
 }
 
 void main1(Params& params)
 {
     LOG_ENTER();
-    params.Print(stdout);
     if (params.Server) 
     {
         Server server;
