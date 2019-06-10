@@ -2,7 +2,7 @@
 #include "Utils.h"
 
 
-void Utils::print_info(FILE *file, ND2_ADAPTER_INFO &info)
+void Utils::print_adapter_info(FILE *file, ND2_ADAPTER_INFO &info)
 {
 #define PU(X,Y) fprintf(file, "  \"" #X "\": %" #Y ",\n", info.##X)
 #define EU(X,Y) fprintf(file, "  \"" #X "\": %" #Y "\n", info.##X)

@@ -83,6 +83,16 @@ public:
     }
 };
 
+static size_t ServerPeerInfoOffset(const Params& params)
+{
+    return params.MaxXfer + params.HdrLen + sizeof(PeerInfo);
+}
+
+static size_t ClientPeerInfoOffset(const Params& params)
+{
+    return params.MaxXfer + params.HdrLen;
+}
+
 void Server::Run(const Params& params)
 {
     LOG_ENTER();
@@ -116,12 +126,15 @@ void Server::RunWorker(const Params& params)
     NdTestBase::CreateMR();
     HEAP heap(0, 0, 0);
     BUFFER<char> buffer(&heap, HEAP_ZERO_MEMORY, params.MaxXfer + params.HdrLen + 2 * sizeof(PeerInfo));
+    PeerInfo* const pServerInfo = (PeerInfo*)(buffer + ServerPeerInfoOffset(params));
+    PeerInfo* const pClientInfo = (PeerInfo*)(buffer + ClientPeerInfoOffset(params));
     BUFFER<ND2_SGE> sges(&heap, HEAP_ZERO_MEMORY, (ULONG)min(params.nSge, info.MaxInitiatorSge));
     {
         ULONG const flags = ND_MR_FLAG_ALLOW_LOCAL_WRITE | ND_MR_FLAG_ALLOW_REMOTE_WRITE;
         NdTestBase::RegisterDataBuffer(buffer, (DWORD)buffer.size(), flags);
     }
     {
+        LOG("post receive for peerInfo and terminate messages");
         ND2_SGE sge = { buffer + params.MaxXfer + params.HdrLen, sizeof(PeerInfo), m_pMr->GetLocalToken() };
         NdTestBase::PostReceive(&sge, 1, Ctxt::Recv);
         NdTestBase::PostReceive(&sge, 1, Ctxt::Recv);
@@ -133,6 +146,28 @@ void Server::RunWorker(const Params& params)
     }
     NdTestServerBase::GetConnectionRequest();
     NdTestServerBase::Accept(0, 0);
+
+    {
+        LOG("wait for incoming peer info message");
+        WaitForCompletionAndCheckContext(Ctxt::Recv);
+        printf("\nReceived Client PeerInfo:\n");
+        print_PeerInfo(stdout, *pClientInfo);
+        printf("\n");
+    }
+    NdTestBase::CreateMW();
+    NdTestBase::Bind(buffer, (DWORD)buffer.size(), ND_OP_FLAG_ALLOW_WRITE);
+    {
+        LOG("send remote token and address");
+        pServerInfo->m_remoteToken = m_pMw->GetRemoteToken();
+        pServerInfo->m_remoteAddress = (UINT64)((char*)buffer);
+        ND2_SGE sge = { pServerInfo, sizeof(*pServerInfo), m_pMr->GetLocalToken() };
+        NdTestBase::Send(&sge, 1, 0, Ctxt::Send);
+        LOG("waiting to complete the sending of the server PeerInfo data");
+        WaitForCompletionAndCheckContext(Ctxt::Send);
+        printf("\nSent Server PeerInfo:\n");
+        print_PeerInfo(stdout, *pServerInfo);
+        printf("\n");
+    }
 
     LOG_VOID_RETURN();
 }
@@ -194,6 +229,8 @@ void Client::RunWorker(const Params& params, const struct sockaddr_in& v4Src, co
     NdTestBase::CreateMR();
     HEAP heap(0, 0, 0);
     BUFFER<char> buffer(&heap, HEAP_ZERO_MEMORY, params.MaxXfer + params.HdrLen + 2 * sizeof(PeerInfo));
+    PeerInfo* const pServerInfo = (PeerInfo*)(buffer + ServerPeerInfoOffset(params));
+    PeerInfo* const pClientInfo = (PeerInfo*)(buffer + ClientPeerInfoOffset(params));
     BUFFER<ND2_SGE> sges(&heap, HEAP_ZERO_MEMORY, 2);
     {
         ULONG const flags = ND_MR_FLAG_ALLOW_LOCAL_WRITE | ND_MR_FLAG_ALLOW_REMOTE_WRITE;
@@ -201,7 +238,7 @@ void Client::RunWorker(const Params& params, const struct sockaddr_in& v4Src, co
     }
     {
         ND2_ADAPTER_INFO info = GetAdapterInfo();
-        Utils::print_info(stdout, info);
+        Utils::print_adapter_info(stdout, info);
         ULONG const queueDepth = min(info.MaxCompletionQueueDepth, info.MaxInitiatorQueueDepth);
         ULONG const nMaxSge = min((ULONG)params.nSge, info.MaxInitiatorSge);
         ULONG const inlineThreshold = info.InlineRequestThreshold;
@@ -214,12 +251,6 @@ void Client::RunWorker(const Params& params, const struct sockaddr_in& v4Src, co
     {
         PeerInfo *pInfo = (PeerInfo*)(buffer + params.MaxXfer + params.HdrLen);
         ND2_SGE sge = { pInfo, sizeof(PeerInfo), m_pMr->GetLocalToken() };
-
-        fprintf(stdout, "\nPeerInfo located at %p before the send:\n", pInfo);
-        print_PeerInfo(stdout, *pInfo);
-        Utils::hexdumptofile(stdout, pInfo, sizeof(*pInfo));
-        fprintf(stdout, "\nPostReceive\nND2_SGE:\n");
-        Utils::print_sge(stdout, sge);
         NdTestBase::PostReceive(&sge, 1, Ctxt::Recv);
     }
 
@@ -229,23 +260,17 @@ void Client::RunWorker(const Params& params, const struct sockaddr_in& v4Src, co
     NdTestBase::Bind(buffer, (DWORD)buffer.size(), ND_OP_FLAG_ALLOW_WRITE);
 
     {
-        LOG("send remote token and address");
-        size_t const offset = params.MaxXfer + params.HdrLen + sizeof(PeerInfo);
-        PeerInfo *pPeerInfo = (PeerInfo*)(buffer + offset);
-        PeerInfo& peerInfo = *pPeerInfo;
-        peerInfo.m_remoteToken = m_pMw->GetRemoteToken();
-        peerInfo.m_remoteAddress = (UINT64)((char*)buffer);
+        LOG("send client remote token and address to the server");
+        pClientInfo->m_remoteToken = m_pMw->GetRemoteToken();
+        pClientInfo->m_remoteAddress = (UINT64)((char*)buffer);
 
-        fprintf(stdout, "\nsending PeerInfo:\n");
-        print_PeerInfo(stdout, peerInfo);
 
-        ND2_SGE sge = { &peerInfo, sizeof(peerInfo), m_pMr->GetLocalToken() };
+        ND2_SGE sge = { pClientInfo, sizeof(*pClientInfo), m_pMr->GetLocalToken() };
         DWORD const count = 1;
         DWORD const flags = 0;
-
-        fprintf(stdout, "\nSend\nND2_SGE:\n");
-        Utils::print_sge(stdout, sge);
         NdTestBase::Send(&sge, count, flags, Ctxt::Send);
+        fprintf(stdout, "\nSent Client PeerInfo:\n");
+        print_PeerInfo(stdout, *pClientInfo);
     }
     {
         LOG("wait for send completion and incomming peer info message");
@@ -273,10 +298,8 @@ void Client::RunWorker(const Params& params, const struct sockaddr_in& v4Src, co
             }, true);
         }
         {
-            size_t const offset = params.MaxXfer + params.HdrLen;
-            PeerInfo *pInfo = (PeerInfo*)(buffer + offset);
-            printf("\nReceived PeerInfo\n");
-            print_PeerInfo(stdout, *pInfo);
+            printf("\nReceived Server PeerInfo\n");
+            print_PeerInfo(stdout, *pServerInfo);
         }
     }
 

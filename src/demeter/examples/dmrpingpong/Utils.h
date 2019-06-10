@@ -4,7 +4,7 @@
 class Utils
 {
 public:
-    static void print_info(FILE *file, ND2_ADAPTER_INFO &info);
+    static void print_adapter_info(FILE *file, ND2_ADAPTER_INFO &info);
     static void print_result(FILE *file, const ND2_RESULT &result);
     static const char* request_type(ND2_REQUEST_TYPE rtype);
     static void print_sge(FILE *file, const ND2_SGE &sge);
