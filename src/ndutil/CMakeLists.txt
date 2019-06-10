@@ -22,11 +22,13 @@ else()
     set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 endif()
 
-if (${CMAKE_SIZEOF_VOID_P} EQUAL "8")
-    set (PROJECTNAME_ARCHITECTURE "x64")
-else ()
-    set (PROJECTNAME_ARCHITECTURE "x86")
-endif ()
+set (PROJECTNAME_ARCHITECTURE "x64")
+
+#if (${CMAKE_SIZEOF_VOID_P} EQUAL "8")
+#    set (PROJECTNAME_ARCHITECTURE "x64")
+#else ()
+#    set (PROJECTNAME_ARCHITECTURE "x86")
+#endif ()
 message( STATUS "Building for Proc Arch: " "${PROJECTNAME_ARCHITECTURE}" )
 
 message( STATUS "Current Source Dir: " "${CMAKE_CURRENT_SOURCE_DIR}" )
@@ -97,7 +99,7 @@ source_group("include" FILES ${INCLUDE})
 
 set_source_files_properties(${SRC}
     PROPERTIES
-    COMPILE_FLAGS "/Yuprecomp.h"
+    COMPILE_FLAGS "/Ycprecomp.h"
 )
 
 # Define Release by default.
@@ -128,10 +130,10 @@ if(MSVC)
    set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /EHsc")
    set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /EHsc")
    set (CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /ignore:4099")
-   set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /Yuprecomp.h /FIprecomp.h")
+   set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /Yuprecomp.h")
     
    add_definitions(-DUNICODE)
-   add_compile_options(/MP)
+   add_compile_options(/MT)
 endif(MSVC)
 if(NOT MSVC)
    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
@@ -140,6 +142,20 @@ if(NOT MSVC)
    endif()
 endif(NOT MSVC)
 
+# Add /Qspectre and /guard:cf
+message(STATUS "MSVC_VERSION: " ${MSVC_VERSION})
+if (MSVC AND (MSVC_VERSION GREATER 1900))
+    if (${use_control_flow_guard})
+        message("Setting CONTROL FLOW GUARD") 
+        set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /guard:cf")
+        SET(CMAKE_EXE_LINKER_FLAGS  "/guard:cf /DYNAMICBASE")
+    endif()
+    if (${use_qspectre})
+        message("Setting QSPECTRE")
+        set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /Qspectre")
+    endif()
+endif()
+
 
 # Add custom command
 add_custom_command(
@@ -147,6 +163,8 @@ add_custom_command(
     PRE_BUILD
     COMMAND ${CMAKE_MC_COMPILER} -h "${CMAKE_CURRENT_SOURCE_DIR}" -r "${CMAKE_CURRENT_BINARY_DIR}" ${CMAKE_CURRENT_SOURCE_DIR}/ndstatus.mc
 )
+
+#set_target_properties(${PROJ_NAME} PROPERTIES PLATFORM_TOOLSET "WindowsUserModeDriver10.0")
 
 # Add library to build.
 add_library(${PROJ_NAME} ${SRC} ${INCLUDE})
