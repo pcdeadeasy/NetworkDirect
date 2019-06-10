@@ -40,7 +40,8 @@ void Utils::print_result(FILE *file, const ND2_RESULT &result)
 #define QU(X,Y) fprintf(file, "  \"" #X "\": \"%" #Y "\",\n", result.##X)
 #define EU(X,Y) fprintf(file, "  \"" #X "\": %" #Y "\n", result.##X)
     fprintf(file, "{\n");
-    PU(Status, 08x);
+    QU(Status, 08X);
+    fprintf(file, "  \"Status\": \"%s\",\n", Utils::get_status_string(result.Status));
     PU(BytesTransferred, u);
     QU(QueuePairContext, p);
     QU(RequestContext, p);
@@ -121,13 +122,9 @@ int Utils::hexdumptostring(char *output, size_t output_size, const void *input, 
                 j += sprintf_s(output + j, output_size - j, "  %s\n", ascii);
             j += sprintf_s(output + j, output_size - j, "[%08X] ", i);
         }
-        if ((i % 16) == 8)
         {
-            j += sprintf_s(output + j, output_size - j, " - %02X", pc[i]);
-        }
-        else
-        {
-            j += sprintf_s(output + j, output_size - j, " %02X", pc[i]);
+            const char *fmt = ((i % 16) == 8) ? " - %02X" : " %02X";
+            j += sprintf_s(output + j, output_size - j, fmt, pc[i]);
         }
         ascii[i % 16] = ((pc[i] < 0x20) || (pc[i] > 0x7e)) ? '.' : pc[i];
         ascii[(i % 16) + 1] = '\0';
@@ -141,4 +138,16 @@ int Utils::hexdumptostring(char *output, size_t output_size, const void *input, 
     }
     j += sprintf_s(output + j, output_size - j, "  %s\n", ascii);
     return j;
+}
+
+const char* Utils::get_status_string(HRESULT status)
+{
+#define FOR_RESULT(X) case X: return(#X);
+    switch (status)
+    {
+        FOR_ALL_ND_RESULTS(FOR_RESULT)
+    default:
+        return "UNDEFINED";
+    }
+#undef FOR_RESULT
 }
