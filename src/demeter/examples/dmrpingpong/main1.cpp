@@ -135,7 +135,7 @@ void Server::RunWorker(const Params& params)
     }
     {
         LOG("post receive for peerInfo and terminate messages");
-        ND2_SGE sge = { buffer + params.MaxXfer + params.HdrLen, sizeof(PeerInfo), m_pMr->GetLocalToken() };
+        ND2_SGE sge = { pClientInfo, sizeof(*pClientInfo), m_pMr->GetLocalToken() };
         NdTestBase::PostReceive(&sge, 1, Ctxt::Recv);
         NdTestBase::PostReceive(&sge, 1, Ctxt::Recv);
     }
@@ -299,6 +299,7 @@ void Client::RunWorker(const Params& params, const struct sockaddr_in& v4Src, co
 
 void main1(Params& params)
 {
+    printf("Version: %zu\n", params.Version);
     LOG_ENTER();
     if (params.Server) 
     {

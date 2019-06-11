@@ -36,6 +36,7 @@ Params::Params(int argc, char **argv)
         throw Params::Exception();
     }
 
+    Version = 1;
     Server = result["server"].as<bool>();
     Client = result["client"].as<bool>();
     Blocking = result["blocking"].as<bool>();

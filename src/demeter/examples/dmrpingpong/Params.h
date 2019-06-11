@@ -23,6 +23,7 @@ public:
     size_t HdrLen;
     size_t MaxVolume;
     size_t MaxIterations;
+    size_t Version;
     char Logfile[_MAX_PATH + 1];
     char Ip[_MAX_PATH + 1];
     unsigned short Port;
