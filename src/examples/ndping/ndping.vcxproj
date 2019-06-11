@@ -15,6 +15,7 @@
   <ItemDefinitionGroup>
     <ClCompile>
       <PreprocessorDefinitions>_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(SolutionDir)Logger;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -28,6 +29,11 @@
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="ndping.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\Logger\Logger.vcxproj">
+      <Project>{7124fa54-4b6d-4bf1-a373-06b665fcc703}</Project>
+    </ProjectReference>
   </ItemGroup>
   <PropertyGroup>
     <ConfigurationType>Application</ConfigurationType>

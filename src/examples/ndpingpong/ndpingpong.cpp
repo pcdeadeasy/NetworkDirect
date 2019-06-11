@@ -8,6 +8,7 @@
 #include "ndtestutil.h"
 #include "logging.h"
 #include <functional>
+#include <Logger.h>
 
 const USHORT x_DefaultPort = 54325;
 const DWORD x_MaxXfer = (4 * 1024 * 1024);
@@ -40,10 +41,14 @@ public:
     NdPingPongServer(char *pBuf, bool useEvents) :
         m_pBuf(pBuf),
         m_bUseEvents(useEvents)
-    {}
+    {
+        LOG_ENTER();
+        LOG_VOID_RETURN();
+    }
 
     ~NdPingPongServer()
     {
+        LOG_ENTER();
         if (m_sendSgl != nullptr)
         {
             delete[] m_sendSgl;
@@ -53,6 +58,7 @@ public:
         {
             delete[] m_recvSgl;
         }
+        LOG_VOID_RETURN();
     }
 
     void RunTest(
@@ -60,6 +66,7 @@ public:
         _In_ DWORD queueDepth,
         _In_ DWORD nSge)
     {
+        LOG_ENTER();
         NdPingPongServer::Init(v4Src);
         NdTestBase::CreateMR();
         NdTestBase::RegisterDataBuffer(m_pBuf, x_MaxXfer + x_HdrLen, ND_MR_FLAG_ALLOW_LOCAL_WRITE);
@@ -83,6 +90,7 @@ public:
         m_recvSgl = new (std::nothrow) ND2_SGE[nSge];
         if (m_sendSgl == nullptr || m_recvSgl == nullptr)
         {
+            LOG_VOID_RETURN();
             LOG_FAILURE_AND_EXIT(L"Failed to allocate sgl.", __LINE__);
         }
 
@@ -115,10 +123,12 @@ public:
 
         //tear down
         NdTestBase::Shutdown();
+        LOG_VOID_RETURN();
     }
 
     void Pong(DWORD nIters, DWORD len)
     {
+        LOG_ENTER();
         // prepare send sge
         DWORD nSendSge = NdTestBase::PrepareSge(m_sendSgl, m_nMaxSge,
             m_pBuf, len, x_HdrLen, m_pMr->GetLocalToken());
@@ -128,6 +138,7 @@ public:
         bool bCancelled = false;
         const std::function<void(ND2_RESULT *)> processCompletionFn = [&bCancelled](ND2_RESULT *pComp)
         {
+            LOG("Entering Pong.processCompletionFn");
             if (pComp->Status == ND_SUCCESS)
             {
                 *(reinterpret_cast<bool *>(pComp->RequestContext)) = true;
@@ -138,8 +149,11 @@ public:
             }
             else
             {
+                LOG("Exiting Pong.processCompletionFn");
+                LOG_VOID_RETURN();
                 LOG_FAILURE_HRESULT_AND_EXIT(pComp->Status, L"unexpected event: %08x\n", __LINE__);
             }
+            LOG("Exiting Pong.processCompletionFn");
         };
 
         for (DWORD i = 0; i < nIters; i++)
@@ -160,6 +174,7 @@ public:
             }
             m_bSendCompleted = false;
         }
+        LOG_VOID_RETURN();
     }
 
 private:
@@ -178,10 +193,14 @@ public:
     NdPingPongClient(char *pBuf, bool bUseEvents) :
         m_pBuf(pBuf),
         m_bUseEvents(bUseEvents)
-    {}
+    {
+        LOG_ENTER();
+        LOG_VOID_RETURN();
+    }
 
     ~NdPingPongClient()
     {
+        LOG_ENTER();
         if (m_sendSgl != nullptr)
         {
             delete[] m_sendSgl;
@@ -191,6 +210,7 @@ public:
         {
             delete[] m_recvSgl;
         }
+        LOG_VOID_RETURN();
     }
 
     void RunTest(
@@ -199,6 +219,7 @@ public:
         _In_ DWORD queueDepth,
         _In_ DWORD nMaxSge)
     {
+        LOG_ENTER();
         NdTestBase::Init(v4Src);
 
         NdTestBase::CreateMR();
@@ -223,6 +244,7 @@ public:
         m_recvSgl = new (std::nothrow) ND2_SGE[nMaxSge];
         if (m_sendSgl == nullptr || m_recvSgl == nullptr)
         {
+            LOG_VOID_RETURN();
             LOG_FAILURE_AND_EXIT(L"Failed to allocate failed to allocate sgl.", __LINE__);
         }
 
@@ -276,10 +298,12 @@ public:
 
         //tear down
         NdTestBase::Shutdown();
+        LOG_VOID_RETURN();
     }
 
     void Ping(DWORD nIters, DWORD len)
     {
+        LOG_ENTER();
         // prepare send sge
         DWORD nSendSge = NdTestBase::PrepareSge(m_sendSgl, m_nMaxSge,
             m_pBuf, len, x_HdrLen, m_pMr->GetLocalToken());
@@ -289,6 +313,7 @@ public:
         bool bCancelled = false;
         const std::function<void(ND2_RESULT *)> processCompletionFn = [&bCancelled](ND2_RESULT *pComp)
         {
+            LOG("Entering Ping.proccessCompletionFn");
             if (pComp->Status == ND_SUCCESS)
             {
                 *(reinterpret_cast<bool *>(pComp->RequestContext)) = true;
@@ -299,8 +324,11 @@ public:
             }
             else
             {
+                LOG("Exiting Ping.processCompletionFn");
+                LOG_VOID_RETURN();
                 LOG_FAILURE_HRESULT_AND_EXIT(pComp->Status, L"unexpected event: %08x\n", __LINE__);
             }
+            LOG("Exiting Ping.processCompletionFn");
         };
 
         for (DWORD i = 0; i < nIters; i++)
@@ -321,6 +349,7 @@ public:
             m_bRecvCompleted = false;
             NdTestBase::PostReceive(m_recvSgl, m_nRecvSge, &m_bRecvCompleted);
         }
+        LOG_VOID_RETURN();
     }
 
 private:
@@ -339,6 +368,9 @@ private:
 
 int __cdecl _tmain(int argc, TCHAR* argv[])
 {
+    {
+        Logger logger("log.json");
+    LOG_ENTER();
     bool bServer = false;
     bool bClient = false;
     DWORD nSge = 1;
@@ -353,6 +385,7 @@ int __cdecl _tmain(int argc, TCHAR* argv[])
     if (ret != 0)
     {
         printf("Failed to initialize Windows Sockets: %d\n", ret);
+        LOG_INT_RETURN(__LINE__ + 1);
         exit(__LINE__);
     }
 
@@ -380,6 +413,7 @@ int __cdecl _tmain(int argc, TCHAR* argv[])
             if (i == argc - 2)
             {
                 ShowUsage();
+                LOG_INT_RETURN(-1);
                 exit(-1);
             }
             nSge = _ttol(argv[++i]);
@@ -389,6 +423,7 @@ int __cdecl _tmain(int argc, TCHAR* argv[])
             if (i == argc - 2)
             {
                 ShowUsage();
+                LOG_INT_RETURN(-1);
                 exit(-1);
             }
             queueDepth = _ttol(argv[++i]);
@@ -400,6 +435,7 @@ int __cdecl _tmain(int argc, TCHAR* argv[])
         else if ((wcscmp(arg, L"-h") == 0) || (wcscmp(arg, L"--help") == 0))
         {
             ShowUsage();
+            LOG_INT_RETURN(0);
             exit(0);
         }
     }
@@ -415,6 +451,7 @@ int __cdecl _tmain(int argc, TCHAR* argv[])
         printf("Exactly one of client (c or "
             "server (s) must be specified.\n\n");
         ShowUsage();
+        LOG_INT_RETURN(__LINE__ + 1);
         exit(__LINE__);
     }
 
@@ -422,6 +459,7 @@ int __cdecl _tmain(int argc, TCHAR* argv[])
     {
         printf("Bad address.\n\n");
         ShowUsage();
+        LOG_INT_RETURN(__LINE__ + 1);
         exit(__LINE__);
     }
 
@@ -434,6 +472,7 @@ int __cdecl _tmain(int argc, TCHAR* argv[])
     {
         printf("Exactly one of blocking (b or polling (p) must be specified.\n\n");
         ShowUsage();
+        LOG_INT_RETURN(__LINE__ + 1);
         exit(__LINE__);
     }
 
@@ -441,18 +480,21 @@ int __cdecl _tmain(int argc, TCHAR* argv[])
     {
         printf("Invalid or missing SGE length\n\n");
         ShowUsage();
+        LOG_INT_RETURN(__LINE__ + 1);
         exit(__LINE__);
     }
 
     HRESULT hr = NdStartup();
     if (FAILED(hr))
     {
+        LOG_INT_RETURN(__LINE__ + 1);
         LOG_FAILURE_HRESULT_AND_EXIT(hr, L"NdStartup failed with %08x", __LINE__);
     }
 
     char *pBuf = static_cast<char *>(HeapAlloc(GetProcessHeap(), 0, x_MaxXfer + x_HdrLen));
     if (!pBuf)
     {
+        LOG_INT_RETURN(__LINE__ + 1);
         LOG_FAILURE_AND_EXIT(L"Failed to allocate data buffer.", __LINE__);
     }
 
@@ -474,6 +516,7 @@ int __cdecl _tmain(int argc, TCHAR* argv[])
         if (FAILED(hr))
         {
             HeapFree(GetProcessHeap(), 0, pBuf);
+            LOG_INT_RETURN(__LINE__ + 1);
             LOG_FAILURE_HRESULT_AND_EXIT(hr, L"NdResolveAddress failed with %08x", __LINE__);
         }
 #pragma warning (suppress: 6001) // no need to initialize pBuf
@@ -485,10 +528,13 @@ int __cdecl _tmain(int argc, TCHAR* argv[])
     hr = NdCleanup();
     if (FAILED(hr))
     {
+        LOG_INT_RETURN(__LINE__ + 1);
         LOG_FAILURE_HRESULT_AND_EXIT(hr, L"NdCleanup failed with %08x", __LINE__);
     }
 
     END_LOG(TESTNAME);
+    LOG_INT_RETURN(0);
+}
     _fcloseall();
     WSACleanup();
     return 0;
