@@ -140,10 +140,7 @@ void Server::RunWorker(const Params& params)
         NdTestBase::PostReceive(&sge, 1, Ctxt::Recv);
     }
     NdTestServerBase::CreateListener();
-    {
-        const struct sockaddr_in v4Src = GetSocketAddress(params);
-        NdTestServerBase::Listen(v4Src);
-    }
+    NdTestServerBase::Listen(GetSocketAddress(params));
     NdTestServerBase::GetConnectionRequest();
     NdTestServerBase::Accept(0, 0);
 
@@ -152,7 +149,6 @@ void Server::RunWorker(const Params& params)
         WaitForCompletionAndCheckContext(Ctxt::Recv);
         printf("\nReceived Client PeerInfo:\n");
         print_PeerInfo(stdout, *pClientInfo);
-        printf("\n");
     }
     NdTestBase::CreateMW();
     NdTestBase::Bind(buffer, (DWORD)buffer.size(), ND_OP_FLAG_ALLOW_WRITE);
