@@ -223,11 +223,19 @@ void Server::RunWorker(const Params& params)
             Utils::write_result(buf, sizeof(buf), result);
             printf("\nND2_RESULT:\n%s\n", buf);
         }
-
         {
             char buf[512];
             write_PeerInfo(buf, sizeof(buf), *pServerInfo);
             LOG("Sent Server PeerInfo:\n%s", buf);
+        }
+    }
+    {
+        printf("Waiting for the terminator\n");
+        ND2_RESULT result = WaitForCompletionAndCheckContext(Ctxt::Recv);
+        {
+            char buf[512];
+            Utils::write_result(buf, sizeof(buf), result);
+            printf("\nND2_RESULT:\n%s\n", buf);
         }
     }
     LOG_VOID_RETURN();
