@@ -330,3 +330,8 @@ ASALocalRun/
 
 # MFractors (Xamarin productivity tool) working folder 
 .mfractor/
+
+# Modification by Kirk Olynyk
+out/
+src/ndutil/ndstatus.rc
+src/ndutil/ndstatus_MSG*

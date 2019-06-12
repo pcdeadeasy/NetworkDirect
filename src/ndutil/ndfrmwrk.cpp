@@ -9,6 +9,7 @@
 #include "ndaddr.h"
 #include "ndprov.h"
 #include "ndfrmwrk.h"
+#include "Logger.h"
 
 
 namespace NetworkDirect
@@ -42,13 +43,16 @@ namespace NetworkDirect
         m_Socket(INVALID_SOCKET),
         m_nRef(0)
     {
+        LOG_ENTER();
         InitializeCriticalSection(&m_lock);
         ::ZeroMemory(m_Ov, sizeof(m_Ov));
+        LOG_VOID_RETURN();
     }
 
 
     Framework::~Framework()
     {
+        LOG_ENTER();
         while (!m_NdAddrList.empty())
         {
             Address* pAddr = &m_NdAddrList.front();
@@ -88,12 +92,14 @@ namespace NetworkDirect
         }
 
         DeleteCriticalSection(&m_lock);
+        LOG_VOID_RETURN();
     }
 
 
     HRESULT
         Framework::Init()
     {
+        LOG_ENTER();
         int ret;
         WSADATA data;
 
@@ -102,7 +108,9 @@ namespace NetworkDirect
         ret = ::WSAStartup(MAKEWORD(2, 2), &data);
         if (ret != 0)
         {
-            return HRESULT_FROM_WIN32(ret);
+            HRESULT hr = HRESULT_FROM_WIN32(ret);
+            LOG_HRESULT_RETURN(hr);
+            return hr;
         }
 
         // Create an IOCP to get all the different notifications:
@@ -111,14 +119,18 @@ namespace NetworkDirect
         m_hIocp = ::CreateIoCompletionPort(INVALID_HANDLE_VALUE, nullptr, 0, 0);
         if (m_hIocp == nullptr)
         {
-            return HRESULT_FROM_WIN32(::GetLastError());
+            HRESULT hr = HRESULT_FROM_WIN32(::GetLastError());
+            LOG_HRESULT_RETURN(hr);
+            return hr;
         }
 
         // Create a socket for address changes.
         m_Socket = ::WSASocketW(AF_INET, SOCK_STREAM, 0, nullptr, 0, WSA_FLAG_OVERLAPPED);
         if (m_Socket == INVALID_SOCKET)
         {
-            return HRESULT_FROM_WIN32(::WSAGetLastError());
+            HRESULT hr = HRESULT_FROM_WIN32(::WSAGetLastError());
+            LOG_HRESULT_RETURN(hr);
+            return hr;
         }
 
         // Bind the socket change handle to the IOCP.
@@ -126,14 +138,18 @@ namespace NetworkDirect
             reinterpret_cast<HANDLE>(m_Socket), m_hIocp, ND_NOTIFY_ADDR_CHANGE, 0);
         if (hIocp != m_hIocp)
         {
-            return HRESULT_FROM_WIN32(::GetLastError());
+            HRESULT hr = HRESULT_FROM_WIN32(::GetLastError());
+            LOG_HRESULT_RETURN(hr);
+            return hr;
         }
 
         // Get provider change notification handle.
         ret = ::WSAProviderConfigChange(&m_hProviderChange, nullptr, nullptr);
         if (ret != 0)
         {
-            return HRESULT_FROM_WIN32(::WSAGetLastError());
+            HRESULT hr = HRESULT_FROM_WIN32(::WSAGetLastError());
+            LOG_HRESULT_RETURN(hr);
+            return hr;
         }
 
         // Bind the provider change handle to the IOCP.
@@ -142,7 +158,9 @@ namespace NetworkDirect
             m_hProviderChange, m_hIocp, ND_NOTIFY_PROVIDER_CHANGE, 0);
         if (hIocp != m_hIocp)
         {
-            return HRESULT_FROM_WIN32(::GetLastError());
+            HRESULT hr = HRESULT_FROM_WIN32(::GetLastError());
+            LOG_HRESULT_RETURN(hr);
+            return hr;
         }
 
         // Request address change notification.
@@ -151,7 +169,9 @@ namespace NetworkDirect
             0, &BytesRet, &m_Ov[ND_NOTIFY_ADDR_CHANGE], nullptr);
         if (ret != 0 && WSAGetLastError() != WSA_IO_PENDING)
         {
-            return HRESULT_FROM_WIN32(::WSAGetLastError());
+            HRESULT hr = HRESULT_FROM_WIN32(::WSAGetLastError());
+            LOG_HRESULT_RETURN(hr);
+            return hr;
         }
 
         // Generate a provider change notification, so that the next call that
@@ -160,9 +180,12 @@ namespace NetworkDirect
             &m_Ov[ND_NOTIFY_PROVIDER_CHANGE]);
         if (ret == FALSE)
         {
-            return HRESULT_FROM_WIN32(::GetLastError());
+            HRESULT hr = HRESULT_FROM_WIN32(::GetLastError());
+            LOG_HRESULT_RETURN(hr);
+            return hr;
         }
 
+        LOG_HRESULT_RETURN(S_OK);
         return S_OK;
     }
 
@@ -170,13 +193,17 @@ namespace NetworkDirect
     ULONG
         Framework::AddRef()
     {
-        return ::InterlockedIncrement(&m_nRef);
+        LOG_ENTER();
+        ULONG ans = ::InterlockedIncrement(&m_nRef);
+        LOG_ULONG_RETURN(ans);
+        return ans;
     }
 
 
     ULONG
         Framework::Release()
     {
+        LOG_ENTER();
         ASSERT(m_nRef > 0);
 
         ULONG nRef = ::InterlockedDecrement(&m_nRef);
@@ -185,7 +212,7 @@ namespace NetworkDirect
         {
             delete this;
         }
-
+        LOG_ULONG_RETURN(nRef);
         return nRef;
     }
 
@@ -197,6 +224,7 @@ namespace NetworkDirect
             _Inout_ SIZE_T* pcbAddressList
         )
     {
+        LOG_ENTER();
         // Sync our provider and address lists
         ProcessUpdates();
 
@@ -220,6 +248,7 @@ namespace NetworkDirect
         if (nV4 == 0 && nV6 == 0)
         {
             *pcbAddressList = 0;
+            LOG_HRESULT_RETURN(ND_SUCCESS);
             return ND_SUCCESS;
         }
 
@@ -230,6 +259,7 @@ namespace NetworkDirect
         if (pAddressList == nullptr || cbRequired > *pcbAddressList)
         {
             *pcbAddressList = cbRequired;
+            LOG_HRESULT_RETURN(ND_BUFFER_OVERFLOW);
             return ND_BUFFER_OVERFLOW;
         }
 
@@ -250,6 +280,7 @@ namespace NetworkDirect
             CopyAddressList(m_NdV1AddrList, pAddressList, &pBuf, &cbRemaining);
         }
 
+        LOG_HRESULT_RETURN(S_OK);
         return S_OK;
     }
 
@@ -262,6 +293,7 @@ namespace NetworkDirect
             _Inout_ SIZE_T* pcbLocalAddress
         )
     {
+        LOG_ENTER();
         //
         // Sync our provider and address lists
         //
@@ -302,15 +334,19 @@ namespace NetworkDirect
             case WSAEFAULT:
                 if (len < *pcbLocalAddress)
                 {
+                    LOG_HRESULT_RETURN(ND_BUFFER_OVERFLOW);
                     return ND_BUFFER_OVERFLOW;
                 }
                 __fallthrough;
             default:
+                LOG_HRESULT_RETURN(ND_UNSUCCESSFUL);
                 return ND_UNSUCCESSFUL;
             case WSAEINVAL:
+                LOG_HRESULT_RETURN(ND_INVALID_ADDRESS);
                 return ND_INVALID_ADDRESS;
             case WSAENETUNREACH:
             case WSAENETDOWN:
+                LOG_HRESULT_RETURN(ND_NETWORK_UNREACHABLE);
                 return ND_NETWORK_UNREACHABLE;
             }
         }
@@ -325,6 +361,7 @@ namespace NetworkDirect
         {
             if (pAddr->Matches(pLocalAddress))
             {
+                LOG_HRESULT_RETURN(S_OK);
                 return S_OK;
             }
         }
@@ -335,10 +372,12 @@ namespace NetworkDirect
         {
             if (pAddr->Matches(pLocalAddress))
             {
+                LOG_HRESULT_RETURN(S_OK);
                 return S_OK;
             }
         }
 
+        LOG_HRESULT_RETURN(ND_INVALID_ADDRESS);
         return ND_INVALID_ADDRESS;
     }
 
@@ -349,11 +388,13 @@ namespace NetworkDirect
             _In_ SIZE_T cbAddress
         )
     {
+        LOG_ENTER();
         ASSERT(pAddress);
 
         HRESULT hr = ValidateAddress(pAddress, cbAddress);
         if (FAILED(hr))
         {
+            LOG_HRESULT_RETURN(hr);
             return hr;
         }
 
@@ -369,6 +410,7 @@ namespace NetworkDirect
         {
             if (pAddr->Matches(pAddress))
             {
+                LOG_HRESULT_RETURN(ND_SUCCESS);
                 return ND_SUCCESS;
             }
         }
@@ -379,10 +421,12 @@ namespace NetworkDirect
         {
             if (pAddr->Matches(pAddress))
             {
+                LOG_HRESULT_RETURN(ND_SUCCESS);
                 return ND_SUCCESS;
             }
         }
 
+        LOG_HRESULT_RETURN(ND_INVALID_ADDRESS);
         return ND_INVALID_ADDRESS;
     }
 
@@ -395,11 +439,13 @@ namespace NetworkDirect
             _Deref_out_ VOID** ppIAdapter
         )
     {
+        LOG_ENTER();
         ASSERT(pAddress);
         ASSERT(ppIAdapter);
         HRESULT hr = ValidateAddress(pAddress, cbAddress);
         if (FAILED(hr))
         {
+            LOG_HRESULT_RETURN(hr);
             return hr;
         }
 
@@ -446,6 +492,7 @@ namespace NetworkDirect
 
             break;
         }
+        LOG_HRESULT_RETURN(hr);
         return hr;
     }
 
@@ -453,8 +500,10 @@ namespace NetworkDirect
     void
         Framework::FlushProvidersForUser()
     {
+        LOG_ENTER();
         Lock lock(&m_lock);
         FlushProviders();
+        LOG_VOID_RETURN();
     }
 
 
@@ -464,13 +513,16 @@ namespace NetworkDirect
             _In_ SIZE_T cbAddress
         )
     {
+        LOG_ENTER();
         if (cbAddress < sizeof(struct sockaddr))
         {
+            LOG_HRESULT_RETURN(ND_INVALID_PARAMETER_2);
             return ND_INVALID_PARAMETER_2;
         }
 
         if (cbAddress > ULONG_MAX)
         {
+            LOG_HRESULT_RETURN(ND_INVALID_PARAMETER_2);
             return ND_INVALID_PARAMETER_2;
         }
 
@@ -479,6 +531,7 @@ namespace NetworkDirect
         case AF_INET:
             if (cbAddress < sizeof(struct sockaddr_in))
             {
+                LOG_HRESULT_RETURN(ND_INVALID_PARAMETER_2);
                 return ND_INVALID_PARAMETER_2;
             }
             break;
@@ -486,14 +539,17 @@ namespace NetworkDirect
         case AF_INET6:
             if (cbAddress < sizeof(struct sockaddr_in6))
             {
+                LOG_HRESULT_RETURN(ND_INVALID_PARAMETER_2);
                 return ND_INVALID_PARAMETER_2;
             }
             break;
 
         default:
+            LOG_HRESULT_RETURN(ND_INVALID_ADDRESS);
             return ND_INVALID_ADDRESS;
         }
 
+        LOG_HRESULT_RETURN(ND_SUCCESS);
         return ND_SUCCESS;
     }
 
@@ -505,6 +561,7 @@ namespace NetworkDirect
             _Inout_ SIZE_T* pnV6
         )
     {
+        LOG_ENTER();
         for (List<Address>::iterator pAddr = list.begin();
             pAddr != list.end() && (*pnV4 + *pnV6) < INT_MAX;
             ++pAddr)
@@ -521,6 +578,7 @@ namespace NetworkDirect
                 continue;
             }
         }
+        LOG_VOID_RETURN();
     }
 
 
@@ -531,6 +589,7 @@ namespace NetworkDirect
             _Inout_ List<Address>* pList
         )
     {
+        LOG_ENTER();
         for (int i = 0; i < addrList.iAddressCount; i++)
         {
             // We only handle IPv4 and IPv6 addresses.
@@ -568,6 +627,7 @@ namespace NetworkDirect
                 pList->push_back(pAddr);
             }
         }
+        LOG_VOID_RETURN();;
     }
 
 
@@ -579,6 +639,7 @@ namespace NetworkDirect
             _Inout_ SIZE_T* pcbBuf
         )
     {
+        LOG_ENTER();
         INT nAddress = pAddressList->iAddressCount;
 
         for (List<Address>::iterator pAddr = list.begin();
@@ -603,12 +664,14 @@ namespace NetworkDirect
         }
 
         pAddressList->iAddressCount = nAddress;
+        LOG_VOID_RETURN();
     }
 
 
     void
         Framework::ProcessUpdates()
     {
+        LOG_ENTER();
         BOOL ret;
 
         // Check the IOCP for completion of any of our requests.
@@ -663,6 +726,7 @@ namespace NetworkDirect
         } while (ret == TRUE ||
             (::GetLastError() != WAIT_TIMEOUT /*&&
             ::GetLastError() != ERROR_ABANDONED_WAIT*/));
+        LOG_VOID_RETURN();
     }
 
 
@@ -670,6 +734,7 @@ namespace NetworkDirect
         Framework::ProcessProviderChange()
     {
         // Enumerate the provider catalog, and rebuild our list of providers.
+        LOG_ENTER();
         DWORD len = 0;
         INT err;
         INT ret = ::WSCEnumProtocols(nullptr, nullptr, &len, &err);
@@ -677,6 +742,7 @@ namespace NetworkDirect
         ASSERT(err == WSAENOBUFS);
         if (ret != SOCKET_ERROR || err != WSAENOBUFS)
         {
+            LOG_VOID_RETURN();
             return;
         }
 
@@ -690,6 +756,7 @@ namespace NetworkDirect
         ));
         if (pProtocols == nullptr)
         {
+            LOG_VOID_RETURN();
             return;
         }
 
@@ -697,6 +764,7 @@ namespace NetworkDirect
         if (ret == SOCKET_ERROR)
         {
             ::HeapFree(ghHeap, 0, pProtocols);
+            LOG_VOID_RETURN();
             return;
         }
 
@@ -808,12 +876,14 @@ namespace NetworkDirect
 
         // We now have an up-to-date provider list.  Populate the address table.
         ProcessAddressChange();
+        LOG_VOID_RETURN();
     }
 
 
     void
         Framework::ProcessAddressChange()
     {
+        LOG_ENTER();
         // Remove all existing addresses.
         while (!m_NdAddrList.empty())
         {
@@ -882,12 +952,14 @@ namespace NetworkDirect
         {
             ::HeapFree(ghHeap, 0, pAddrList);
         }
+        LOG_VOID_RETURN();
     }
 
 
     void
         Framework::FlushProviders()
     {
+        LOG_ENTER();
         List<Provider>::iterator iter = m_ProviderList.begin();
         while (iter != m_ProviderList.end())
         {
@@ -903,6 +975,7 @@ namespace NetworkDirect
                 delete pProv;
             }
         }
+        LOG_VOID_RETURN();
     }
 
 } // namespace NetworkDirect
@@ -918,6 +991,7 @@ NdStartup(
     VOID
 )
 {
+    LOG_ENTER();
     LONG init;
     do
     {
@@ -930,7 +1004,10 @@ NdStartup(
         if (ghHeap == nullptr)
         {
             ::InterlockedDecrement(&gInitializing);
-            return HRESULT_FROM_WIN32(::GetLastError());
+            
+            HRESULT hr = HRESULT_FROM_WIN32(::GetLastError());
+            LOG_HRESULT_RETURN(hr);
+            return hr;
         }
 
         gpFramework = new NetworkDirect::Framework();
@@ -939,6 +1016,7 @@ NdStartup(
             ::HeapDestroy(ghHeap);
             ghHeap = nullptr;
             ::InterlockedDecrement(&gInitializing);
+            LOG_HRESULT_RETURN(ND_NO_MEMORY);
             return ND_NO_MEMORY;
         }
         HRESULT hr = gpFramework->Init();
@@ -949,12 +1027,14 @@ NdStartup(
             ::HeapDestroy(ghHeap);
             ghHeap = nullptr;
             ::InterlockedDecrement(&gInitializing);
+            LOG_HRESULT_RETURN(hr);;
             return hr;
         }
     }
 
     gpFramework->AddRef();
     ::InterlockedDecrement(&gInitializing);
+    LOG_HRESULT_RETURN(S_OK);
     return S_OK;
 }
 
@@ -964,6 +1044,7 @@ NdCleanup(
     VOID
 )
 {
+    LOG_ENTER();
     LONG init;
     do
     {
@@ -973,6 +1054,7 @@ NdCleanup(
     if (gpFramework == nullptr)
     {
         ::InterlockedDecrement(&gInitializing);
+        LOG_HRESULT_RETURN(ND_DEVICE_NOT_READY);
         return ND_DEVICE_NOT_READY;
     }
 
@@ -984,6 +1066,7 @@ NdCleanup(
     }
 
     ::InterlockedDecrement(&gInitializing);
+    LOG_HRESULT_RETURN(S_OK);
     return S_OK;
 }
 
@@ -993,12 +1076,15 @@ NdFlushProviders(
     VOID
 )
 {
+    LOG_ENTER();
     if (gpFramework == nullptr)
     {
+        LOG_VOID_RETURN();
         return;
     }
 
     gpFramework->FlushProvidersForUser();
+    LOG_VOID_RETURN();
 }
 
 
@@ -1012,12 +1098,16 @@ NdQueryAddressList(
     _Inout_ SIZE_T* pcbAddressList
 )
 {
+    LOG_ENTER();
     if (gpFramework == nullptr)
     {
+        LOG_HRESULT_RETURN(ND_DEVICE_NOT_READY);
         return ND_DEVICE_NOT_READY;
     }
 
-    return gpFramework->QueryAddressList(flags, pAddressList, pcbAddressList);
+    HRESULT hr = gpFramework->QueryAddressList(flags, pAddressList, pcbAddressList);
+    LOG_HRESULT_RETURN(hr);
+    return hr;
 }
 
 
@@ -1029,17 +1119,21 @@ NdResolveAddress(
     _Inout_ SIZE_T* pcbLocalAddress
 )
 {
+    LOG_ENTER();
     if (gpFramework == nullptr)
     {
+        LOG_HRESULT_RETURN(ND_DEVICE_NOT_READY);
         return ND_DEVICE_NOT_READY;
     }
 
-    return gpFramework->ResolveAddress(
+    HRESULT hr = gpFramework->ResolveAddress(
         pRemoteAddress,
         cbRemoteAddress,
         pLocalAddress,
         pcbLocalAddress
     );
+    LOG_HRESULT_RETURN(hr);
+    return hr;
 }
 
 
@@ -1049,12 +1143,16 @@ NdCheckAddress(
     _In_ SIZE_T cbAddress
 )
 {
+    LOG_ENTER();;
     if (gpFramework == nullptr)
     {
+        LOG_HRESULT_RETURN(ND_DEVICE_NOT_READY);
         return ND_DEVICE_NOT_READY;
     }
 
-    return gpFramework->CheckAddress(pAddress, cbAddress);
+    HRESULT hr = gpFramework->CheckAddress(pAddress, cbAddress);
+    LOG_HRESULT_RETURN(hr);
+    return hr;
 }
 
 
@@ -1066,12 +1164,16 @@ NdOpenAdapter(
     _Deref_out_ VOID** ppIAdapter
 )
 {
+    LOG_ENTER();
     if (gpFramework == nullptr)
     {
+        LOG_HRESULT_RETURN(ND_DEVICE_NOT_READY);
         return ND_DEVICE_NOT_READY;
     }
 
-    return gpFramework->OpenAdapter(iid, pAddress, cbAddress, ppIAdapter);
+    HRESULT hr = gpFramework->OpenAdapter(iid, pAddress, cbAddress, ppIAdapter);
+    LOG_HRESULT_RETURN(hr);
+    return hr;
 }
 
 
@@ -1082,10 +1184,13 @@ NdOpenV1Adapter(
     _Deref_out_ INDAdapter** ppIAdapter
 )
 {
-    return gpFramework->OpenAdapter(
+    LOG_ENTER();
+    HRESULT hr = gpFramework->OpenAdapter(
         IID_INDAdapter,
         pAddress,
         cbAddress,
         reinterpret_cast<VOID**>(ppIAdapter)
     );
+    LOG_HRESULT_RETURN(hr);
+    return hr;
 }
