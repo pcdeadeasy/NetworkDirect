@@ -191,11 +191,12 @@ void Server::RunWorker(const Params& params)
 
     {
         LOG("<- Wait for incoming peer info message ->");
+        printf("waiting for the arival of the client's PeerInfo structure ...\n");
         ND2_RESULT result = WaitForCompletionAndCheckContext(Ctxt::Recv);
         {
             char buf[512];
             Utils::write_result(buf, sizeof(buf), result);
-            printf("\nND2_RESULT:\n%s\n", buf);
+            printf("ND2_RESULT:\n%s\n", buf);
         }
         printf("\nReceived Client PeerInfo:\n");
         print_PeerInfo(stdout, *pClientInfo);
@@ -212,16 +213,18 @@ void Server::RunWorker(const Params& params)
         pServerInfo->m_remoteToken = m_pMw->GetRemoteToken();
         pServerInfo->m_remoteAddress = (UINT64)((char*)buffer);
         ND2_SGE sge = { pServerInfo, sizeof(*pServerInfo), m_pMr->GetLocalToken() };
+        printf("\nsending Server Peerinfo ... \n");
         NdTestBase::Send(&sge, 1, 0, Ctxt::Send);
-        printf("\nSent Server PeerInfo:\n");
+        printf("\nsent Server's PeerInfo structure\n");
         print_PeerInfo(stdout, *pServerInfo);
         printf("\n");
         LOG("<- Waiting to complete the sending of the server PeerInfo data ->");
+        printf("waiting on the compltion of the send ...\n");
         ND2_RESULT result = WaitForCompletionAndCheckContext(Ctxt::Send);
         {
             char buf[512];
             Utils::write_result(buf, sizeof(buf), result);
-            printf("\nND2_RESULT:\n%s\n", buf);
+            printf("ND2_RESULT:\n%s\n", buf);
         }
         {
             char buf[512];
@@ -230,12 +233,12 @@ void Server::RunWorker(const Params& params)
         }
     }
     {
-        printf("Waiting for the terminator\n");
+        printf("Waiting for the terminator message ...\n");
         ND2_RESULT result = WaitForCompletionAndCheckContext(Ctxt::Recv);
         {
             char buf[512];
             Utils::write_result(buf, sizeof(buf), result);
-            printf("\nND2_RESULT:\n%s\n", buf);
+            printf("ND2_RESULT:\n%s\n", buf);
         }
     }
     LOG_VOID_RETURN();
