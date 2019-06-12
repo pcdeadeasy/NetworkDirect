@@ -82,7 +82,32 @@ public:
         throw "Don't call this!";
     }
     ND2_ADAPTER_INFO GetAdapterInfo();
+    ND2_RESULT WaitForCompletionAndCheckContext(void *expectedContext);
 };
+
+
+ND2_RESULT Server::WaitForCompletionAndCheckContext(void *expectedContext)
+{
+    LOG_ENTER();
+    ND2_RESULT result = { 0 };
+    WaitForCompletion([&expectedContext, &result](ND2_RESULT *pComp)
+    {
+        result = *pComp;
+        if (ND_SUCCESS != pComp->Status)
+        {
+            LOG_ERROR_UNEQUAL(pComp->Status, ND_SUCCESS);
+            LogIfErrorExit(pComp->Status, ND_SUCCESS, "Unexpected completion status", __LINE__);
+        }
+        if (expectedContext != pComp->RequestContext)
+        {
+            LOG_ERROR_RETURN();
+            LogErrorExit("Unexpected completion\n", __LINE__);
+        }
+    }, true);
+    LOG_STRUCT_RETURN(ND2_RESULT);
+    return result;
+}
+
 
 class Client : public NdTestClientBase
 {
@@ -166,7 +191,12 @@ void Server::RunWorker(const Params& params)
 
     {
         LOG("<- Wait for incoming peer info message ->");
-        WaitForCompletionAndCheckContext(Ctxt::Recv);
+        ND2_RESULT result = WaitForCompletionAndCheckContext(Ctxt::Recv);
+        {
+            char buf[512];
+            Utils::write_result(buf, sizeof(buf), result);
+            printf("\nND2_RESULT:\n%s\n", buf);
+        }
         printf("\nReceived Client PeerInfo:\n");
         print_PeerInfo(stdout, *pClientInfo);
         {
@@ -184,7 +214,7 @@ void Server::RunWorker(const Params& params)
         ND2_SGE sge = { pServerInfo, sizeof(*pServerInfo), m_pMr->GetLocalToken() };
         NdTestBase::Send(&sge, 1, 0, Ctxt::Send);
         LOG("<- Waiting to complete the sending of the server PeerInfo data ->");
-        WaitForCompletionAndCheckContext(Ctxt::Send);
+        ND2_RESULT result = WaitForCompletionAndCheckContext(Ctxt::Send);
 
         printf("\nSent Server PeerInfo:\n");
         print_PeerInfo(stdout, *pServerInfo);
