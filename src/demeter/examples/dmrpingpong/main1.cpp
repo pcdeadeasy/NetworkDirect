@@ -213,12 +213,17 @@ void Server::RunWorker(const Params& params)
         pServerInfo->m_remoteAddress = (UINT64)((char*)buffer);
         ND2_SGE sge = { pServerInfo, sizeof(*pServerInfo), m_pMr->GetLocalToken() };
         NdTestBase::Send(&sge, 1, 0, Ctxt::Send);
-        LOG("<- Waiting to complete the sending of the server PeerInfo data ->");
-        ND2_RESULT result = WaitForCompletionAndCheckContext(Ctxt::Send);
-
         printf("\nSent Server PeerInfo:\n");
         print_PeerInfo(stdout, *pServerInfo);
         printf("\n");
+        LOG("<- Waiting to complete the sending of the server PeerInfo data ->");
+        ND2_RESULT result = WaitForCompletionAndCheckContext(Ctxt::Send);
+        {
+            char buf[512];
+            Utils::write_result(buf, sizeof(buf), result);
+            printf("\nND2_RESULT:\n%s\n", buf);
+        }
+
         {
             char buf[512];
             write_PeerInfo(buf, sizeof(buf), *pServerInfo);
