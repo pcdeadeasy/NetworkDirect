@@ -9,8 +9,6 @@
 #include "ndaddr.h"
 #include "ndprov.h"
 #include "ndfrmwrk.h"
-//#include "Logger.h"
-
 
 namespace NetworkDirect
 {
