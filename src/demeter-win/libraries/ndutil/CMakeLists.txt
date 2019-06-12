@@ -95,6 +95,8 @@ set(INCLUDE
   ./ndfrmwrk.h  
   ./ndprov.h
   ./ndutil.h
+  include/logging.h
+  include/ndcommon.h
   ./precomp.h  
 )
 
