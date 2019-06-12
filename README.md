@@ -8,6 +8,16 @@ NetworkDirect SDK is available in [Nuget](https://www.nuget.org/packages/network
 
 # Building
 
+## Using cmake
+
+- md build
+- cd build
+  - Run cmake -G "Visual Studio 15 2017 Win64" ..
+  - del CMakeCache.txt
+  - Run cmake -G "Visual Studio 15 2017 Win64" -T "WindowsUserModeDriver10.0" -DCMAKE_C_COMPILER_WORKS=1 -DCMAKE_CXX_COMPILER_WORKS=1 ..
+  - cmake --build . --target ndutil
+
+
 ## Prerequisites
 
  - [Visial Studio 2017](https://docs.microsoft.com/visualstudio/install/install-visual-studio)
