@@ -5,7 +5,7 @@
 
 #include "precomp.h"
 #include "ndaddr.h"
-#include <Logger.h>
+//#include <Logger.h>
 
 
 namespace NetworkDirect

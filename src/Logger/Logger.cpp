@@ -2,7 +2,7 @@
 #include <Windows.h>
 #include <stdarg.h>
 #include <stdio.h>
-#include "Logger.h"
+//#include "Logger.h"
 
 static void emit(int, FILE*);
 static void emit_string(FILE*, const char*);
