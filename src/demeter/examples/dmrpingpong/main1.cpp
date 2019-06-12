@@ -191,19 +191,19 @@ void Server::RunWorker(const Params& params)
 
     {
         LOG("<- Wait for incoming peer info message ->");
-        printf("waiting for the arival of the client's PeerInfo structure ...\n");
+        printf("waiting for the arrival of the client's PeerInfo structure ...\n");
         ND2_RESULT result = WaitForCompletionAndCheckContext(Ctxt::Recv);
         {
             char buf[512];
             Utils::write_result(buf, sizeof(buf), result);
             printf("ND2_RESULT:\n%s\n", buf);
         }
-        printf("\nReceived Client PeerInfo:\n");
+        printf("\nreceived client PeerInfo:\n");
         print_PeerInfo(stdout, *pClientInfo);
         {
             char buf[512];
             write_PeerInfo(buf, sizeof(buf), *pClientInfo);
-            LOG("Received Client PeerInfo:\n%s", buf);
+            LOG("received client PeerInfo:\n%s", buf);
         }
     }
     NdTestBase::CreateMW();
@@ -213,18 +213,18 @@ void Server::RunWorker(const Params& params)
         pServerInfo->m_remoteToken = m_pMw->GetRemoteToken();
         pServerInfo->m_remoteAddress = (UINT64)((char*)buffer);
         ND2_SGE sge = { pServerInfo, sizeof(*pServerInfo), m_pMr->GetLocalToken() };
-        printf("\nsending Server Peerinfo ... \n");
+        printf("sending Server Peerinfo ... \n");
         NdTestBase::Send(&sge, 1, 0, Ctxt::Send);
-        printf("\nsent Server's PeerInfo structure\n");
+        printf("sent Server's PeerInfo structure\n");
         print_PeerInfo(stdout, *pServerInfo);
         printf("\n");
         LOG("<- Waiting to complete the sending of the server PeerInfo data ->");
-        printf("waiting on the compltion of the send ...\n");
+        printf("waiting on the completion of the send ...\n");
         ND2_RESULT result = WaitForCompletionAndCheckContext(Ctxt::Send);
         {
             char buf[512];
             Utils::write_result(buf, sizeof(buf), result);
-            printf("ND2_RESULT:\n%s\n", buf);
+            printf("send has been complted and this is the result ...\nND2_RESULT:\n%s\n", buf);
         }
         {
             char buf[512];
@@ -233,7 +233,7 @@ void Server::RunWorker(const Params& params)
         }
     }
     {
-        printf("Waiting for the terminator message ...\n");
+        printf("\nwaiting for the terminatation message ...\n");
         ND2_RESULT result = WaitForCompletionAndCheckContext(Ctxt::Recv);
         {
             char buf[512];
@@ -341,8 +341,9 @@ void Client::RunWorker(const Params& params, const struct sockaddr_in& v4Src, co
         ND2_SGE sge = { pClientInfo, sizeof(*pClientInfo), m_pMr->GetLocalToken() };
         DWORD const count = 1;
         DWORD const flags = 0;
+        printf("\nsending client Peerinfo to the server ...\n");
         NdTestBase::Send(&sge, count, flags, Ctxt::Send);
-        fprintf(stdout, "\nSent Client PeerInfo:\n");
+        fprintf(stdout, "sent client PeerInfo asynchronously ...\n");
         print_PeerInfo(stdout, *pClientInfo);
         {
             char buf[512];
@@ -352,6 +353,7 @@ void Client::RunWorker(const Params& params, const struct sockaddr_in& v4Src, co
     }
     {
         LOG("<- Wait for send completion and incomming peer info message ->");
+        printf("\nwaiting on the completion of either the send or the receive ...\n");
         bool gotSendCompletion = false;
         bool gotPeerInfoMsg = false;
         while (!(gotSendCompletion && gotPeerInfoMsg))
@@ -362,17 +364,19 @@ void Client::RunWorker(const Params& params, const struct sockaddr_in& v4Src, co
                     char tbuf[512];
                     Utils::write_result(tbuf, sizeof(tbuf), *pCompletion);
                     LOG("ND2_RESULT\n%s", tbuf);
-                    printf("\nND2_RESULT:\n%s\n", tbuf);
+                    printf("ND2_RESULT:\n%s\n", tbuf);
                 }
                 void* ctxt = pCompletion->RequestContext;
                 if (ctxt == Ctxt::Send)
                 {
+                    printf("the send was successful\n");
                     gotSendCompletion = true;
                 }
                 else if (ctxt == Ctxt::Recv)
                 {
+                    printf("the receive was successful\n");
                     gotPeerInfoMsg = true;
-                    printf("\nReceived Server PeerInfo\n");
+                    printf("Received Server PeerInfo\n");
                     print_PeerInfo(stdout, *pServerInfo);
                     {
                         char buf[512];
