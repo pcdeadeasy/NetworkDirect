@@ -213,11 +213,10 @@ void Server::RunWorker(const Params& params)
         pServerInfo->m_remoteToken = m_pMw->GetRemoteToken();
         pServerInfo->m_remoteAddress = (UINT64)((char*)buffer);
         ND2_SGE sge = { pServerInfo, sizeof(*pServerInfo), m_pMr->GetLocalToken() };
-        printf("sending Server Peerinfo ... \n");
+        printf("\nsending Server Peerinfo ... (ctxt = %p)\n", Ctxt::Send);
         NdTestBase::Send(&sge, 1, 0, Ctxt::Send);
         printf("sent Server's PeerInfo structure\n");
         print_PeerInfo(stdout, *pServerInfo);
-        printf("\n");
         LOG("<- Waiting to complete the sending of the server PeerInfo data ->");
         printf("waiting on the completion of the send ...\n");
         ND2_RESULT result = WaitForCompletionAndCheckContext(Ctxt::Send);
@@ -229,7 +228,7 @@ void Server::RunWorker(const Params& params)
         {
             char buf[512];
             write_PeerInfo(buf, sizeof(buf), *pServerInfo);
-            LOG("Sent Server PeerInfo:\n%s", buf);
+            LOG("sent server PeerInfo:\n%s", buf);
         }
     }
     {
@@ -341,7 +340,7 @@ void Client::RunWorker(const Params& params, const struct sockaddr_in& v4Src, co
         ND2_SGE sge = { pClientInfo, sizeof(*pClientInfo), m_pMr->GetLocalToken() };
         DWORD const count = 1;
         DWORD const flags = 0;
-        printf("\nsending client Peerinfo to the server ...\n");
+        printf("\nsending client Peerinfo to the server (ctxt = %p)...\n", Ctxt::Send);
         NdTestBase::Send(&sge, count, flags, Ctxt::Send);
         fprintf(stdout, "sent client PeerInfo asynchronously ...\n");
         print_PeerInfo(stdout, *pClientInfo);
