@@ -387,7 +387,15 @@ void Client::RunWorker(const Params& params, const struct sockaddr_in& v4Src, co
     }
     {
         LOG("<- Send terminate message ->");
+        printf("\nSending the terminate message ...\n");
         NdTestBase::Send(nullptr, 0, 0);
+        WaitForCompletion([](ND2_RESULT *pCompletion)
+        {
+            char buf[512];
+            Utils::write_result(buf, sizeof(buf), *pCompletion);
+            printf("ND2_RESULT:\n%s\n", buf);
+        }, true);
+
     }
     LOG_VOID_RETURN();
 }
