@@ -2,54 +2,106 @@
 #include "Utils.h"
 
 
-void Utils::print_adapter_info(FILE *file, ND2_ADAPTER_INFO &info)
+int Utils::write_adapter_info(char * const buffer, size_t buffer_count, const ND2_ADAPTER_INFO &info)
 {
-#define PU(X,Y) fprintf(file, "  \"" #X "\": %" #Y ",\n", info.##X)
-#define EU(X,Y) fprintf(file, "  \"" #X "\": %" #Y "\n", info.##X)
-    fprintf(file, "{\n");
-    PU(InfoVersion, u);
-    PU(VendorId, u);
-    PU(DeviceId, u);
-    PU(AdapterId, zu);
-    PU(MaxRegistrationSize, zu);
-    PU(MaxWindowSize, zu);
-    PU(MaxInitiatorSge, u);
-    PU(MaxReceiveSge, u);
-    PU(MaxReadSge, u);
-    PU(MaxTransferLength, u);
-    PU(MaxInlineDataSize, u);
-    PU(MaxInboundReadLimit, u);
-    PU(MaxOutboundReadLimit, u);
-    PU(MaxReceiveQueueDepth, u);
-    PU(MaxInitiatorQueueDepth, u);
-    PU(MaxSharedReceiveQueueDepth, u);
-    PU(MaxCompletionQueueDepth, u);
-    PU(InlineRequestThreshold, u);
-    PU(LargeRequestThreshold, u);
-    PU(MaxCallerData, u);
-    PU(MaxCalleeData, u);
-    EU(AdapterFlags, u);
-    fprintf(file, "}\n");
+#define PU(X, Y) "    \"" #X "\": %" #Y ",\n"
+#define EU(X, Y) "    \"" #X "\": %" #Y "\n"
+    const char* const fmt =
+        "{\n"
+        PU(InfoVersion, u)
+        PU(VendorId, u)
+        PU(DeviceId, u)
+        PU(AdapterId, zu)
+        PU(MaxRegistrationSize, zu)
+        PU(MaxWindowSize, zu)
+        PU(MaxInitiatorSge, u)
+        PU(MaxReceiveSge, u)
+        PU(MaxReadSge, u)
+        PU(MaxTransferLength, u)
+        PU(MaxInlineDataSize, u)
+        PU(MaxInboundReadLimit, u)
+        PU(MaxOutboundReadLimit, u)
+        PU(MaxReceiveQueueDepth, u)
+        PU(MaxInitiatorQueueDepth, u)
+        PU(MaxSharedReceiveQueueDepth, u)
+        PU(MaxCompletionQueueDepth, u)
+        PU(InlineRequestThreshold, u)
+        PU(LargeRequestThreshold, u)
+        PU(MaxCallerData, u)
+        PU(MaxCalleeData, u)
+        EU(AdapterFlags, u)
+        "}";
+    return
+        snprintf(
+            buffer,
+            buffer_count,
+            fmt,
+            info.InfoVersion,
+            info.VendorId,
+            info.DeviceId,
+            info.AdapterId,
+            info.MaxRegistrationSize,
+            info.MaxWindowSize,
+            info.MaxInitiatorSge,
+            info.MaxReceiveSge,
+            info.MaxReadSge,
+            info.MaxTransferLength,
+            info.MaxInlineDataSize,
+            info.MaxInboundReadLimit,
+            info.MaxOutboundReadLimit,
+            info.MaxReceiveQueueDepth,
+            info.MaxInitiatorQueueDepth,
+            info.MaxSharedReceiveQueueDepth,
+            info.MaxCompletionQueueDepth,
+            info.InlineRequestThreshold,
+            info.LargeRequestThreshold,
+            info.MaxCallerData,
+            info.MaxCalleeData,
+            info.AdapterFlags
+        );
 #undef EU
 #undef PU
 }
 
+void Utils::print_adapter_info(FILE *file, ND2_ADAPTER_INFO &info)
+{
+    char buffer[1024];
+    int rc = Utils::write_adapter_info(buffer, sizeof(buffer), info);
+    printf("write_adapter_info -> %d\n", rc);
+    fprintf(file, "%s\n", buffer);
+}
+
+
+int Utils::write_result(char *buffer, size_t buffer_count, const ND2_RESULT &result)
+{
+    const char* const fmt =
+        "{\n"
+        "    \"Status\": \"%s\",\n"
+        "    \"BytesTransferred\": %u,\n"
+        "    \"QueuePairContext\": \"%p\",\n"
+        "    \"RequestContext\": \"%p\",\n"
+        "    \"RequestType:\": \"%s\"\n"
+        "}";
+    int rc = 
+        snprintf(
+            buffer, 
+            buffer_count, 
+            fmt, 
+            Utils::get_status_string(result.Status),
+            result.BytesTransferred,
+            result.QueuePairContext,
+            result.RequestContext, 
+            Utils::request_type(result.RequestType)
+        );
+    return rc;
+}
+
 void Utils::print_result(FILE *file, const ND2_RESULT &result)
 {
-#define PU(X,Y) fprintf(file, "  \"" #X "\": %" #Y ",\n", result.##X)
-#define QU(X,Y) fprintf(file, "  \"" #X "\": \"%" #Y "\",\n", result.##X)
-#define EU(X,Y) fprintf(file, "  \"" #X "\": %" #Y "\n", result.##X)
-    fprintf(file, "{\n");
-    QU(Status, 08X);
-    fprintf(file, "  \"Status\": \"%s\",\n", Utils::get_status_string(result.Status));
-    PU(BytesTransferred, u);
-    QU(QueuePairContext, p);
-    QU(RequestContext, p);
-    fprintf(file, "  \"RequestType\": { \"value\": %u, \"symbol\": \"%s\" },\n", result.RequestType, Utils::request_type(result.RequestType));
-    fprintf(file, "}\n");
-#undef QU
-#undef EU
-#undef PU
+    char buffer[512];
+    int rc = Utils::write_result(buffer, sizeof(buffer), result);
+    fprintf(file, "%s\n", buffer);
+
 }
 
 const char* Utils::request_type(ND2_REQUEST_TYPE rtype)

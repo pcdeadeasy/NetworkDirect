@@ -32,7 +32,8 @@ def main(path: str) -> None:
             level -= 1
             print("{0}{1}".format(indent * level, comment))
         else:
-            print("{0}{1}".format(indent * level, comment))
+            for s in comment.split('\n'):
+                print("{0}{1}".format(indent * level, s))
 
 if __name__ == '__main__':
     # pylint: disable=no-value-for-parameter

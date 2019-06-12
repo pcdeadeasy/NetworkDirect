@@ -115,6 +115,11 @@ void Server::RunWorker(const Params& params)
 {
     LOG_ENTER();
     ND2_ADAPTER_INFO info = GetAdapterInfo();
+    {
+        char temporary[1024];
+        int rc = Utils::write_adapter_info(temporary, sizeof(temporary), info);
+        LOG("ND2_ADAPTER_INFO:\n%s", temporary);
+    }
     NdTestBase::CreateCQ(info.MaxCompletionQueueDepth);
     NdTestBase::CreateConnector();
     {
@@ -128,13 +133,13 @@ void Server::RunWorker(const Params& params)
     BUFFER<char> buffer(&heap, HEAP_ZERO_MEMORY, params.MaxXfer + params.HdrLen + 2 * sizeof(PeerInfo));
     PeerInfo* const pServerInfo = (PeerInfo*)(buffer + ServerPeerInfoOffset(params));
     PeerInfo* const pClientInfo = (PeerInfo*)(buffer + ClientPeerInfoOffset(params));
-    BUFFER<ND2_SGE> sges(&heap, HEAP_ZERO_MEMORY, (ULONG)min(params.nSge, info.MaxInitiatorSge));
     {
+        LOG("<- Register the data buffer ->");
         ULONG const flags = ND_MR_FLAG_ALLOW_LOCAL_WRITE | ND_MR_FLAG_ALLOW_REMOTE_WRITE;
         NdTestBase::RegisterDataBuffer(buffer, (DWORD)buffer.size(), flags);
     }
     {
-        LOG("post receive for peerInfo and terminate messages");
+        LOG("<- Post receive for peerInfo and terminate messages ->");
         ND2_SGE sge = { pClientInfo, sizeof(*pClientInfo), m_pMr->GetLocalToken() };
         NdTestBase::PostReceive(&sge, 1, Ctxt::Recv);
         NdTestBase::PostReceive(&sge, 1, Ctxt::Recv);
@@ -145,7 +150,7 @@ void Server::RunWorker(const Params& params)
     NdTestServerBase::Accept(0, 0);
 
     {
-        LOG("wait for incoming peer info message");
+        LOG("<- Wait for incoming peer info message ->");
         WaitForCompletionAndCheckContext(Ctxt::Recv);
         printf("\nReceived Client PeerInfo:\n");
         print_PeerInfo(stdout, *pClientInfo);
@@ -153,12 +158,12 @@ void Server::RunWorker(const Params& params)
     NdTestBase::CreateMW();
     NdTestBase::Bind(buffer, (DWORD)buffer.size(), ND_OP_FLAG_ALLOW_WRITE);
     {
-        LOG("send remote token and address");
+        LOG("<- Send remote token and address ->");
         pServerInfo->m_remoteToken = m_pMw->GetRemoteToken();
         pServerInfo->m_remoteAddress = (UINT64)((char*)buffer);
         ND2_SGE sge = { pServerInfo, sizeof(*pServerInfo), m_pMr->GetLocalToken() };
         NdTestBase::Send(&sge, 1, 0, Ctxt::Send);
-        LOG("waiting to complete the sending of the server PeerInfo data");
+        LOG("<- Waiting to complete the sending of the server PeerInfo data ->");
         WaitForCompletionAndCheckContext(Ctxt::Send);
         printf("\nSent Server PeerInfo:\n");
         print_PeerInfo(stdout, *pServerInfo);
@@ -227,13 +232,17 @@ void Client::RunWorker(const Params& params, const struct sockaddr_in& v4Src, co
     BUFFER<char> buffer(&heap, HEAP_ZERO_MEMORY, params.MaxXfer + params.HdrLen + 2 * sizeof(PeerInfo));
     PeerInfo* const pServerInfo = (PeerInfo*)(buffer + ServerPeerInfoOffset(params));
     PeerInfo* const pClientInfo = (PeerInfo*)(buffer + ClientPeerInfoOffset(params));
-    BUFFER<ND2_SGE> sges(&heap, HEAP_ZERO_MEMORY, 2);
     {
         ULONG const flags = ND_MR_FLAG_ALLOW_LOCAL_WRITE | ND_MR_FLAG_ALLOW_REMOTE_WRITE;
         NdTestBase::RegisterDataBuffer(buffer, (DWORD)buffer.size(), flags);
     }
     {
         ND2_ADAPTER_INFO info = GetAdapterInfo();
+        {
+            char temporary[1024];
+            int rc = Utils::write_adapter_info(temporary, sizeof(temporary), info);
+            LOG("ND2_ADAPTER_INFO:\n%s", temporary);
+        }
         ULONG const queueDepth = min(info.MaxCompletionQueueDepth, info.MaxInitiatorQueueDepth);
         ULONG const nMaxSge = min((ULONG)params.nSge, info.MaxInitiatorSge);
         ULONG const inlineThreshold = info.InlineRequestThreshold;
@@ -242,7 +251,7 @@ void Client::RunWorker(const Params& params, const struct sockaddr_in& v4Src, co
         NdTestBase::CreateQueuePair(min(queueDepth, info.MaxReceiveQueueDepth), (DWORD)params.nSge, inlineThreshold);
     }
     
-    LOG("post receive for PeerInfo message");
+    LOG("<- Post receive for PeerInfo message ->");
     {
         ND2_SGE sge = { pServerInfo, sizeof(*pServerInfo), m_pMr->GetLocalToken() };
         NdTestBase::PostReceive(&sge, 1, Ctxt::Recv);
@@ -254,7 +263,7 @@ void Client::RunWorker(const Params& params, const struct sockaddr_in& v4Src, co
     NdTestBase::Bind(buffer, (DWORD)buffer.size(), ND_OP_FLAG_ALLOW_WRITE);
 
     {
-        LOG("send client remote token and address to the server");
+        LOG("<- Send client remote token and address to the server ->");
         pClientInfo->m_remoteToken = m_pMw->GetRemoteToken();
         pClientInfo->m_remoteAddress = (UINT64)((char*)buffer);
 
@@ -266,13 +275,15 @@ void Client::RunWorker(const Params& params, const struct sockaddr_in& v4Src, co
         print_PeerInfo(stdout, *pClientInfo);
     }
     {
-        LOG("wait for send completion and incomming peer info message");
+        LOG("<- Wait for send completion and incomming peer info message ->");
         bool gotSendCompletion = false;
         bool gotPeerInfoMsg = false;
         while (!(gotSendCompletion && gotPeerInfoMsg))
         {
-            WaitForCompletion([&gotSendCompletion, &gotPeerInfoMsg](ND2_RESULT *pCompletion)
+            WaitForCompletion([&gotSendCompletion, &gotPeerInfoMsg, &pServerInfo](ND2_RESULT *pCompletion)
             {
+                printf("\nND2_RESULT:\n");
+                Utils::print_result(stdout, *pCompletion);
                 void* ctxt = pCompletion->RequestContext;
                 if (ctxt == Ctxt::Send)
                 {
@@ -281,18 +292,20 @@ void Client::RunWorker(const Params& params, const struct sockaddr_in& v4Src, co
                 else if (ctxt == Ctxt::Recv)
                 {
                     gotPeerInfoMsg = true;
+                    printf("\nReceived Server PeerInfo\n");
+                    print_PeerInfo(stdout, *pServerInfo);
                 }
                 else
                 {
-                    LOG("Unexpected Context");
+                    LOG("<- Unexpected Context ->");
                     throw "Unexpected Context";
                 }
             }, true);
         }
-        {
-            printf("\nReceived Server PeerInfo\n");
-            print_PeerInfo(stdout, *pServerInfo);
-        }
+    }
+    {
+        LOG("<- Send terminate message ->");
+        NdTestBase::Send(nullptr, 0, 0);
     }
     LOG_VOID_RETURN();
 }
