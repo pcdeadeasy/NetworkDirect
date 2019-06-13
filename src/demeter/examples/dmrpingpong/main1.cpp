@@ -101,10 +101,10 @@ static struct sockaddr_in GetSocketAddress(const Params& params)
     printf(#X ":\n%s\n", tbuf);                     \
 }
 
-#define PLOG(X) \
-{               \
-    LOG(X);     \
-    printf(X "\n");  \
+#define PLOG(X)         \
+{                       \
+    LOG(X);             \
+    printf(X "\n");     \
 }
 
 class Server : public NdTestServerBase
@@ -317,19 +317,18 @@ void Client::RunWorker(const Params& params, const struct sockaddr_in& v4Src, co
         ULONG const flags = ND_MR_FLAG_ALLOW_LOCAL_WRITE | ND_MR_FLAG_ALLOW_REMOTE_WRITE;
         NdTestBase::RegisterDataBuffer(buffer, (DWORD)buffer.size(), flags);
     }
-    {
-        ND2_ADAPTER_INFO info = GetAdapterInfo();
-        LOG_ADAPTER_INFO(info);
-        ULONG const queueDepth = min(info.MaxCompletionQueueDepth, info.MaxInitiatorQueueDepth);
-        ULONG const nMaxSge = min((ULONG)params.nSge, info.MaxInitiatorSge);
-        ULONG const inlineThreshold = info.InlineRequestThreshold;
-        NdTestBase::CreateCQ(queueDepth);
-        NdTestBase::CreateConnector();
-        NdTestBase::CreateQueuePair(min(queueDepth, info.MaxReceiveQueueDepth), (DWORD)params.nSge, inlineThreshold);
-    }
+ 
+    ND2_ADAPTER_INFO info = GetAdapterInfo();
+    LOG_ADAPTER_INFO(info);
+    ULONG const queueDepth = min(info.MaxCompletionQueueDepth, info.MaxInitiatorQueueDepth);
+    ULONG const nMaxSge = min((ULONG)params.nSge, info.MaxInitiatorSge);
+    ULONG const inlineThreshold = info.InlineRequestThreshold;
+    NdTestBase::CreateCQ(queueDepth);
+    NdTestBase::CreateConnector();
+    NdTestBase::CreateQueuePair(min(queueDepth, info.MaxReceiveQueueDepth), (DWORD)params.nSge, inlineThreshold);
     
-    LOG("<- Post receive for PeerInfo message ->");
     {
+        PLOG("[Post receive for PeerInfo message]");
         ND2_SGE sge = { pServerInfo, sizeof(*pServerInfo), m_pMr->GetLocalToken() };
         NdTestBase::PostReceive(&sge, 1, Ctxt::Recv);
     }
@@ -338,58 +337,57 @@ void Client::RunWorker(const Params& params, const struct sockaddr_in& v4Src, co
     NdTestClientBase::CompleteConnect();
     NdTestBase::CreateMW();
     NdTestBase::Bind(buffer, (DWORD)buffer.size(), ND_OP_FLAG_ALLOW_WRITE);
+    
+    PLOG("[send client remote token and address to the server]");
+    pClientInfo->m_remoteToken = m_pMw->GetRemoteToken();
+    pClientInfo->m_remoteAddress = (UINT64)((char*)buffer);
 
     {
-        LOG("<- Send client remote token and address to the server ->");
-        pClientInfo->m_remoteToken = m_pMw->GetRemoteToken();
-        pClientInfo->m_remoteAddress = (UINT64)((char*)buffer);
-
         ND2_SGE sge = { pClientInfo, sizeof(*pClientInfo), m_pMr->GetLocalToken() };
         DWORD const count = 1;
         DWORD const flags = 0;
         printf("\nsending client Peerinfo to the server (ctxt = %p)...\n", Ctxt::Send);
         NdTestBase::Send(&sge, count, flags, Ctxt::Send);
-        PLOG_PEERINFO(*pClientInfo, "sent client PeerInfo asynchronously ...")
-        LOG("<- Wait for send completion and incomming peer info message ->");
-        printf("\nwaiting on the completion of either the send or the receive ...\n");
-        bool gotSendCompletion = false;
-        bool gotPeerInfoMsg = false;
-        while (!(gotSendCompletion && gotPeerInfoMsg))
-        {
-            WaitForCompletion([&gotSendCompletion, &gotPeerInfoMsg, &pServerInfo](ND2_RESULT *pCompletion)
-            {
-                printf("\n");
-                PLOG_RESULT(*pCompletion);
-                void* ctxt = pCompletion->RequestContext;
-                if (ctxt == Ctxt::Send)
-                {
-                    printf("the send was successful\n");
-                    gotSendCompletion = true;
-                }
-                else if (ctxt == Ctxt::Recv)
-                {
-                    printf("the receive was successful\n");
-                    gotPeerInfoMsg = true;
-                    PLOG_PEERINFO(*pServerInfo, "received server PeerInfo");
-                }
-                else
-                {
-                    LOG("<- Unexpected Context ->");
-                    throw "Unexpected Context";
-                }
-            }, true);
-        }
     }
+    PLOG_PEERINFO(*pClientInfo, "sent client PeerInfo asynchronously ...")
+    PLOG("[Wait for send completion and incomming peer info message]");
+    PLOG("[waiting on the completion of either the send or the receive]");
+    bool gotSendCompletion = false;
+    bool gotPeerInfoMsg = false;
+    while (!(gotSendCompletion && gotPeerInfoMsg))
     {
-        LOG("<- Send terminate message ->");
-        printf("\nSending the terminate message ...\n");
-        NdTestBase::Send(nullptr, 0, 0);
-        WaitForCompletion([](ND2_RESULT *pCompletion)
+        WaitForCompletion([&gotSendCompletion, &gotPeerInfoMsg, &pServerInfo](ND2_RESULT *pCompletion)
         {
+            printf("\n");
             PLOG_RESULT(*pCompletion);
+            void* ctxt = pCompletion->RequestContext;
+            if (ctxt == Ctxt::Send)
+            {
+                PLOG("[the send was successful]");
+                gotSendCompletion = true;
+            }
+            else if (ctxt == Ctxt::Recv)
+            {
+                PLOG("[the receive was successful]");
+                gotPeerInfoMsg = true;
+                PLOG_PEERINFO(*pServerInfo, "received server PeerInfo");
+            }
+            else
+            {
+                LOG("<- Unexpected Context ->");
+                throw "Unexpected Context";
+            }
         }, true);
-
     }
+    
+    PLOG("[Sending the terminate message]");
+    NdTestBase::Send(nullptr, 0, 0);
+    WaitForCompletion([](ND2_RESULT *pCompletion)
+    {
+        PLOG("[termination message has been sent]");
+        PLOG_RESULT(*pCompletion);
+    }, true);
+    
     LOG_VOID_RETURN();
 }
 
