@@ -87,7 +87,7 @@ static struct sockaddr_in GetSocketAddress(const Params& params)
 #define PLOG_PEERINFO(X, Y)                 \
 {                                           \
     char buf[512];                          \
-    fprintf(stdout, Y "\n");                \
+    fprintf(stdout, Y "\n" #X ":\n");       \
     print_PeerInfo(stdout, X);              \
     write_PeerInfo(buf, sizeof(buf), X);    \
     LOG(#X ":\n%s", buf);                   \
@@ -241,7 +241,7 @@ void Server::RunWorker(const Params& params)
     PLOG_PEERINFO(*pServerInfo, "[sent server's PeerInfo structure]");
     PLOG("[Waiting to complete the sending of the server PeerInfo data]");
     result = WaitForCompletionAndCheckContext(Ctxt::Send);
-    PLOG("[send has been complted]");
+    PLOG("[send has been completed this is the result]");
     PLOG_RESULT(result);
     PLOG_PEERINFO(*pServerInfo, "send has been completed");
 
@@ -350,10 +350,10 @@ void Client::RunWorker(const Params& params, const struct sockaddr_in& v4Src, co
         NdTestBase::Send(&sge, count, flags, Ctxt::Send);
     }
     PLOG_PEERINFO(*pClientInfo, "sent client PeerInfo asynchronously ...")
-    PLOG("[Wait for send completion and incomming peer info message]");
     PLOG("[waiting on the completion of either the send or the receive]");
     bool gotSendCompletion = false;
     bool gotPeerInfoMsg = false;
+    PLOG_PEERINFO(*pServerInfo, "[This is the server PeerInfo state before we look for the completion]");
     while (!(gotSendCompletion && gotPeerInfoMsg))
     {
         WaitForCompletion([&gotSendCompletion, &gotPeerInfoMsg, &pServerInfo](ND2_RESULT *pCompletion)
