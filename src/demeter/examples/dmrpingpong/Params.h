@@ -30,4 +30,5 @@ public:
 
     void Print(FILE* file = stdout);
     void Save(const char *file_path);
+    int WriteToBuffer(char* buffer, size_t buffer_size) const;
 };

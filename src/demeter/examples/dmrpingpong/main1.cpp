@@ -70,6 +70,37 @@ static struct sockaddr_in GetSocketAddress(const Params& params)
     return ans;
 }
 
+#define LOG_PARAMS(X)                       \
+{                                           \
+    char temp[2048];                        \
+    X.WriteToBuffer(temp, sizeof(temp));    \
+    LOG("Params:\n%s", temp);               \
+}
+
+#define LOG_ADAPTER_INFO(X)                                                 \
+{                                                                           \
+    char temporary[1024];                                                   \
+    int rc = Utils::write_adapter_info(temporary, sizeof(temporary), X);    \
+    LOG(#X ":\n%s", temporary);                                             \
+}
+
+#define PLOG_PEERINFO(X, Y)                 \
+{                                           \
+    char buf[512];                          \
+    fprintf(stdout, Y "\n");                \
+    print_PeerInfo(stdout, X);              \
+    write_PeerInfo(buf, sizeof(buf), X);    \
+    LOG(#X ":\n%s", buf);                   \
+}
+
+#define PLOG_RESULT(X)                              \
+{                                                   \
+    char tbuf[512];                                 \
+    Utils::write_result(tbuf, sizeof(tbuf), X);     \
+    LOG(#X ":\n%s", tbuf);                          \
+    printf(#X ":\n%s\n", tbuf);                     \
+}
+
 class Server : public NdTestServerBase
 {
 public:
@@ -84,7 +115,6 @@ public:
     ND2_ADAPTER_INFO GetAdapterInfo();
     ND2_RESULT WaitForCompletionAndCheckContext(void *expectedContext);
 };
-
 
 ND2_RESULT Server::WaitForCompletionAndCheckContext(void *expectedContext)
 {
@@ -107,7 +137,6 @@ ND2_RESULT Server::WaitForCompletionAndCheckContext(void *expectedContext)
     LOG_STRUCT_RETURN(ND2_RESULT);
     return result;
 }
-
 
 class Client : public NdTestClientBase
 {
@@ -154,6 +183,7 @@ void Server::Run(const Params& params)
 void Server::RunWorker(const Params& params)
 {
     LOG_ENTER();
+    LOG_PARAMS(params);
     ND2_ADAPTER_INFO info = GetAdapterInfo();
     {
         char temporary[1024];
@@ -193,18 +223,8 @@ void Server::RunWorker(const Params& params)
         LOG("<- Wait for incoming peer info message ->");
         printf("waiting for the arrival of the client's PeerInfo structure ...\n");
         ND2_RESULT result = WaitForCompletionAndCheckContext(Ctxt::Recv);
-        {
-            char buf[512];
-            Utils::write_result(buf, sizeof(buf), result);
-            printf("ND2_RESULT:\n%s\n", buf);
-        }
-        printf("\nreceived client PeerInfo:\n");
-        print_PeerInfo(stdout, *pClientInfo);
-        {
-            char buf[512];
-            write_PeerInfo(buf, sizeof(buf), *pClientInfo);
-            LOG("received client PeerInfo:\n%s", buf);
-        }
+        PLOG_RESULT(result);
+        PLOG_PEERINFO(*pClientInfo, "received client PeerInfo");
     }
     NdTestBase::CreateMW();
     NdTestBase::Bind(buffer, (DWORD)buffer.size(), ND_OP_FLAG_ALLOW_WRITE);
@@ -297,6 +317,7 @@ void Client::Run(const Params& params)
 void Client::RunWorker(const Params& params, const struct sockaddr_in& v4Src, const struct sockaddr_in &v4Server)
 {
     LOG_ENTER();
+    LOG_PARAMS(params);
     NdTestBase::CreateMR();
     HEAP heap(0, 0, 0);
     BUFFER<char> buffer(&heap, HEAP_ZERO_MEMORY, params.MaxXfer + params.HdrLen + 2 * sizeof(PeerInfo));
@@ -308,11 +329,7 @@ void Client::RunWorker(const Params& params, const struct sockaddr_in& v4Src, co
     }
     {
         ND2_ADAPTER_INFO info = GetAdapterInfo();
-        {
-            char temporary[1024];
-            int rc = Utils::write_adapter_info(temporary, sizeof(temporary), info);
-            LOG("ND2_ADAPTER_INFO:\n%s", temporary);
-        }
+        LOG_ADAPTER_INFO(info);
         ULONG const queueDepth = min(info.MaxCompletionQueueDepth, info.MaxInitiatorQueueDepth);
         ULONG const nMaxSge = min((ULONG)params.nSge, info.MaxInitiatorSge);
         ULONG const inlineThreshold = info.InlineRequestThreshold;
@@ -342,15 +359,7 @@ void Client::RunWorker(const Params& params, const struct sockaddr_in& v4Src, co
         DWORD const flags = 0;
         printf("\nsending client Peerinfo to the server (ctxt = %p)...\n", Ctxt::Send);
         NdTestBase::Send(&sge, count, flags, Ctxt::Send);
-        fprintf(stdout, "sent client PeerInfo asynchronously ...\n");
-        print_PeerInfo(stdout, *pClientInfo);
-        {
-            char buf[512];
-            write_PeerInfo(buf, sizeof(buf), *pClientInfo);
-            LOG("Sent Client PeerInfo:\n%s", buf);
-        }
-    }
-    {
+        PLOG_PEERINFO(*pClientInfo, "sent client PeerInfo asynchronously ...")
         LOG("<- Wait for send completion and incomming peer info message ->");
         printf("\nwaiting on the completion of either the send or the receive ...\n");
         bool gotSendCompletion = false;
@@ -359,12 +368,8 @@ void Client::RunWorker(const Params& params, const struct sockaddr_in& v4Src, co
         {
             WaitForCompletion([&gotSendCompletion, &gotPeerInfoMsg, &pServerInfo](ND2_RESULT *pCompletion)
             {
-                {
-                    char tbuf[512];
-                    Utils::write_result(tbuf, sizeof(tbuf), *pCompletion);
-                    LOG("ND2_RESULT\n%s", tbuf);
-                    printf("ND2_RESULT:\n%s\n", tbuf);
-                }
+                printf("\n");
+                PLOG_RESULT(*pCompletion);
                 void* ctxt = pCompletion->RequestContext;
                 if (ctxt == Ctxt::Send)
                 {
@@ -375,13 +380,7 @@ void Client::RunWorker(const Params& params, const struct sockaddr_in& v4Src, co
                 {
                     printf("the receive was successful\n");
                     gotPeerInfoMsg = true;
-                    printf("Received Server PeerInfo\n");
-                    print_PeerInfo(stdout, *pServerInfo);
-                    {
-                        char buf[512];
-                        write_PeerInfo(buf, sizeof(buf), *pServerInfo);
-                        LOG("Received Server PeerInfo:\n%s", buf);
-                    }
+                    PLOG_PEERINFO(*pServerInfo, "received server PeerInfo");
                 }
                 else
                 {
@@ -397,9 +396,7 @@ void Client::RunWorker(const Params& params, const struct sockaddr_in& v4Src, co
         NdTestBase::Send(nullptr, 0, 0);
         WaitForCompletion([](ND2_RESULT *pCompletion)
         {
-            char buf[512];
-            Utils::write_result(buf, sizeof(buf), *pCompletion);
-            printf("ND2_RESULT:\n%s\n", buf);
+            PLOG_RESULT(*pCompletion);
         }, true);
 
     }
