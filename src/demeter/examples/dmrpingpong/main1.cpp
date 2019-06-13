@@ -101,6 +101,12 @@ static struct sockaddr_in GetSocketAddress(const Params& params)
     printf(#X ":\n%s\n", tbuf);                     \
 }
 
+#define PLOG(X) \
+{               \
+    LOG(X);     \
+    printf(X "\n");  \
+}
+
 class Server : public NdTestServerBase
 {
 public:
@@ -182,14 +188,12 @@ void Server::Run(const Params& params)
 
 void Server::RunWorker(const Params& params)
 {
+    ND2_RESULT result;
+
     LOG_ENTER();
     LOG_PARAMS(params);
     ND2_ADAPTER_INFO info = GetAdapterInfo();
-    {
-        char temporary[1024];
-        int rc = Utils::write_adapter_info(temporary, sizeof(temporary), info);
-        LOG("ND2_ADAPTER_INFO:\n%s", temporary);
-    }
+    LOG_ADAPTER_INFO(info);
     NdTestBase::CreateCQ(info.MaxCompletionQueueDepth);
     NdTestBase::CreateConnector();
     {
@@ -204,12 +208,12 @@ void Server::RunWorker(const Params& params)
     PeerInfo* const pServerInfo = (PeerInfo*)(buffer + ServerPeerInfoOffset(params));
     PeerInfo* const pClientInfo = (PeerInfo*)(buffer + ClientPeerInfoOffset(params));
     {
-        LOG("<- Register the data buffer ->");
+        PLOG("[register the data buffer]");
         ULONG const flags = ND_MR_FLAG_ALLOW_LOCAL_WRITE | ND_MR_FLAG_ALLOW_REMOTE_WRITE;
         NdTestBase::RegisterDataBuffer(buffer, (DWORD)buffer.size(), flags);
     }
     {
-        LOG("<- Post receive for peerInfo and terminate messages ->");
+        LOG("[Post receive for peerInfo and terminate messages]");
         ND2_SGE sge = { pClientInfo, sizeof(*pClientInfo), m_pMr->GetLocalToken() };
         NdTestBase::PostReceive(&sge, 1, Ctxt::Recv);
         NdTestBase::PostReceive(&sge, 1, Ctxt::Recv);
@@ -219,47 +223,33 @@ void Server::RunWorker(const Params& params)
     NdTestServerBase::GetConnectionRequest();
     NdTestServerBase::Accept(0, 0);
 
-    {
-        LOG("<- Wait for incoming peer info message ->");
-        printf("waiting for the arrival of the client's PeerInfo structure ...\n");
-        ND2_RESULT result = WaitForCompletionAndCheckContext(Ctxt::Recv);
-        PLOG_RESULT(result);
-        PLOG_PEERINFO(*pClientInfo, "received client PeerInfo");
-    }
+    PLOG("[wait for incoming peer info message]");
+    result = WaitForCompletionAndCheckContext(Ctxt::Recv);
+    PLOG_RESULT(result);
+    PLOG_PEERINFO(*pClientInfo, "[received client PeerInfo]");
+
     NdTestBase::CreateMW();
     NdTestBase::Bind(buffer, (DWORD)buffer.size(), ND_OP_FLAG_ALLOW_WRITE);
+    PLOG("[Send remote token and address]");
+    pServerInfo->m_remoteToken = m_pMw->GetRemoteToken();
+    pServerInfo->m_remoteAddress = (UINT64)((char*)buffer);
     {
-        LOG("<- Send remote token and address ->");
-        pServerInfo->m_remoteToken = m_pMw->GetRemoteToken();
-        pServerInfo->m_remoteAddress = (UINT64)((char*)buffer);
         ND2_SGE sge = { pServerInfo, sizeof(*pServerInfo), m_pMr->GetLocalToken() };
-        printf("\nsending Server Peerinfo ... (ctxt = %p)\n", Ctxt::Send);
+        printf("\n[sending Server Peerinfo ... (ctxt = %p)]\n", Ctxt::Send);
         NdTestBase::Send(&sge, 1, 0, Ctxt::Send);
-        printf("sent Server's PeerInfo structure\n");
-        print_PeerInfo(stdout, *pServerInfo);
-        LOG("<- Waiting to complete the sending of the server PeerInfo data ->");
-        printf("waiting on the completion of the send ...\n");
-        ND2_RESULT result = WaitForCompletionAndCheckContext(Ctxt::Send);
-        {
-            char buf[512];
-            Utils::write_result(buf, sizeof(buf), result);
-            printf("send has been complted and this is the result ...\nND2_RESULT:\n%s\n", buf);
-        }
-        {
-            char buf[512];
-            write_PeerInfo(buf, sizeof(buf), *pServerInfo);
-            LOG("sent server PeerInfo:\n%s", buf);
-        }
     }
-    {
-        printf("\nwaiting for the terminatation message ...\n");
-        ND2_RESULT result = WaitForCompletionAndCheckContext(Ctxt::Recv);
-        {
-            char buf[512];
-            Utils::write_result(buf, sizeof(buf), result);
-            printf("ND2_RESULT:\n%s\n", buf);
-        }
-    }
+    PLOG_PEERINFO(*pServerInfo, "[sent server's PeerInfo structure]");
+    PLOG("[Waiting to complete the sending of the server PeerInfo data]");
+    result = WaitForCompletionAndCheckContext(Ctxt::Send);
+    PLOG("[send has been complted]");
+    PLOG_RESULT(result);
+    PLOG_PEERINFO(*pServerInfo, "send has been completed");
+
+    PLOG("[waiting for the terminatation message]");
+    result = WaitForCompletionAndCheckContext(Ctxt::Recv);
+    PLOG("[Termination has been received]");
+    PLOG_RESULT(result);
+
     LOG_VOID_RETURN();
 }
 
