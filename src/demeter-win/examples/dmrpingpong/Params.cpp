@@ -133,6 +133,50 @@ void Params::Print(FILE* file)
     fprintf(file, "}\n");
 }
 
+int Params::WriteToBuffer(char* buffer, size_t buffer_size) const
+{
+    const char* const fmt = 
+        "{\n"
+        "    \"Server\": %d,\n"
+        "    \"Client\": %d,\n"
+        "    \"Blocking\": %d,\n"
+        "    \"Polling\": %d,\n"
+        "    \"Write\": %d,\n"
+        "    \"Read\": %d,\n"
+        "    \"nSge\": %zu,\n"
+        "    \"nPipeline\": %zu,\n"
+        "    \"MaxXfer\": %zu,\n"
+        "    \"HdrLen\": %zu,\n"
+        "    \"MaxVolume\": %zu\n"
+        "    \"MaxIterations\": %zu,\n"
+        "    \"Logfile\": \"%s\",\n"
+        "    \"Ip\": \"%s\",\n"
+        "    \"Port\": %u\n"
+        "}";
+    int ans =
+        snprintf(
+            buffer,
+            buffer_size,
+            fmt,
+            Server,
+            Client,
+            Blocking,
+            Polling,
+            Write,
+            Read,
+            nSge,
+            nPipeline,
+            MaxXfer,
+            HdrLen,
+            MaxVolume,
+            MaxIterations,
+            Logfile,
+            Ip,
+            Port
+        );
+    return ans;
+}
+
 void Params::Save(const char *file_path)
 {
     FILE *file = 0;
