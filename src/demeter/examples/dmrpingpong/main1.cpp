@@ -368,9 +368,9 @@ void Client::RunWorker(const Params& params, const struct sockaddr_in& v4Src, co
             }
             else if (ctxt == Ctxt::Recv)
             {
-                PLOG("[the receive was successful]");
-                gotPeerInfoMsg = true;
+                PLOG("[the receive was successful so server's PeerInfo has been filled in]");
                 PLOG_PEERINFO(*pServerInfo, "received server PeerInfo");
+                gotPeerInfoMsg = true;
             }
             else
             {
