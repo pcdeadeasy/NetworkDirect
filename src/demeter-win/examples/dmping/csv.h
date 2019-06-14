@@ -1,5 +1,4 @@
 #pragma once
-#include <WinHeap.h>
 
 typedef struct _KVP {
     const char *key;

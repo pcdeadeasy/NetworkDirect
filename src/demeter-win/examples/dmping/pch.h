@@ -9,6 +9,19 @@
 #ifndef PCH_H
 #define PCH_H
 
+#pragma once
+
 // TODO: add headers that you want to pre-compile here
+#include "../../libraries/logger/Logger.h"
+//#include "../../libraries/ndutil/ndutil.h"
+//#include "../../libraries/ndutil/include/ndcommon.h"
+//#include "../../libraries/ndutil/ndtestutil.h"
+
+#include <stdio.h>
+#include <ctype.h>
+#include "../../libraries/winshim/Winshim.h"
+#include "../../libraries/winshim/WinHeap.h"
+#include "csv.h"
+
 
 #endif //PCH_H

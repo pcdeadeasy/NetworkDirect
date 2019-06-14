@@ -1,14 +1,6 @@
 #include "pch.h"
-#include <stdio.h>
-#include <Logger.h>
-#include <Winshim.h>
-#include <WinHeap.h>
-#include <ndutil.h>
-#include <ndcommon.h>
-#include <ndtestutil.h>
-#include "csv.h"
 
-class NetworkDirectEnvironment
+/*class NetworkDirectEnvironment
 {
 public:
     NetworkDirectEnvironment()
@@ -263,3 +255,4 @@ int main(int arc, char* argv[])
     LOG_INT_RETURN(rc);
     return rc;
 }
+*/

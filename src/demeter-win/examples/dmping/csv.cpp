@@ -1,8 +1,6 @@
 #include "pch.h"
-#include <ctype.h>
 #include "csv.h"
-#include <Winshim.h>
-#include <Logger.h>
+
 
 //class FILE_IMAGE
 //{

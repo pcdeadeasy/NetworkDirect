@@ -16,3 +16,4 @@
 #include "list.h"
 #include "initguid.h"
 #include "ndspi.h"
+#include "ndtestutil.h"

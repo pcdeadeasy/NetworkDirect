@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.0.0 FATAL_ERROR)
 
-set(PROJ_NAME ndutil)
+set(PROJ_NAME dmping)
 project(${PROJ_NAME})
 
 # Check platforms
@@ -79,27 +79,14 @@ set(OUTPUT_DEBUG Debug/bin)
 set(OUTPUT_RELEASE Release/bin)
 # Folders files
 set(SRC 
-  ./ndaddr.cpp  
-  ./ndfrmwrk.cpp
-  ./ndprov.cpp
-  ./ndtestutil.cpp
+  ./dmping.cpp 
+  ./csv.cpp
+  ./pch.cpp
 )
 
 set(INCLUDE
-  ./assertutil.h
-  ./list.h 
-  ./nddef.h
-  ./ndioctl.h 
-  ./ndspi.h
-  ./ndsupport.h
-  ./ndaddr.h  
-  ./ndfrmwrk.h  
-  ./ndprov.h
-  ./ndutil.h
-  ./include/logging.h
-  ./include/ndcommon.h
-  ./ndtestutil.h
-  ./precomp.h
+  ./csv.h
+  ./pch.h
 )
 
 source_group("src" FILES ${SRC})
@@ -107,7 +94,7 @@ source_group("include" FILES ${INCLUDE})
 
 set_source_files_properties(${SRC}
     PROPERTIES
-    COMPILE_FLAGS "/Ycprecomp.h"
+    COMPILE_FLAGS "/Ycpch.h"
 )
 
 # Define Release by default.
@@ -138,7 +125,8 @@ if(MSVC)
    set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /EHsc")
    set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /EHsc")
    set (CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /ignore:4099")
-   set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /Yuprecomp.h")
+   set (CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /ignore:4075")
+   set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /Yupch.h")
     
    add_definitions(-DUNICODE)
    add_compile_options(/MT)
@@ -164,29 +152,16 @@ if (MSVC AND (MSVC_VERSION GREATER 1900))
     endif()
 endif()
 
-
-# Add custom command
-add_custom_command(
-    OUTPUT ndutil.h
-    PRE_BUILD
-    COMMAND ${CMAKE_MC_COMPILER} -h "${CMAKE_CURRENT_SOURCE_DIR}" -r "${CMAKE_CURRENT_BINARY_DIR}" ${CMAKE_CURRENT_SOURCE_DIR}/ndstatus.mc
-)
-
-#set_target_properties(${PROJ_NAME} PROPERTIES PLATFORM_TOOLSET "WindowsUserModeDriver10.0")
+#set(CMAKE_GENERATOR "Visual Studio 15 2017 Win64" CACHE INTERNAL "" FORCE)
+#set(CMAKE_GENERATOR_TOOLSET "v141" CACHE INTERNAL "" FORCE)
+message("generator is set to ${CMAKE_GENERATOR}")
 
 # Add library to build.
-add_library(${PROJ_NAME} ${SRC} ${INCLUDE})
-target_link_libraries(${PROJ_NAME} Logger)
+add_executable(${PROJ_NAME} ${SRC} ${INCLUDE})
+target_link_libraries(${PROJ_NAME} Logger ndutil winshim)
 
-# add_precompiled_header(${PROJ_NAME} precomp.h SOURCE_CXX ${SRC} FORCEINCLUDE)
-
-#target_include_directories(${PROJ_NAME} PUBLIC include "${CMAKE_CURRENT_SOURCE_DIR}")
-#if(CMAKE_COMPILER_IS_GNUCXX)
-#  target_compile_options(${PROJ_NAME} PRIVATE -fPIC)
-#endif()
 #target_link_libraries(${PROJ_NAME} ndutil)
-
 set_property(TARGET ${PROJ_NAME} PROPERTY FOLDER "private/libraries")
-#install (TARGETS ndutil DESTINATION bin)
+#install (TARGETS Logger DESTINATION bin)
 
 
