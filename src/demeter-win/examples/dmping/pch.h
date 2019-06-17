@@ -11,9 +11,17 @@
 
 #pragma once
 
+#ifdef _DEBUG 
+#include <crtdbg.h> 
+#endif
+
+#define _WINSOCKAPI_
+
 // TODO: add headers that you want to pre-compile here
 #include "../../libraries/logger/Logger.h"
-//#include "../../libraries/ndutil/ndutil.h"
+#include "../../libraries/ndutil/ndutil.h"
+#include "../../libraries/ndutil/ndtestutil.h"
+#include "../../libraries/ndutil/ndsupport.h"
 //#include "../../libraries/ndutil/include/ndcommon.h"
 //#include "../../libraries/ndutil/ndtestutil.h"
 
@@ -22,6 +30,7 @@
 #include "../../libraries/winshim/Winshim.h"
 #include "../../libraries/winshim/WinHeap.h"
 #include "csv.h"
+//#include ""
 
 
 #endif //PCH_H

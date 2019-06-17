@@ -94,7 +94,7 @@ source_group("include" FILES ${INCLUDE})
 
 set_source_files_properties(${SRC}
     PROPERTIES
-    COMPILE_FLAGS "/Ycpch.h"
+    COMPILE_FLAGS "/Ycpch.h /c"
 )
 
 # Define Release by default.
@@ -129,7 +129,14 @@ if(MSVC)
    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /Yupch.h")
     
    add_definitions(-DUNICODE)
-   add_compile_options(/MT)
+   message( STATUS "CMAKE_BUILD_TYPE: " "${CMAKE_BUILD_TYPE}" )
+   if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+      add_compile_options(/MTd)
+   else()
+	    add_compile_options(/MT)
+   endif()
+   set(CMAKE_GENERATOR_TOOLSET "v141" CACHE STRING "Platform Toolset" FORCE)
+   message( STATUS "CMAKE_GENERATOR_TOOLSET: " "${CMAKE_GENERATOR_TOOLSET}" )
 endif(MSVC)
 if(NOT MSVC)
    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
@@ -159,6 +166,7 @@ message("generator is set to ${CMAKE_GENERATOR}")
 # Add library to build.
 add_executable(${PROJ_NAME} ${SRC} ${INCLUDE})
 target_link_libraries(${PROJ_NAME} Logger ndutil winshim)
+#set_target_properties(${PROJ_NAME} PROPERTIES PLATFORM_TOOLSET "v141")
 
 #target_link_libraries(${PROJ_NAME} ndutil)
 set_property(TARGET ${PROJ_NAME} PROPERTY FOLDER "private/libraries")

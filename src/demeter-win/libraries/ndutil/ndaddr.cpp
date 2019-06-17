@@ -3,6 +3,8 @@
 // Licensed under the MIT License.
 //
 
+#pragma once
+
 #include "precomp.h"
 #include "ndaddr.h"
 

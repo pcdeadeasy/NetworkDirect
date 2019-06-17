@@ -1,5 +1,4 @@
 #pragma once
-#pragma once
 
 #ifndef ERROR_STRINGS_H
 #define ERROR_STRINGS_H

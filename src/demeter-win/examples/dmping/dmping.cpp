@@ -1,6 +1,9 @@
+#pragma once
+#define INITGUID
+
 #include "pch.h"
 
-/*class NetworkDirectEnvironment
+class NetworkDirectEnvironment
 {
 public:
     NetworkDirectEnvironment()
@@ -195,7 +198,7 @@ static void test_server(HEAP &heap, PARAM_INPUT &input)
 {
 	LOG_ENTER();
 	struct sockaddr_in v4Src = GetServerAddress(input.ip);
-	v4Src.sin_port = input.port;
+	v4Src.sin_port = (USHORT)input.port;
 	PingServer server(heap, input);
 	server.RunTest(v4Src, 0, input.nSge);
 	LOG_VOID_RETURN();
@@ -255,4 +258,3 @@ int main(int arc, char* argv[])
     LOG_INT_RETURN(rc);
     return rc;
 }
-*/

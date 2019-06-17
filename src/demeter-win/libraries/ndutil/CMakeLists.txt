@@ -107,7 +107,7 @@ source_group("include" FILES ${INCLUDE})
 
 set_source_files_properties(${SRC}
     PROPERTIES
-    COMPILE_FLAGS "/Ycprecomp.h"
+    COMPILE_FLAGS "/Ycprecomp.h /c"
 )
 
 # Define Release by default.
@@ -141,7 +141,11 @@ if(MSVC)
    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /Yuprecomp.h")
     
    add_definitions(-DUNICODE)
-   add_compile_options(/MT)
+   if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+      add_compile_options(/MTd)
+   else()
+	  add_compile_options(/MT)
+   endif()
 endif(MSVC)
 if(NOT MSVC)
    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")

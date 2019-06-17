@@ -33,8 +33,10 @@ static LPWSTR GetSystemHresultStrW(HRESULT hr)
   );
   if (!ret)
   {
-    _tcscpy_s(pErrorBuf, nErrorBufSz,
-      TEXT("Unknown runtime error\n"));
+    //_tcscpy_s(pErrorBuf, nErrorBufSz,
+    //  TEXT("Unknown runtime error\n"));
+      
+    wcsncpy(pErrorBuf, L"Unknown runtime error\n", nErrorBufSz);
   }
   return pErrorBuf;
 }
