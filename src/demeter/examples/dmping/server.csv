@@ -1,0 +1,13 @@
+key,value
+count,4
+role,server
+ip,10.10.1.4
+port,54324
+MaxXfer,4194304
+HdrLen,40
+MaxVolume,2097152000
+MaxIterations,500000
+nSge,1
+bPoling,false
+bBlocking,false
+nPipeline,128

@@ -8,7 +8,7 @@
 #include <ws2spi.h>
 #include <coguid.h>
 
-#include "../Logger/Logger.h"
+#include "..\Logger\Logger.h"
 #include "assertutil.h"
 #include "ndutil.h"
 #include "list.h"
