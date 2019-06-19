@@ -179,7 +179,7 @@ add_custom_command(
 #set_target_properties(${PROJ_NAME} PROPERTIES PLATFORM_TOOLSET "WindowsUserModeDriver10.0")
 
 # Add library to build.
-add_library(${PROJ_NAME} ${SRC} ${INCLUDE})
+add_library(${PROJ_NAME} STATIC ${SRC} ${INCLUDE})
 target_link_libraries(${PROJ_NAME} Logger)
 
 # add_precompiled_header(${PROJ_NAME} precomp.h SOURCE_CXX ${SRC} FORCEINCLUDE)

@@ -1,6 +1,20 @@
 cmake_minimum_required(VERSION 3.0.0 FATAL_ERROR)
 
+#set (LIB_SRC "${CMAKE_CURRENT_LIST_DIR}/../../libraries")
+#configure_file(CMakeLists.txt.in ndutil-lib/CMakeLists.txt)
+
+message( STATUS "Done configuring makefile")
+message( STATUS "CMAKE_BINARY_DIR:" ${CMAKE_BINARY_DIR})
+message( STATUS "CMAKE_CURRENT_BINARY_DIR:" ${CMAKE_CURRENT_BINARY_DIR})
+
+#execute_process(COMMAND ${CMAKE_COMMAND} -G "${CMAKE_GENERATOR}" ${CMAKE_CURRENT_BINARY_DIR}/ndutil-lib )
+
+#execute_process(COMMAND ${CMAKE_COMMAND} -G "${CMAKE_GENERATOR}" ../src/demeter-win/libraries)
+  
+#execute_process(COMMAND ${CMAKE_COMMAND} --build . --target ndutil)
+
 set(PROJ_NAME dmping)
+
 project(${PROJ_NAME})
 
 # Check platforms
@@ -129,12 +143,14 @@ if(MSVC)
    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /Yupch.h")
     
    add_definitions(-DUNICODE)
+   #add_compile_options(/MTd)
+   
    message( STATUS "CMAKE_BUILD_TYPE: " "${CMAKE_BUILD_TYPE}" )
-   if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-      add_compile_options(/MTd)
-   else()
-	    add_compile_options(/MT)
-   endif()
+   #if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+   #   add_compile_options(/MTd)
+   #else()
+   #   add_compile_options(/MT)
+   #endif()
    set(CMAKE_GENERATOR_TOOLSET "v141" CACHE STRING "Platform Toolset" FORCE)
    message( STATUS "CMAKE_GENERATOR_TOOLSET: " "${CMAKE_GENERATOR_TOOLSET}" )
 endif(MSVC)
@@ -165,7 +181,10 @@ message("generator is set to ${CMAKE_GENERATOR}")
 
 # Add library to build.
 add_executable(${PROJ_NAME} ${SRC} ${INCLUDE})
+add_dependencies(${PROJ_NAME} ndutillib-build)
+target_link_directories(${PROJ_NAME} PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/../../ndutillib-prefix/src/ndutillib-build/Debug)
 target_link_libraries(${PROJ_NAME} Logger ndutil winshim)
+#target_link_libraries(${PROJ_NAME} Logger ndutil winshim)
 #set_target_properties(${PROJ_NAME} PROPERTIES PLATFORM_TOOLSET "v141")
 
 #target_link_libraries(${PROJ_NAME} ndutil)
