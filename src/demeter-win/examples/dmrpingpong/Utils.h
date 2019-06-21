@@ -1,5 +1,4 @@
 #pragma once
-#include <ndcommon.h>
 
 class Utils
 {

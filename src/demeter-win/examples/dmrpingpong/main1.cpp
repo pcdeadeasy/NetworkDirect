@@ -1,10 +1,4 @@
 #include "pch.h"
-#include "ndcommon.h"
-#include "ndtestutil.h"
-#include <logging.h>
-#include <Logger.h>
-#include <Winshim.h>
-#include <WinHeap.h>
 #include "Params.h"
 #include "Utils.h"
 

@@ -1,9 +1,10 @@
+#define INITGUID
+
 #include "pch.h"
 #include <stdio.h>
-#include <Logger.h>
-#include <Winshim.h>
 #include "ndscope.h"
 #include "Params.h"
+
 
 void main1(Params&);
 

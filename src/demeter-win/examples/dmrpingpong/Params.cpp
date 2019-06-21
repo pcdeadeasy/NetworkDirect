@@ -1,6 +1,5 @@
 #include "pch.h"
 #include "Params.h"
-#include <Logger.h>
 #include "cxxopts.hpp"
 
 Params::Params(int argc, char **argv)
