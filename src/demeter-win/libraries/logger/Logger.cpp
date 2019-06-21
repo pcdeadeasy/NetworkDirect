@@ -1,5 +1,3 @@
-#pragma once
-
 #include "stdafx.h"
 #include <Windows.h>
 #include <stdarg.h>
