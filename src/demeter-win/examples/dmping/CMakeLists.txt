@@ -1,17 +1,7 @@
 cmake_minimum_required(VERSION 3.0.0 FATAL_ERROR)
 
-#set (LIB_SRC "${CMAKE_CURRENT_LIST_DIR}/../../libraries")
-#configure_file(CMakeLists.txt.in ndutil-lib/CMakeLists.txt)
-
-message( STATUS "Done configuring makefile")
 message( STATUS "CMAKE_BINARY_DIR:" ${CMAKE_BINARY_DIR})
 message( STATUS "CMAKE_CURRENT_BINARY_DIR:" ${CMAKE_CURRENT_BINARY_DIR})
-
-#execute_process(COMMAND ${CMAKE_COMMAND} -G "${CMAKE_GENERATOR}" ${CMAKE_CURRENT_BINARY_DIR}/ndutil-lib )
-
-#execute_process(COMMAND ${CMAKE_COMMAND} -G "${CMAKE_GENERATOR}" ../src/demeter-win/libraries)
-  
-#execute_process(COMMAND ${CMAKE_COMMAND} --build . --target ndutil)
 
 set(PROJ_NAME dmping)
 
@@ -142,18 +132,12 @@ if(MSVC)
    set (CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /ignore:4075")
    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /Yupch.h")
     
-   add_definitions(-DUNICODE)
-   #add_compile_options(/MTd)
-   
-   message( STATUS "CMAKE_BUILD_TYPE: " "${CMAKE_BUILD_TYPE}" )
-   #if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-   #   add_compile_options(/MTd)
-   #else()
-   #   add_compile_options(/MT)
-   #endif()
+   add_definitions(-DUNICODE)  
+   message( STATUS "CMAKE_BUILD_TYPE: " "${CMAKE_BUILD_TYPE}" )   
    set(CMAKE_GENERATOR_TOOLSET "v141" CACHE STRING "Platform Toolset" FORCE)
    message( STATUS "CMAKE_GENERATOR_TOOLSET: " "${CMAKE_GENERATOR_TOOLSET}" )
 endif(MSVC)
+
 if(NOT MSVC)
    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
    if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
@@ -173,19 +157,39 @@ if (MSVC AND (MSVC_VERSION GREATER 1900))
         message("Setting QSPECTRE")
         set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /Qspectre")
     endif()
+    set(CompilerFlags        
+        CMAKE_CXX_FLAGS_DEBUG
+        CMAKE_CXX_FLAGS_RELEASE
+        CMAKE_CXX_FLAGS_MINSIZEREL
+        CMAKE_CXX_FLAGS_RELWITHDEBINFO        
+        CMAKE_C_FLAGS_DEBUG
+        CMAKE_C_FLAGS_RELEASE
+        CMAKE_C_FLAGS_MINSIZEREL
+        CMAKE_C_FLAGS_RELWITHDEBINFO
+        )
+    foreach(CompilerFlag ${CompilerFlags})
+    	if(CMAKE_BUILD_TYPE STREQUAL "Release")
+    		string(REPLACE "/MD" "/MT" ${CompilerFlag} "${${CompilerFlag}}")
+    		set(${CompilerFlag} "${${CompilerFlag}}" CACHE STRING "msvc compiler flags" FORCE)
+    		message("MSVC flags: ${CompilerFlag}:${${CompilerFlag}}")
+    	else()		
+    		string(REPLACE "/MD" "/MTd" ${CompilerFlag} "${${CompilerFlag}}")
+    		set(${CompilerFlag} "${${CompilerFlag}}" CACHE STRING "msvc compiler flags" FORCE)
+    		message("MSVC flags: ${CompilerFlag}:${${CompilerFlag}}")
+    	endif()
+    endforeach()
+
 endif()
 
 #set(CMAKE_GENERATOR "Visual Studio 15 2017 Win64" CACHE INTERNAL "" FORCE)
 #set(CMAKE_GENERATOR_TOOLSET "v141" CACHE INTERNAL "" FORCE)
-message("generator is set to ${CMAKE_GENERATOR}")
+message("CMAKE_GENERATOR is set to ${CMAKE_GENERATOR}")
 
 # Add library to build.
 add_executable(${PROJ_NAME} ${SRC} ${INCLUDE})
 add_dependencies(${PROJ_NAME} ndutillib-build)
 target_link_directories(${PROJ_NAME} PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/../../ndutillib-prefix/src/ndutillib-build/Debug)
 target_link_libraries(${PROJ_NAME} Logger ndutil winshim)
-#target_link_libraries(${PROJ_NAME} Logger ndutil winshim)
-#set_target_properties(${PROJ_NAME} PROPERTIES PLATFORM_TOOLSET "v141")
 
 #target_link_libraries(${PROJ_NAME} ndutil)
 set_property(TARGET ${PROJ_NAME} PROPERTY FOLDER "private/libraries")
