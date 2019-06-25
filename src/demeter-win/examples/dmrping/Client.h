@@ -1,7 +1,9 @@
 #pragma once
-#include <ndcommon.h>
-#include <ndtestutil.h>
-#include <WinHeap.h>
+#include "../../libraries/ndutil/ndutil.h"
+#include "../../libraries/ndutil/ndtestutil.h"
+#include "../../libraries/ndutil/ndsupport.h"
+#include "../../libraries/ndutil/include/ndcommon.h"
+#include "../../libraries/Winshim/WinHeap.h"
 #include "Params.h"
 
 class Client : public NdTestClientBase

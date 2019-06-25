@@ -1,9 +1,10 @@
+#define INITGUID
 #include "pch.h"
 #include <iostream>
-#include <ndcommon.h>
-#include <ndtestutil.h>
-#include <Logger.h>
-#include <Winshim.h>
+#include "../../libraries/logger/Logger.h"
+#include "../../libraries/Winshim/Winshim.h"
+#include "../../libraries/ndutil/ndutil.h"
+#include "../../libraries/ndutil/ndtestutil.h"
 #include "Params.h"
 #include "Server.h"
 #include "Client.h"
