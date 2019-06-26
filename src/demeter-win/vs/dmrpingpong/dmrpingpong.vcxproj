@@ -36,6 +36,12 @@
       <Project>{2e85b211-0c24-49f9-9a96-55f81384890e}</Project>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\examples\dmrpingpong\ndscope.h" />
+    <ClInclude Include="..\..\examples\dmrpingpong\Params.h" />
+    <ClInclude Include="..\..\examples\dmrpingpong\pch.h" />
+    <ClInclude Include="..\..\examples\dmrpingpong\Utils.h" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
     <ProjectGuid>{510F6040-3187-4081-A8B3-94FFE227DE2E}</ProjectGuid>
