@@ -192,8 +192,8 @@ message("CMAKE_GENERATOR is set to ${CMAKE_GENERATOR}")
 
 # Add library to build.
 add_executable(${PROJ_NAME} ${SRC} ${INCLUDE})
-add_dependencies(${PROJ_NAME} ndutillib-build)
-target_link_directories(${PROJ_NAME} PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/../../ndutillib-prefix/src/ndutillib-build/Debug)
+add_dependencies(${PROJ_NAME} rdmalib-build)
+target_link_directories(${PROJ_NAME} PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/../../rdmalib/src/rdmalib-build/Debug)
 target_link_libraries(${PROJ_NAME} Logger ndutil winshim)
 
 #target_link_libraries(${PROJ_NAME} ndutil)
