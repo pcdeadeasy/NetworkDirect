@@ -111,6 +111,7 @@ if(NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE "Release")
   message(STATUS "Build type not specified: Use Release by default.")
 endif(NOT CMAKE_BUILD_TYPE)
+message(STATUS "CMAKE_BUILD_TYPE:" "${CMAKE_BUILD_TYPE}")
 
 ############## Artefacts Output #################
 # Defines outputs , depending Debug or Release. #
@@ -137,8 +138,7 @@ if(MSVC)
    set (CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /ignore:4075")
    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /Yupch.h")
     
-   add_definitions(-DUNICODE)  
-   message( STATUS "CMAKE_BUILD_TYPE: " "${CMAKE_BUILD_TYPE}" )   
+   add_definitions(-DUNICODE)     
    set(CMAKE_GENERATOR_TOOLSET "v141" CACHE STRING "Platform Toolset" FORCE)
    message( STATUS "CMAKE_GENERATOR_TOOLSET: " "${CMAKE_GENERATOR_TOOLSET}" )
 endif(MSVC)
@@ -193,8 +193,12 @@ message("CMAKE_GENERATOR is set to ${CMAKE_GENERATOR}")
 # Add library to build.
 add_executable(${PROJ_NAME} ${SRC} ${INCLUDE})
 add_dependencies(${PROJ_NAME} rdmalib-build)
-target_link_directories(${PROJ_NAME} PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/../../rdmalib/src/rdmalib-build/Debug)
-target_link_libraries(${PROJ_NAME} Logger ndutil winshim)
+if (MSVC)
+	target_link_directories(${PROJ_NAME} PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/../../rdmalib/src/rdmalib-build/$(ConfigurationName)/)
+	target_link_libraries(${PROJ_NAME} Logger ndutil winshim)
+else()
+	# target_link_libraries(${PROJ_NAME} Logger ndutil winshim)
+endif()
 
 #target_link_libraries(${PROJ_NAME} ndutil)
 set_property(TARGET ${PROJ_NAME} PROPERTY FOLDER "private/libraries")
