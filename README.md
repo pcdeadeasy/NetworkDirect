@@ -14,7 +14,10 @@ NetworkDirect SDK is available in [Nuget](https://www.nuget.org/packages/network
 - cd build
   - Run cmake -G "Visual Studio 15 2017 Win64" ..
   - cmake --build . --target dmrpingpong
-
+  
+## Using bprep and bbld
+- bprep // Run this to create a build directory and runs cmake -G for VS
+- bbcl <projectname> // using this to build specific projects like dmrpingpong
 
 ## Prerequisites
 
