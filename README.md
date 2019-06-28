@@ -18,7 +18,6 @@ NetworkDirect SDK is available in [Nuget](https://www.nuget.org/packages/network
 ## Using bprep and bbld
 - bprep // Run this to create a build directory and runs cmake -G for VS
 - bbcl <projectname> // using this to build specific projects like dmrpingpong
-- dmping bld is broken
 
 ## Prerequisites
 
