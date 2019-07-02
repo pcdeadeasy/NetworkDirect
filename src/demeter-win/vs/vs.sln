@@ -22,6 +22,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "dmrping", "dmrping\dmrping.
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "dmping", "dmping\dmping.vcxproj", "{D17BE6FE-E613-4123-A16E-233A00A56BBA}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "utils", "utils\utils.vcxproj", "{9A2A4ADD-3437-4974-B926-E5D0DF29E57A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -78,6 +80,14 @@ Global
 		{D17BE6FE-E613-4123-A16E-233A00A56BBA}.Release|x64.Build.0 = Release|x64
 		{D17BE6FE-E613-4123-A16E-233A00A56BBA}.Release|x86.ActiveCfg = Release|Win32
 		{D17BE6FE-E613-4123-A16E-233A00A56BBA}.Release|x86.Build.0 = Release|Win32
+		{9A2A4ADD-3437-4974-B926-E5D0DF29E57A}.Debug|x64.ActiveCfg = Debug|x64
+		{9A2A4ADD-3437-4974-B926-E5D0DF29E57A}.Debug|x64.Build.0 = Debug|x64
+		{9A2A4ADD-3437-4974-B926-E5D0DF29E57A}.Debug|x86.ActiveCfg = Debug|Win32
+		{9A2A4ADD-3437-4974-B926-E5D0DF29E57A}.Debug|x86.Build.0 = Debug|Win32
+		{9A2A4ADD-3437-4974-B926-E5D0DF29E57A}.Release|x64.ActiveCfg = Release|x64
+		{9A2A4ADD-3437-4974-B926-E5D0DF29E57A}.Release|x64.Build.0 = Release|x64
+		{9A2A4ADD-3437-4974-B926-E5D0DF29E57A}.Release|x86.ActiveCfg = Release|Win32
+		{9A2A4ADD-3437-4974-B926-E5D0DF29E57A}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

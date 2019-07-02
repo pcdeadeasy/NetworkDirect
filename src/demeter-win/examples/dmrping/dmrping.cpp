@@ -5,6 +5,7 @@
 #include "../../libraries/Winshim/Winshim.h"
 #include "../../libraries/ndutil/ndutil.h"
 #include "../../libraries/ndutil/ndtestutil.h"
+#include "../../libraries/Utils/Utils.h"
 #include "Params.h"
 #include "Server.h"
 #include "Client.h"

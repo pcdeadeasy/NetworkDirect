@@ -1,10 +1,6 @@
 cmake_minimum_required(VERSION 3.0.0 FATAL_ERROR)
 
-message( STATUS "CMAKE_BINARY_DIR:" ${CMAKE_BINARY_DIR})
-message( STATUS "CMAKE_CURRENT_BINARY_DIR:" ${CMAKE_CURRENT_BINARY_DIR})
-
-set(PROJ_NAME dmrping)
-
+set(PROJ_NAME utils)
 project(${PROJ_NAME})
 
 # Check platforms
@@ -83,38 +79,26 @@ set(OUTPUT_DEBUG Debug/bin)
 set(OUTPUT_RELEASE Release/bin)
 # Folders files
 set(SRC 
-  ./Client.cpp
-  ./dmrping.cpp 
-  ./Params.cpp
-  ./pch.cpp
-  ./PeerInfo.cpp
-  ./Server.cpp
+  ./Utils.cpp
 )
 
 set(INCLUDE
-  ./Client.h
-  ./ctxt.h
-  ./Params.h
-  ./pch.h
-  ./PeerInfo.h
-  ./Server.h
-  ../../libraries/Utils/Utils.h
+  ./Utils.h
 )
 
 source_group("src" FILES ${SRC})
 source_group("include" FILES ${INCLUDE})
 
-set_source_files_properties(${SRC}
-    PROPERTIES
-    COMPILE_FLAGS "/Ycpch.h /c"
-)
+# set_source_files_properties(${SRC}
+#     PROPERTIES
+#     COMPILE_FLAGS "/Ycstdafx.h /c"
+# )
 
 # Define Release by default.
 if(NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE "Release")
   message(STATUS "Build type not specified: Use Release by default.")
 endif(NOT CMAKE_BUILD_TYPE)
-message(STATUS "CMAKE_BUILD_TYPE:" "${CMAKE_BUILD_TYPE}")
 
 ############## Artefacts Output #################
 # Defines outputs , depending Debug or Release. #
@@ -138,14 +122,15 @@ if(MSVC)
    set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /EHsc")
    set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /EHsc")
    set (CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /ignore:4099")
-   set (CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /ignore:4075")
-   set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /Yupch.h")
+#   set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /Yustdafx.h")
     
-   add_definitions(-DUNICODE)     
-   set(CMAKE_GENERATOR_TOOLSET "v141" CACHE STRING "Platform Toolset" FORCE)
-   message( STATUS "CMAKE_GENERATOR_TOOLSET: " "${CMAKE_GENERATOR_TOOLSET}" )
+   add_definitions(-DUNICODE)
+   if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+      add_compile_options(/MTd)
+   else()
+	  add_compile_options(/MT)
+   endif()
 endif(MSVC)
-
 if(NOT MSVC)
    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
    if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
@@ -159,13 +144,13 @@ if (MSVC AND (MSVC_VERSION GREATER 1900))
     if (${use_control_flow_guard})
         message("Setting CONTROL FLOW GUARD") 
         set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /guard:cf")
-        SET(CMAKE_EXE_LINKER_FLAGS  "/guard:cf /DYNAMICBASE")
+        #SET(CMAKE_EXE_LINKER_FLAGS  "/guard:cf /DYNAMICBASE")
     endif()
     if (${use_qspectre})
         message("Setting QSPECTRE")
         set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /Qspectre")
     endif()
-    set(CompilerFlags        
+	set(CompilerFlags        
         CMAKE_CXX_FLAGS_DEBUG
         CMAKE_CXX_FLAGS_RELEASE
         CMAKE_CXX_FLAGS_MINSIZEREL
@@ -186,26 +171,13 @@ if (MSVC AND (MSVC_VERSION GREATER 1900))
     		message("MSVC flags: ${CompilerFlag}:${${CompilerFlag}}")
     	endif()
     endforeach()
-
 endif()
 
-#set(CMAKE_GENERATOR "Visual Studio 15 2017 Win64" CACHE INTERNAL "" FORCE)
-#set(CMAKE_GENERATOR_TOOLSET "v141" CACHE INTERNAL "" FORCE)
-message("CMAKE_GENERATOR is set to ${CMAKE_GENERATOR}")
+
 
 # Add library to build.
-add_executable(${PROJ_NAME} ${SRC} ${INCLUDE})
-add_dependencies(${PROJ_NAME} rdmalib-build)
+add_library(${PROJ_NAME} STATIC ${SRC} ${INCLUDE})
 
-if (MSVC)
-	target_link_directories(${PROJ_NAME} PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/../../rdmalib/src/rdmalib-build/$(ConfigurationName)/)
-	target_link_libraries(${PROJ_NAME} Logger ndutil winshim utils)
-else()
-	# target_link_libraries(${PROJ_NAME} Logger ndutil winshim utils)
-endif()
-
-#target_link_libraries(${PROJ_NAME} ndutil)
 set_property(TARGET ${PROJ_NAME} PROPERTY FOLDER "private/libraries")
-#install (TARGETS Logger DESTINATION bin)
 
 

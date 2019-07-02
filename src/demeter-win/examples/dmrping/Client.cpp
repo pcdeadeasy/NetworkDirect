@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "../../libraries/logger/Logger.h"
 #include "../../libraries/Winshim/WinHeap.h"
+#include "../../libraries/Utils/Utils.h"
 #include "Client.h"
 #include "ctxt.h"
 #include "PeerInfo.h"

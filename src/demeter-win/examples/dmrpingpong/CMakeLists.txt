@@ -86,14 +86,12 @@ set(SRC
   ./dmrpingpong.cpp
   ./main1.cpp
   ./params.cpp
-  ./utils.cpp
   ./pch.cpp
 )
 
 set(INCLUDE
   ./ndscope.h
   ./params.h
-  ./utils.h
   ./cxxopts.hpp
   ./pch.h
 )
@@ -196,7 +194,7 @@ add_dependencies(${PROJ_NAME} rdmalib-build)
 
 if (MSVC)
 	target_link_directories(${PROJ_NAME} PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/../../rdmalib/src/rdmalib-build/$(ConfigurationName)/)
-	target_link_libraries(${PROJ_NAME} Logger ndutil winshim)
+	target_link_libraries(${PROJ_NAME} Logger ndutil winshim utils)
 else()
 	# target_link_libraries(${PROJ_NAME} Logger ndutil winshim)
 endif()

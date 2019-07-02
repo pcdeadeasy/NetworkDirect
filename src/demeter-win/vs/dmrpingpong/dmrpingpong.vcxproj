@@ -23,7 +23,6 @@
     <ClCompile Include="..\..\examples\dmrpingpong\main1.cpp" />
     <ClCompile Include="..\..\examples\dmrpingpong\Params.cpp" />
     <ClCompile Include="..\..\examples\dmrpingpong\pch.cpp" />
-    <ClCompile Include="..\..\examples\dmrpingpong\Utils.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\logger\logger.vcxproj">
@@ -31,6 +30,9 @@
     </ProjectReference>
     <ProjectReference Include="..\ndutil\ndutil.vcxproj">
       <Project>{8c7c0240-27c3-4a36-afbc-a553dd3fd42b}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\utils\utils.vcxproj">
+      <Project>{9a2a4add-3437-4974-b926-e5d0df29e57a}</Project>
     </ProjectReference>
     <ProjectReference Include="..\Winshim\Winshim.vcxproj">
       <Project>{2e85b211-0c24-49f9-9a96-55f81384890e}</Project>
@@ -40,7 +42,7 @@
     <ClInclude Include="..\..\examples\dmrpingpong\ndscope.h" />
     <ClInclude Include="..\..\examples\dmrpingpong\Params.h" />
     <ClInclude Include="..\..\examples\dmrpingpong\pch.h" />
-    <ClInclude Include="..\..\examples\dmrpingpong\Utils.h" />
+    <ClInclude Include="..\..\libraries\Utils\Utils.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>

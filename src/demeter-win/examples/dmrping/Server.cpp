@@ -1,40 +1,10 @@
 #include "pch.h"
 #include "../../libraries/logger/Logger.h"
 #include "../../libraries/Winshim/WinHeap.h"
+#include "../../libraries/Utils/Utils.h"
 #include "Server.h"
 #include "ctxt.h"
 #include "PeerInfo.h"
-
-static void print_info(ND2_ADAPTER_INFO &info)
-{
-#define PU(X,Y) printf("  \"" #X "\": %" #Y ",\n", info.##X)
-    printf("ND2_ADAPTER_INFO:\n");
-    printf("{\n");
-    PU(InfoVersion, u);
-    PU(VendorId, u);
-    PU(DeviceId, u);
-    PU(AdapterId, zu);
-    PU(MaxRegistrationSize, zu);
-    PU(MaxWindowSize, zu);
-    PU(MaxInitiatorSge, u);
-    PU(MaxReceiveSge, u);
-    PU(MaxReadSge, u);
-    PU(MaxTransferLength, u);
-    PU(MaxInlineDataSize, u);
-    PU(MaxInboundReadLimit, u);
-    PU(MaxOutboundReadLimit, u);
-    PU(MaxReceiveQueueDepth, u);
-    PU(MaxInitiatorQueueDepth, u);
-    PU(MaxSharedReceiveQueueDepth, u);
-    PU(MaxCompletionQueueDepth, u);
-    PU(InlineRequestThreshold, u);
-    PU(LargeRequestThreshold, u);
-    PU(MaxCallerData, u);
-    PU(MaxCalleeData, u);
-    PU(AdapterFlags, u);
-    printf("}\n");
-#undef PU
-}
 
 static bool supports_in_order_dma(ND2_ADAPTER_INFO &info)
 {
@@ -75,7 +45,7 @@ ND2_ADAPTER_INFO Server::initialize(BUFFER<char> &Buf)
     LOG_ENTER();
     ND2_ADAPTER_INFO info = { 0 };
     NdTestBase::GetAdapterInfo(&info);
-    print_info(info);
+    Utils::print_adapter_info(stdout, info);
     check_in_order_dma_is_supported(info);
     NdTestBase::CreateCQ(info.MaxCompletionQueueDepth);
     NdTestBase::CreateConnector();
