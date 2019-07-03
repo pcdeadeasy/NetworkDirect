@@ -415,6 +415,7 @@ void NdTestBase::PostReceive(
     const char* errorMessage)
 {
     LOG_ENTER();
+    LOG("context %p", requestContext);
     HRESULT hr = m_pQp->Receive(requestContext, Sge, nSge);
     LOG("IND2QueuePair::Receive -> %08X", hr);
     LOG_ERROR_UNEQUAL(hr, expectedResult);
@@ -433,6 +434,7 @@ void NdTestBase::Write(
     const char* errorMessage)
 {
     LOG_ENTER();
+    LOG("context %p", requestContext);
     HRESULT hr;
     hr = m_pQp->Write(requestContext, Sge, nSge, remoteAddress, remoteToken, flag);
     LOG("IND2QueuePair::Write -> %08X", hr);
@@ -452,6 +454,7 @@ void NdTestBase::Read(
     const char* errorMessage)
 {
     LOG_ENTER();
+    LOG("context %p", requestContext);
     HRESULT hr;
     hr = m_pQp->Read(requestContext, Sge, nSge, remoteAddress, remoteToken, flag);
     LOG("IND2QueuePair::Read -> %08X", hr);
@@ -469,6 +472,7 @@ void NdTestBase::Send(
     const char* errorMessage)
 {
     LOG_ENTER();
+    LOG("context %p", requestContext);
     HRESULT hr = m_pQp->Send(requestContext, Sge, nSge, flags);
     LOG("IND2QueuePair::Send -> %08X", hr);
     LOG_ERROR_UNEQUAL(hr, expectedResult);
@@ -485,6 +489,7 @@ void NdTestBase::Send(
     const char* errorMessage)
 {
     LOG_ENTER();
+    LOG("context %p", requestContext);
     HRESULT hr = m_pQp->Send(requestContext, Sge, nSge, flags);
     LOG("IND2QueuePair::Send -> %08X", hr);
 
@@ -538,6 +543,7 @@ void NdTestBase::WaitForCompletion(
     };
     LOG("IND2QueuePair::GetResults -> 0 (%zu times)", call_count-1);
     LOG("IND2QueuePair::GetResults -> %08X", ul);
+    LOG("context %p", ndRes.RequestContext);
     LOG("%u bytes transferred", ndRes.BytesTransferred);
     LOG_VOID_RETURN();
 }
