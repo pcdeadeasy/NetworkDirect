@@ -170,6 +170,7 @@ void NdTestBase::Bind(DWORD bufferLength, ULONG flags, void *context, HRESULT ex
 void NdTestBase::Bind(const void *pBuf, DWORD bufferLength, ULONG flags, void *context, HRESULT expectedResult, const char* errorMessage)
 {
     LOG_ENTER();
+    LOG("context %p", context);
 #pragma warning(suppress: 6001)
     HRESULT hr = m_pQp->Bind(context, m_pMr, m_pMw, pBuf, bufferLength, flags);
     LOG("IND2QueuePair::Bind -> %08X", hr);

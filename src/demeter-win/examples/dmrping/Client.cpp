@@ -117,6 +117,7 @@ void Client::post_receive(BUFFER<char> &buf)
     sge.BufferLength = (ULONG)buf.size();
     sge.MemoryRegionToken = m_pMr->GetLocalToken();
     LOG("IND2MemoryRegion::GetLocalToken -> %08X", sge.MemoryRegionToken);
+    LOG_SGES(&sge, 1);
     NdTestBase::PostReceive(&sge, 1, RECV_CTXT);
     LOG_VOID_RETURN();
 }

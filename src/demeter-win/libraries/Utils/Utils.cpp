@@ -101,7 +101,6 @@ void Utils::print_result(FILE *file, const ND2_RESULT &result)
     char buffer[512];
     int rc = Utils::write_result(buffer, sizeof(buffer), result);
     fprintf(file, "%s\n", buffer);
-
 }
 
 const char* Utils::request_type(ND2_REQUEST_TYPE rtype)
@@ -122,13 +121,22 @@ const char* Utils::request_type(ND2_REQUEST_TYPE rtype)
 #undef K
 }
 
+int Utils::sge_to_string(char *output, size_t output_size, const ND2_SGE &sge)
+{
+    const char* const fmt = 
+        "{\n"
+        "  \"Buffer\": \"%p\",\n"
+        "  \"BufferLength\": %u,\n"
+        "  \"MemoryRegionToken\": %u\n"
+       "}";
+    return sprintf_s(output, output_size, fmt, sge.Buffer, sge.BufferLength, sge.MemoryRegionToken);
+}
+
 void Utils::print_sge(FILE *file, const ND2_SGE &sge)
 {
-    fprintf(file, "{\n");
-    fprintf(file, "  \"Buffer\": \"%p\",\n", sge.Buffer);
-    fprintf(file, "  \"BufferLength\": %u,\n", sge.BufferLength);
-    fprintf(file, "  \"MemoryRegionToken\": %u\n", sge.MemoryRegionToken);
-    fprintf(file, "}\n");
+    char buffer[512];
+    int n = Utils::sge_to_string(buffer, sizeof(buffer), sge);
+    fprintf(file, "%s", buffer);
 }
 
 void Utils::hexdumptofile(FILE *file, const void *addr, size_t len)

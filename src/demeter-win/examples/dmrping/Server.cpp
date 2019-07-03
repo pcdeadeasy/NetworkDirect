@@ -90,6 +90,7 @@ void Server::work(const struct sockaddr_in& v4Src)
     BUFFER<char> buf(&heap, HEAP_ZERO_MEMORY, m_params.MaxXfer + m_params.HdrLen);
     ND2_ADAPTER_INFO info = initialize(buf);
     ND2_SGE sge = get_sge(buf);                     // must be preceeded by initialize
+    LOG_SGES(&sge, 1);
     NdTestBase::PostReceive(&sge, 1, RECV_CTXT);    // post receive for terminate message
     NdTestServerBase::CreateListener();
     NdTestServerBase::Listen(v4Src);
@@ -105,13 +106,16 @@ void Server::work(const struct sockaddr_in& v4Src)
 
 void Server::send_remote_token_and_address(ND2_ADAPTER_INFO &info, BUFFER<char> &buf)
 {
+    LOG_ENTER();
     ND2_SGE sge = get_sge(buf);
     PeerInfo *pInfo = (PeerInfo*)(void*)buf;
     pInfo->RemoteToken = m_pMw->GetRemoteToken();
     LOG("IND2MemoryWindow::GetRemoteToken -> %08X", pInfo->RemoteToken);
     pInfo->IncommingReadLimit = info.MaxInboundReadLimit;
     pInfo->RemoteAddress = (unsigned __int64)(void*)buf;
+    LOG_SGES(&sge, 1);
     NdTestBase::Send(&sge, 1, 0, SEND_CTXT);
+    LOG_VOID_RETURN();
 }
 
 void Server::RunTest(const struct sockaddr_in& v4Src, DWORD, DWORD)
