@@ -40,6 +40,7 @@ static DWORD get_register_flags(Params& params)
     ans |= params.Read ? ND_MR_FLAG_ALLOW_REMOTE_READ : ND_MR_FLAG_ALLOW_REMOTE_WRITE;
     return ans;
 }
+
 ND2_ADAPTER_INFO Server::initialize(BUFFER<char> &Buf)
 {
     LOG_ENTER();

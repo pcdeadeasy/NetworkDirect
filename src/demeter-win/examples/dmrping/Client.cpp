@@ -18,15 +18,6 @@ Client::~Client()
     LOG_VOID_RETURN();
 }
 
-static void print_address(const struct sockaddr_in& addr, const char *name)
-{
-    char buffer[100];
-    DWORD dwAddressStringLength;
-    dwAddressStringLength = (DWORD)sizeof(buffer);
-    Win::WSAAddressToStringA((LPSOCKADDR)&addr, (DWORD)sizeof(addr), 0, buffer, &dwAddressStringLength);
-    printf("%s: %s\n", name, buffer);
-}
-
 void Client::RunTest(const struct sockaddr_in &v4Src, const struct sockaddr_in &v4Dst, DWORD queueDepth, DWORD nSge)
 {
     LOG_ENTER();
