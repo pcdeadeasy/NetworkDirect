@@ -156,6 +156,11 @@
     <ClCompile Include="..\..\libraries\ndutil\ndprov.cpp" />
     <ClCompile Include="..\..\libraries\ndutil\ndtestutil.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\utils\utils.vcxproj">
+      <Project>{9a2a4add-3437-4974-b926-e5d0df29e57a}</Project>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

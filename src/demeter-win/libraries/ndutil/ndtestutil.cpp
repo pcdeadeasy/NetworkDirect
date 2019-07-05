@@ -6,6 +6,7 @@
 
 #include "ndtestutil.h"
 #include "precomp.h"
+#include "../Utils/Utils.h"
 
 //initializer
 NdTestBase::NdTestBase() :
@@ -535,8 +536,11 @@ void NdTestBase::WaitForCompletion(
         {
             LOG("IND2QueuePair::GetResults -> 0 (%zu times)", call_count - 1);
             LOG("IND2QueuePair::GetResults -> %08X", ul);
-            LOG("context %p", ndRes.RequestContext);
-            LOG("%u bytes transferred", ndRes.BytesTransferred);
+            {
+                char buffer[512];
+                Utils::write_result(buffer, sizeof(buffer), ndRes);
+                LOG("%s", buffer);
+            }
             processCompletionFn(&ndRes);
             break;
         }
