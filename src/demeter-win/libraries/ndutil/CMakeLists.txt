@@ -201,7 +201,7 @@ add_custom_command(
 
 # Add library to build.
 add_library(${PROJ_NAME} STATIC ${SRC} ${INCLUDE})
-target_link_libraries(${PROJ_NAME} Logger)
+target_link_libraries(${PROJ_NAME} Logger Utils)
 
 # add_precompiled_header(${PROJ_NAME} precomp.h SOURCE_CXX ${SRC} FORCEINCLUDE)
 
