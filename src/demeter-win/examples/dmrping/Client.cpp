@@ -141,9 +141,7 @@ void Client::Work(const struct sockaddr_in& v4Src, const struct sockaddr_in &v4D
     WaitForCompletionAndCheckContext(RECV_CTXT);
 
     PeerInfo *pInfo = (PeerInfo*)((void*)buf);
-    printf("\nPeerInfo sent from server:\n");
-    print_peerinfo(*pInfo, stdout);
-    printf("\n");
+    printf("\nReceived PeerInfo --\n"); print_peerinfo(*pInfo, stdout); printf("\n");
     send_terminate_message();
 
     LOG_VOID_RETURN();

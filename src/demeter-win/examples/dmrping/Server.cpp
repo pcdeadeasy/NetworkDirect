@@ -113,9 +113,8 @@ void Server::send_remote_token_and_address(ND2_ADAPTER_INFO &info, BUFFER<char> 
     pInfo->IncommingReadLimit = info.MaxInboundReadLimit;
     pInfo->RemoteAddress = (unsigned __int64)(void*)buf;
     LOG_SGES(&sge, 1);
-    printf("\nServer sending PeerInfo to the client\n");
-    print_peerinfo(*pInfo, stdout);
     NdTestBase::Send(&sge, 1, 0, SEND_CTXT);
+    printf("\nSent PeerInfo --\n"); print_peerinfo(*pInfo, stdout); printf("\n");
     LOG_VOID_RETURN();
 }
 
