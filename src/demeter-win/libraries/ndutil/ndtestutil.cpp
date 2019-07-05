@@ -526,14 +526,17 @@ void NdTestBase::WaitForCompletion(
 {
     LOG_ENTER();
     size_t call_count = 0;
-    ULONG ul;
-    ND2_RESULT ndRes;
     for (;;)
     {
+        ND2_RESULT ndRes = { 0 };
         call_count += 1;
-        ul = m_pCq->GetResults(&ndRes, 1);
+        ULONG ul = m_pCq->GetResults(&ndRes, 1);
         if (ul == 1)
         {
+            LOG("IND2QueuePair::GetResults -> 0 (%zu times)", call_count - 1);
+            LOG("IND2QueuePair::GetResults -> %08X", ul);
+            LOG("context %p", ndRes.RequestContext);
+            LOG("%u bytes transferred", ndRes.BytesTransferred);
             processCompletionFn(&ndRes);
             break;
         }
@@ -542,10 +545,6 @@ void NdTestBase::WaitForCompletion(
             WaitForEventNotification();
         }
     };
-    LOG("IND2QueuePair::GetResults -> 0 (%zu times)", call_count-1);
-    LOG("IND2QueuePair::GetResults -> %08X", ul);
-    LOG("context %p", ndRes.RequestContext);
-    LOG("%u bytes transferred", ndRes.BytesTransferred);
     LOG_VOID_RETURN();
 }
 
