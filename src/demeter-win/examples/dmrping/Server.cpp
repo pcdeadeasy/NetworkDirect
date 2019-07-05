@@ -46,7 +46,6 @@ ND2_ADAPTER_INFO Server::initialize(BUFFER<char> &Buf)
     LOG_ENTER();
     ND2_ADAPTER_INFO info = { 0 };
     NdTestBase::GetAdapterInfo(&info);
-    Utils::print_adapter_info(stdout, info);
     check_in_order_dma_is_supported(info);
     NdTestBase::CreateCQ(info.MaxCompletionQueueDepth);
     NdTestBase::CreateConnector();
@@ -114,6 +113,8 @@ void Server::send_remote_token_and_address(ND2_ADAPTER_INFO &info, BUFFER<char> 
     pInfo->IncommingReadLimit = info.MaxInboundReadLimit;
     pInfo->RemoteAddress = (unsigned __int64)(void*)buf;
     LOG_SGES(&sge, 1);
+    printf("\nServer sending PeerInfo to the client\n");
+    print_peerinfo(*pInfo, stdout);
     NdTestBase::Send(&sge, 1, 0, SEND_CTXT);
     LOG_VOID_RETURN();
 }

@@ -31,3 +31,6 @@ Server                                  Client
 server's memory window.
 - Message T is the termination message. No data is sent.
 
+Messages are written into a registered memory window of the peer.
+The location in the memory window is specfied by the array of 
+ND2_SGE structures specified as the argument to the Send method.
