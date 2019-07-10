@@ -35,6 +35,7 @@ bld/
 Generated\ Files/
 
 # Visual Studio Code generated directories
+.ionide/
 .vscode/
 
 # MSTest test Results
