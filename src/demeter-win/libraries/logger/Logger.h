@@ -3,47 +3,42 @@
 
 class LoggerWorker
 {
-  static char Buffer[];
+    static char Buffer[];
 public:
-  static bool IsFirst;
-  static FILE* Stream;
-  static void log(const char *function, const char *file, unsigned int line, const char *fmt, ...);
+    static bool IsFirst;
+    static FILE* Stream;
+    static void log(const char *function, const char *file, unsigned int line, const char *fmt, ...);
 };
 
 class Logger
 {
-  bool m_isFile;
-  Logger() = delete;
+    bool m_isFile;
 public:
-  Logger(const char *file_path = 0) : m_isFile(false)
-  {
-    if (file_path)
-    {
-      if (fopen_s(&LoggerWorker::Stream, file_path, "w") == 0)
-      {
-        m_isFile = true;
-      }
-      else
-      {
-        LoggerWorker::Stream = stdout;
-      }
-    }
-    else
-    {
-      LoggerWorker::Stream = stdout;
-    }
-    fprintf(LoggerWorker::Stream, "[\n");
-  }
 
-  ~Logger()
-  {
-    fprintf(LoggerWorker::Stream, "]\n");
-    if (m_isFile)
+    Logger() : m_isFile(false)
     {
-      fclose(LoggerWorker::Stream);
-      LoggerWorker::Stream = 0;
+        LoggerWorker::Stream = stdout;
+        fprintf(LoggerWorker::Stream, "[\n");
     }
-  }
+
+    Logger(const char *file_path) : m_isFile(false)
+    {
+        if (fopen_s(&LoggerWorker::Stream, file_path, "w") == 0)
+        {
+            m_isFile = true;
+            fprintf(LoggerWorker::Stream, "[\n");
+        }
+    }
+
+    ~Logger()
+    {
+        fprintf(LoggerWorker::Stream, "]\n");
+        if (m_isFile)
+        {
+            fclose(LoggerWorker::Stream);
+            LoggerWorker::Stream = 0;
+        }
+    }
 };
 
 #define LOG(...)                                                            \
