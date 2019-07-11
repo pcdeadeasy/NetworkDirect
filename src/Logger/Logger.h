@@ -13,26 +13,21 @@ public:
 class Logger
 {
   bool m_isFile;
-  Logger() = delete;
 public:
-  Logger(const char *file_path = 0) : m_isFile(false)
-  {
-    if (file_path)
+
+    Logger() : m_isFile(false)
     {
+        LoggerWorker::Stream = stdout;
+        fprintf(LoggerWorker::Stream, "[\n");
+    }
+
+  Logger(const char *file_path) : m_isFile(false)
+  {
       if (fopen_s(&LoggerWorker::Stream, file_path, "w") == 0)
       {
         m_isFile = true;
+        fprintf(LoggerWorker::Stream, "[\n");
       }
-      else
-      {
-        LoggerWorker::Stream = stdout;
-      }
-    }
-    else
-    {
-      LoggerWorker::Stream = stdout;
-    }
-    fprintf(LoggerWorker::Stream, "[\n");
   }
 
   ~Logger()
