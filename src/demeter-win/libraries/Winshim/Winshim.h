@@ -169,6 +169,69 @@ public:
   static int WSACleanup();
 
   /**
+  * \brief permits an incomming connection attempt on a socket
+  **/
+  static SOCKET accept(
+      SOCKET s,
+      sockaddr *addr,
+      int *addrlen
+  );
+
+  /**
+  * \brief associates a local address with a socket
+  **/
+  static int bind(
+      SOCKET s,
+      const sockaddr *name,
+      int namelen
+  );
+
+  /**
+  * \brief closes an existing socket
+  **/
+  static int closesocket(
+      SOCKET s
+  );
+
+  /**
+  * \brief establishes a connection to a specified socket
+  **/
+  static int connect(
+      SOCKET s,
+      const sockaddr *name,
+      int namelen
+  );
+
+  /**
+  * \brief provides protocol-independent translation from an ANSI host name to an address
+  **/
+  static int getaddrinfo(
+      PCSTR pNodeName,
+      PCSTR pServiceName,
+      const ADDRINFOA *pHints,
+      PADDRINFOA *ppResult
+  );
+
+  /**
+  * \brief retrieves the address of the peer to which the socket is connected
+  **/
+  static int getpeername(
+      SOCKET s,
+      sockaddr *name,
+      int *namelen
+  );
+
+  /**
+  * \brief receives data from a connected socket or a bound connnectionless socket
+  **/
+  static int recv(
+      SOCKET s,
+      char *buf,
+      int len,
+      int flags
+  );
+
+  /**
     @brief Converts a network address in its standard text representation
         into its binary form in a sockaddr structure.
 

@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <tchar.h>
 #include <objbase.h>
+#include <WS2tcpip.h>
 
 #pragma comment(lib, "Ws2_32.lib")
 #pragma warning( disable : 4996)
@@ -56,6 +57,90 @@ int Win::WSAStartup(WORD wVersionRequested, LPWSADATA lpWSAData)
     throw Win::Error();
   }
   return ans;
+}
+
+SOCKET Win::accept(SOCKET s, sockaddr *addr, int *addrlen)
+{
+    SOCKET const ans = ::accept(s, addr, addrlen);
+    LOG("accept %d %p %p -> %d", s, addr, addrlen, ans);
+    if (ans == INVALID_SOCKET)
+    {
+        LOG_LAST_ERROR();
+        throw Win::Error();
+    }
+    return ans;
+}
+
+int Win::bind(SOCKET s, const sockaddr *name, int namelen)
+{
+    int const ans = ::bind(s, name, namelen);
+    LOG("bind %d %p %d -> %d", s, name, namelen, ans);
+    if (ans == SOCKET_ERROR)
+    {
+        LOG_LAST_ERROR();
+        throw Win::Error();
+    }
+    return ans;
+}
+
+int Win::closesocket(SOCKET s)
+{
+    int const ans = ::closesocket(s);
+    LOG("closesocket %d -> %d", s, ans);
+    if (ans == SOCKET_ERROR)
+    {
+        LOG_LAST_ERROR();
+        throw Win::Error();
+    }
+    return ans;
+}
+
+int Win::connect(SOCKET s, const sockaddr *name, int namelen)
+{
+    int const ans = ::connect(s, name, namelen);
+    LOG("connect %d %p %d -> %d", s, name, namelen, ans);
+    if (ans == SOCKET_ERROR)
+    {
+        LOG_LAST_ERROR();
+        throw Win::Error();
+    }
+    return ans;
+}
+
+int Win::getaddrinfo(PCSTR pNodeName, PCSTR pServiceName, const ADDRINFOA *pHints, PADDRINFOA *ppResult)
+{
+    int const ans = ::getaddrinfo(pNodeName, pServiceName, pHints, ppResult);
+    LOG("getaddrinfo \"%s\" \"%s\" %p %p -> %d", pNodeName, pServiceName, pHints, ppResult, ans);
+    if (ans != 0)
+    {
+        LOG_LAST_ERROR();
+        throw Win::Error();
+    }
+    return ans;
+}
+
+int Win::getpeername(SOCKET s, sockaddr *name, int *namelen)
+{
+    int const ans = ::getpeername(s, name, namelen);
+    LOG("getpeername %d %p %p -> %d", s, name, namelen, ans);
+    if (ans != 0)
+    {
+        LOG_LAST_ERROR();
+        throw Win::Error();
+    }
+    return ans;
+}
+
+int Win::recv(SOCKET s, char *buf, int len, int flags)
+{
+    int ans = ::recv(s, buf, len, flags);
+    LOG("recv %d %p %d %d -> %d", s, buf, len, flags, ans);
+    if (ans == SOCKET_ERROR)
+    {
+        LOG_LAST_ERROR();
+        throw Win::Error();
+    }
+    return ans;
 }
 
 int Win::WSACleanup() 
