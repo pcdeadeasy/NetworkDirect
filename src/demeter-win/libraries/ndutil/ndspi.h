@@ -23,7 +23,7 @@
 
 #include <winsock2.h>
 #include <unknwn.h>
-#include "ndstatus.h"
+#include "include/ndstatus.h"
 #include "nddef.h"
 
 

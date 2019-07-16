@@ -7,7 +7,7 @@
 
 #include "targetver.h"
 #include "../Logger/Logger.h"
-#include "../ndutil/ndstatus.h"
+#include "../ndutil/include/ndstatus.h"
 #include "winshim.h"
 #include "error_strings.h"
 
