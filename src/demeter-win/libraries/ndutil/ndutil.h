@@ -17,6 +17,10 @@ namespace NetworkDirect
 #endif  // DBG
 #endif  // ASSERT
 
+	struct ndspi_mr
+	{
+		void *pndbase;
+	};
 
     //---------------------------------------------------------
     // Lock wrapper.
