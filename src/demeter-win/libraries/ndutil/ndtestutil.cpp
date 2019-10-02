@@ -512,11 +512,11 @@ void NdTestBase::WaitForEventNotification()
 {
     LOG_ENTER();
     HRESULT hr = m_pCq->Notify(ND_CQ_NOTIFY_ANY, &m_Ov);
-    LOG("IND2QueuePair::Notify -> %08X", hr);
+    LOG("IND2CompletionQueue::Notify -> %08X", hr);
     if (hr == ND_PENDING)
     {
         hr = m_pCq->GetOverlappedResult(&m_Ov, TRUE);
-        LOG("IND2QueuePair::GetOverlappedResult -> %08X");
+        LOG("IND2CompletionQueue::GetOverlappedResult -> %08X");
     }
     LOG_VOID_RETURN();
 }
@@ -534,8 +534,8 @@ void NdTestBase::WaitForCompletion(
         ULONG ul = m_pCq->GetResults(&ndRes, 1);
         if (ul == 1)
         {
-            LOG("IND2QueuePair::GetResults -> 0 (%zu times)", call_count - 1);
-            LOG("IND2QueuePair::GetResults -> %08X", ul);
+            LOG("IND2CompletionQueue::GetResults -> 0 (%zu times)", call_count - 1);
+            LOG("IND2CompletionQueue::GetResults -> %08X", ul);
             {
                 char buffer[512];
                 Utils::write_result(buffer, sizeof(buffer), ndRes);
