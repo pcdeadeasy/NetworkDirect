@@ -8,9 +8,7 @@ import json
 # pylint: disable=import-error
 import click
 
-@click.command()
-@click.option('--path', prompt=True, help='path to JSON log file')
-def main(path: str) -> None:
+def work(path: str) -> None:
     '''
     Print the contents of the JSON log
     file so that the depth of the calls
@@ -34,6 +32,12 @@ def main(path: str) -> None:
         else:
             for s in comment.split('\n'):
                 print("{0}{1}".format(indent * level, s))
+
+@click.command()
+@click.option('--path', prompt=True, help='path to JSON log file')
+def main(path: str) -> None:
+    'docstring'
+    work(path)
 
 if __name__ == '__main__':
     # pylint: disable=no-value-for-parameter
