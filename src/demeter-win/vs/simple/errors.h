@@ -22,3 +22,4 @@
 #define EX_LISTEN                   20
 #define EX_CREATE_CONNECTOR         21
 #define EX_GET_CONNECTION_REQUEST   22
+#define EX_CONNECTOR_BIND           23
