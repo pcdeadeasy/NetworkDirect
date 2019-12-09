@@ -14,7 +14,8 @@ typedef void(*work_t)(
     ND2_ADAPTER_INFO const* const pInfo,
     IND2CompletionQueue* const pSendCompletionQueue,
     IND2CompletionQueue* const pRecvCompletionQueue,
-    IND2QueuePair* const pQueuePair
+    IND2QueuePair* const pQueuePair,
+    IND2Connector* const pConnector
     );
 
 void work(

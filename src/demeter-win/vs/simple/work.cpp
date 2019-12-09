@@ -7,6 +7,54 @@
 #include "errors.h"
 #include "work.h"
 
+static void stage8(
+    params_t* const params,
+    work_t work,
+    const struct sockaddr* pAddress,
+    IND2Adapter* const pAdapter,
+    HANDLE const hOverlappedFile,
+    IND2MemoryRegion* const pMemoryRegion,
+    ND2_ADAPTER_INFO const* const pInfo,
+    IND2CompletionQueue* const pSendCompletionQueue,
+    IND2CompletionQueue* const pRecvCompletionQueue,
+    IND2QueuePair* const pQueuePair
+)
+{
+    LOG_ENTER();
+    IND2Connector* pConnector = 0;
+    HRESULT hr =
+        pAdapter->CreateConnector(IID_IND2Connector, hOverlappedFile, (void**)&pConnector);
+    LOG("IND2Adapter::CreateConnector -> %08X", hr);
+    if (ND_SUCCESS != hr)
+        throw EX_CREATE_CONNECTOR;
+    try
+    {
+        (*work)(
+            params,
+            pAddress,
+            pAdapter,
+            hOverlappedFile,
+            pMemoryRegion,
+            pInfo,
+            pSendCompletionQueue,
+            pRecvCompletionQueue,
+            pQueuePair,
+            pConnector
+            );
+    }
+    catch (...)
+    {
+        ULONG ul = pConnector->Release();
+        LOG("IND2QueuePair::Release -> %u", ul);
+        throw;
+    }
+    ULONG ul = pConnector->Release();
+    LOG("IND2Connector::Release -> %u", ul);
+
+    LOG_VOID_RETURN();
+}
+
+
 static void stage7(
     params_t* const params,
     work_t work,
@@ -47,8 +95,9 @@ static void stage7(
         throw EX_CREATE_QUEUE_PAIR;
     try
     {
-        (*work)(
+        stage8(
             params,
+            work,
             pAddress,
             pAdapter,
             hOverlappedFile,

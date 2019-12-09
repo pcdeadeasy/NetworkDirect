@@ -8,7 +8,7 @@
 #include "work.h"
 #include "client.h"
 
-static void server_work4(
+static void server_work3(
     params_t* const params,
     const struct sockaddr* pAddress,
     IND2Adapter* const pAdapter,
@@ -18,15 +18,26 @@ static void server_work4(
     IND2CompletionQueue* const pSendCompletionQueue,
     IND2CompletionQueue* const pRecvCompletionQueue,
     IND2QueuePair* const pQueuePair,
+    IND2Connector* pConnector,
     void* buffer,
     size_t size,
-    IND2Listener* pListener,
-    IND2Connector* pConnector
+    IND2Listener* pListener
 )
 {
     LOG_ENTER();
+
+    HRESULT hr = pListener->Bind(pAddress, sizeof(*pAddress));
+    LOG("IND2Listener::Bind -> %08X", hr);
+    if (ND_SUCCESS != hr)
+        throw EX_LISTEN_BIND;
+
+    hr = pListener->Listen(params->backlog);
+    LOG("IND2Listener::Listen -> %08X", hr);
+    if (ND_SUCCESS != hr)
+        throw EX_LISTEN;
+
     OVERLAPPED ov = { 0 };
-    HRESULT hr =
+    hr =
         pListener->GetConnectionRequest(
             pConnector,
             &ov
@@ -49,6 +60,7 @@ static void server_work4(
     LOG_VOID_RETURN();
 }
 
+/*
 static void server_work3(
     params_t* const params,
     const struct sockaddr* pAddress,
@@ -114,6 +126,7 @@ static void server_work3(
 
     LOG_VOID_RETURN();
 }
+*/
 
 static void server_work2(
     params_t* const params,
@@ -125,6 +138,7 @@ static void server_work2(
     IND2CompletionQueue* const pSendCompletionQueue,
     IND2CompletionQueue* const pRecvCompletionQueue,
     IND2QueuePair* const pQueuePair,
+    IND2Connector* const pConnector,
     void* buffer,
     size_t size
 )
@@ -167,6 +181,7 @@ static void server_work2(
             pSendCompletionQueue,
             pRecvCompletionQueue,
             pQueuePair,
+            pConnector,
             buffer,
             size,
             pListener
@@ -194,6 +209,7 @@ static void server_work1(
     IND2CompletionQueue* const pSendCompletionQueue,
     IND2CompletionQueue* const pRecvCompletionQueue,
     IND2QueuePair* const pQueuePair,
+    IND2Connector* const pConnector,
     void* buffer,
     size_t size
 )
@@ -212,6 +228,7 @@ static void server_work1(
             pSendCompletionQueue,
             pRecvCompletionQueue,
             pQueuePair,
+            pConnector,
             buffer,
             size
         );
@@ -234,7 +251,8 @@ static void server_work(
     ND2_ADAPTER_INFO const* const pInfo,
     IND2CompletionQueue* const pSendCompletionQueue,
     IND2CompletionQueue* const pRecvCompletionQueue,
-    IND2QueuePair* const pQueuePair
+    IND2QueuePair* const pQueuePair,
+    IND2Connector* const pConnector
 )
 {
     LOG_ENTER();
@@ -255,6 +273,7 @@ static void server_work(
             pSendCompletionQueue,
             pRecvCompletionQueue,
             pQueuePair,
+            pConnector,
             buffer,
             size
         );
