@@ -23,3 +23,5 @@
 #define EX_CREATE_CONNECTOR         21
 #define EX_GET_CONNECTION_REQUEST   22
 #define EX_CONNECTOR_BIND           23
+#define EX_CONNECTOR_CONNECT        24
+

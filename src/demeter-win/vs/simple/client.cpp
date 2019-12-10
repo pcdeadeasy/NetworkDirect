@@ -44,8 +44,41 @@ static void client_work2(
 )
 {
     LOG_ENTER();
+
     HRESULT hr = pConnector->Bind(pAddress, (ULONG)sizeof(*pAddress));
     LOG("IND2Connector::Bind -> %08X", hr);
+    if (ND_SUCCESS != hr)
+        throw EX_CONNECTOR_BIND;
+
+    char pPrivateData[] = "IND2Connector::Connect\0";
+    ULONG cbPrivateData = (ULONG)strlen(pPrivateData) + 1;
+    OVERLAPPED ov = { 0 };
+    hr =
+        pConnector->Connect(
+            pQueuePair,
+            pAddress,
+            (ULONG)sizeof(*pAddress),
+            (ULONG)params->size,
+            (ULONG)params->size,
+            (const void*)pPrivateData,
+            cbPrivateData,
+            &ov
+        );
+    LOG("IND2Connector::Connect -> %08X", hr);
+    if (ND_SUCCESS != hr)
+    {
+        if (hr != ND_PENDING)
+            throw EX_CONNECTOR_CONNECT;
+        uint64_t count = 1;
+        while ((hr = pConnector->GetOverlappedResult(&ov, FALSE)) == ND_PENDING)
+        {
+            count++;
+        }
+        LOG("IND2Connector::GetOverlappedResult -> %08X (%zu calls)", hr, count);
+        if (ND_SUCCESS != hr)
+            throw EX_CONNECTOR_CONNECT;
+    }
+
     LOG_VOID_RETURN();
 }
 

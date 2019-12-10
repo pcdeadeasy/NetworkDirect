@@ -15,7 +15,7 @@ params_t get_params(int argc, char* argv[])
     desc.add_options()
         ("help", "produce help message")
         ("role", po::value<string>(&ans.role), "\"client\" or \"server\"")
-        ("ip", po::value<string>(&ans.ip), "ip address")
+        ("ip", po::value<string>(&ans.ip), "server ip address")
         ("port", po::value<uint16_t>(&ans.port), "port number")
         ("size", po::value<size_t>(&ans.size), "size of buffer")
         ;
