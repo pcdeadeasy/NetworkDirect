@@ -45,11 +45,14 @@ static void client_work2(
 {
     LOG_ENTER();
 
-    HRESULT hr = pConnector->Bind(pAddress, (ULONG)sizeof(*pAddress));
+    // bind to the original ip address of the server
+    SOCKADDR saddr = get_sockaddr((LPSTR)(params->ip.c_str()), AF_INET, params->port);
+    HRESULT hr = pConnector->Bind((const struct sockaddr*)&saddr, (ULONG)sizeof(saddr));
     LOG("IND2Connector::Bind -> %08X", hr);
     if (ND_SUCCESS != hr)
         throw EX_CONNECTOR_BIND;
 
+    // connect to the local resolved address
     char pPrivateData[] = "IND2Connector::Connect\0";
     ULONG cbPrivateData = (ULONG)strlen(pPrivateData) + 1;
     OVERLAPPED ov = { 0 };

@@ -59,7 +59,7 @@ void work1(Params& params)
 
 void work0(Params& params)
 {
-    Logger logger(params.Logfile);
+    Logger logger;
     LOG_ENTER();
     WsaScope wsaScope;
     NdScope ndScope;
