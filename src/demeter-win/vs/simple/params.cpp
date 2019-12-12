@@ -16,8 +16,10 @@ params_t get_params(int argc, char* argv[])
         ("help", "produce help message")
         ("role", po::value<string>(&ans.role), "\"client\" or \"server\"")
         ("ip", po::value<string>(&ans.ip), "server ip address")
-        ("port", po::value<uint16_t>(&ans.port), "port number")
-        ("size", po::value<size_t>(&ans.size), "size of buffer")
+        ("port", po::value<uint16_t>(&ans.port), "port number (defaults to 54326)")
+        ("size", po::value<size_t>(&ans.size), "size of buffer (defaults to 4048)")
+        ("qdepth", po::value<uint32_t>(&ans.queue_depth), "queue depth (defaults to 0)")
+        ("nsge", po::value<uint32_t>(&ans.nsge), "maximum number of sges supported")
         ;
 
     po::variables_map vm;
@@ -34,10 +36,20 @@ params_t get_params(int argc, char* argv[])
         throw EX_INVALID_ROLE;
     if (!vm.count("ip"))
         throw EX_INVALID_IP;
+    if (!vm.count("nsge"))
+        throw EX_NSGE;
     if (!vm.count("port"))
-        throw EX_INVALID_PORT;
+    {
+        ans.port = 54326;
+    }
     if (!vm.count("size"))
-        throw EX_INVALID_SIZE;
+    {
+        ans.size = 4048;
+    }
+    if (!vm.count("qdepth"))
+    {
+        ans.queue_depth = 0;
+    }
 
     return ans;
 }

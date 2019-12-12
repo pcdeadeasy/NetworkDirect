@@ -55,6 +55,7 @@ public:
 #define LOG_HRESULT_RETURN(_hr) LOG_RETURN("%08X", _hr)
 #define LOG_ULONG_RETURN(_ul) LOG_RETURN("%08X", _ul)
 #define LOG_INT_RETURN(_i) LOG_RETURN("%d", _i)
+#define LOG_HEX_RETURN(_i) LOG_RETURN("%08X", _i)
 #define LOG_SIZET_RETURN(_zu) LOG_RETURN("%zu", _zu)
 #define LOG_ERROR_RETURN() LOG_RETURN("%s", "Error")
 #define LOG_ERROR_UNEQUAL(_a, _b) if (_a != _b) LOG_ERROR_RETURN()

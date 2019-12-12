@@ -23,5 +23,8 @@
 #define EX_CREATE_CONNECTOR         21
 #define EX_GET_CONNECTION_REQUEST   22
 #define EX_CONNECTOR_BIND           23
-#define EX_CONNECTOR_CONNECT        24
-
+#define EX_CONNECT                  24
+#define EX_CREATE_EVENT             25
+#define EX_NSGE                     26
+#define EX_COMPLETE_CONNECT         27
+#define EX_NOTIFY                   28

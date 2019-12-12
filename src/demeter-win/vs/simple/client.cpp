@@ -71,7 +71,7 @@ static void client_work2(
     if (ND_SUCCESS != hr)
     {
         if (hr != ND_PENDING)
-            throw EX_CONNECTOR_CONNECT;
+            throw EX_CONNECT;
         uint64_t count = 1;
         while ((hr = pConnector->GetOverlappedResult(&ov, FALSE)) == ND_PENDING)
         {
@@ -79,7 +79,7 @@ static void client_work2(
         }
         LOG("IND2Connector::GetOverlappedResult -> %08X (%zu calls)", hr, count);
         if (ND_SUCCESS != hr)
-            throw EX_CONNECTOR_CONNECT;
+            throw EX_CONNECT;
     }
 
     LOG_VOID_RETURN();
