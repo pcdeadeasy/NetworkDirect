@@ -92,7 +92,7 @@ void Params::ShowUsage()
         "       --hdrlen <size_t>    Header length (default: 40)\n"
         "       --logFile <string>   File to receive JSON logs (default: \"log.json\")\n"
         "       --ip <string>        IPv4 Address\n"
-        "       --port <ushort>      Port number (default: 54331)\n"
+        "       --port <ushort>      Port number (default: 54326)\n"
         "\n"
         "       Notes:\n"
         "\n"
