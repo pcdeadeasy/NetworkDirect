@@ -3,13 +3,14 @@
 #include "State.h"
 #include "ndspi.h"
 
-State::State() :    
-    pAdapter(0), 
+State::State() :
+    pAdapter(0),
     hOverlappedFile(0),
     pMemoryRegion(0),
     pCompletionQueue(0),
     pQueuePair(0),
     pConnector(0),
+    pListener(0),
     buffer(0),
     buffer_size(0)
 {
@@ -29,6 +30,7 @@ State::~State()
     hOverlappedFile = NDSPI::CloseOverlappedFile(hOverlappedFile);
     pConnector = NDSPI::ReleaseConnector(pConnector);
     pAdapter = NDSPI::ReleaseAdapter(pAdapter);
+    pListener = NDSPI::ReleaseListener(pListener);
     ov.hEvent = NDSPI::CloseOverlappedEvent(ov.hEvent);
     buffer = NDSPI::Free(buffer);
     buffer_size = 0;

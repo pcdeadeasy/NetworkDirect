@@ -33,5 +33,10 @@ public:
     static void CompleteConnect(IND2Connector* pConnector);
     static uint32_t GetResults(IND2CompletionQueue* pCompletionQueue, ND2_RESULT results[], uint32_t nResults);
     static HRESULT Notify(IND2CompletionQueue* pCompletionQueue, uint32_t type, OVERLAPPED& ov);
+    static IND2Listener* CreateListener(IND2Adapter* pAdapter, HANDLE hOverlappedFile);
+    static IND2Listener*  ReleaseListener(IND2Listener* pListener);
+    static void ListenerBind(IND2Listener* pListener, const struct sockaddr_in& localAddress);
+    static void Listen(IND2Listener* pListener, uint32_t backlog);
+    static void GetConnectionRequest(IND2Listener* pListener, IND2Connector* pConnector);
 };
 

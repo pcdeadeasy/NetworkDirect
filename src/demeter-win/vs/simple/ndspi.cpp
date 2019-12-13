@@ -51,6 +51,18 @@ HANDLE NDSPI::CloseOverlappedEvent(HANDLE hEvent)
     return 0;
 }
 
+IND2Listener* NDSPI::ReleaseListener(IND2Listener* p)
+{
+    LOG_ENTER();
+    if (p)
+    {
+        ULONG ul = p->Release();
+        LOG("IND2Listener::Release %p -> %u", p, ul);
+    }
+    LOG_PVOID_RETURN(0);
+    return 0;
+}
+
 IND2Connector* NDSPI::ReleaseConnector(IND2Connector* p)
 {
     LOG_ENTER();
@@ -414,4 +426,54 @@ HRESULT NDSPI::Notify(IND2CompletionQueue* pCompletionQueue, uint32_t type, OVER
         throw EX_NOTIFY;
     LOG_HEX_RETURN(hr);
     return hr;
+}
+
+IND2Listener* NDSPI::CreateListener(IND2Adapter* pAdapter, HANDLE hOverlappedFile)
+{
+    LOG_ENTER();
+    IND2Listener* ans = 0;
+    HRESULT hr = pAdapter->CreateListener(IID_IND2Listener, hOverlappedFile, (void**)&ans);
+    LOG("IND2Adapter::CreateListener %p -> %08X", pAdapter, hr);
+    if (ND_SUCCESS != hr)
+        throw EX_CREATE_LISTENER;
+    LOG_PVOID_RETURN(ans);
+    return ans;
+}
+
+void NDSPI::ListenerBind(IND2Listener* pListener, const struct sockaddr_in& localAddress)
+{
+    LOG_ENTER();
+    HRESULT hr = pListener->Bind((const sockaddr*)&localAddress, sizeof(localAddress));
+    LOG("IND2Listener::Bind %p -> %08X", pListener, hr);
+    if (ND_SUCCESS != hr)
+        throw EX_LISTEN_BIND;
+    LOG_VOID_RETURN();
+}
+
+void NDSPI::Listen(IND2Listener* pListener, uint32_t backlog)
+{
+    LOG_ENTER();
+    HRESULT hr = pListener->Listen(backlog);
+    LOG("IND2Listner::Listen %p -> %08X", pListener, hr);
+    if (ND_SUCCESS != hr)
+        throw EX_LISTEN;
+    LOG_VOID_RETURN();
+}
+
+void NDSPI::GetConnectionRequest(IND2Listener* pListener, IND2Connector* pConnector)
+{
+    LOG_ENTER();
+    OVERLAPPED ov = { 0 };
+    HRESULT hr = pListener->GetConnectionRequest(pConnector, &ov);
+    if (ND_SUCCESS != hr)
+    {
+        if (ND_PENDING == hr)
+        {
+            //!!! WARNING WARNING WARNING this will block
+            hr = pListener->GetOverlappedResult(&ov, TRUE);
+        }
+        if (ND_SUCCESS != hr)
+            throw EX_GET_CONNECTION_REQUEST;
+    }
+    LOG_VOID_RETURN();
 }
