@@ -7,6 +7,23 @@ class State
 public:
     State();
     ~State();
+
+    void InitClient(
+        const char* server_ip_address,
+        uint16_t server_port,
+        uint32_t queue_depth,
+        size_t memory_block_size,
+        uint32_t nsge
+    );
+
+    void InitServer(
+        const char* server_ip_address,
+        uint16_t server_port,
+        uint32_t queue_depth,
+        size_t memory_block_size,
+        uint32_t nsge
+    );
+
 public:
     struct sockaddr_in LocalAddress;
     struct sockaddr_in RemoteAddress;

@@ -11,7 +11,7 @@ public:
     static HANDLE CloseOverlappedFile(HANDLE);
     static IND2Adapter* ReleaseAdapter(IND2Adapter*);
     static IND2Connector* ReleaseConnector(IND2Connector*);
-    static IND2MemoryRegion* SimplifiedCreateMemoryRegion(IND2Adapter*, HANDLE);
+    static IND2MemoryRegion* CreateMemoryRegion(IND2Adapter*, HANDLE);
     static void DeregisterMemoryRegionAndWait(IND2MemoryRegion*);
     static void* Free(void*);
     static struct sockaddr_in GetSocketAddress(const char* ip, uint16_t Port);
@@ -19,7 +19,7 @@ public:
     static IND2Adapter* SimplifiedOpenAdapter(const struct sockaddr_in&);
     static HANDLE CreateOverlappedEvent();
     static HANDLE CloseOverlappedEvent(HANDLE);
-    static HANDLE SimplifiedCreateOverlappedFile(IND2Adapter*);
+    static HANDLE CreateOverlappedFile(IND2Adapter*);
     static ND2_ADAPTER_INFO GetAdapterInfo(IND2Adapter*);
     static void* Alloc(size_t size);
     static void RegisterMemoryAndWait(IND2MemoryRegion*, const void*, size_t);
@@ -35,7 +35,7 @@ public:
     static void CompleteConnectAndWait(IND2Connector* pConnector);
     static uint32_t GetResults(IND2CompletionQueue* pCompletionQueue, ND2_RESULT results[], uint32_t nResults);
     static HRESULT Notify(IND2CompletionQueue* pCompletionQueue, uint32_t type, OVERLAPPED& ov);
-    static IND2Listener* SimplifiedCreateListener(IND2Adapter* pAdapter, HANDLE hOverlappedFile);
+    static IND2Listener* CreateListener(IND2Adapter* pAdapter, HANDLE hOverlappedFile);
     static IND2Listener*  ReleaseListener(IND2Listener* pListener);
     static void ListenerBind(IND2Listener* pListener, const struct sockaddr_in& localAddress);
     static void Listen(IND2Listener* pListener, uint32_t backlog);
