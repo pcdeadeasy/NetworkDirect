@@ -11,57 +11,45 @@
 #include "State.h"
 #include "ndspi.h"
 
-void client(params_t* const params, State* const state)
+void client(params_t* const params, State* const S)
 {
     LOG_ENTER();
-    state->InitClient(
+    S->InitClient(
         params->ip.c_str(),
         params->port,
         params->queue_depth,
         params->size,
         params->nsge);
 
-    ND2_SGE sge = { 
-        state->buffer,
-        (ULONG)state->buffer_size,
-        NDSPI::GetLocalToken(state->pMemoryRegion)
-    };
-    fprintf(
-        stderr,
-        "initiating a receive of up to %u bytes\n",
-        sge.BufferLength);
-    NDSPI::Receive(state->pQueuePair, (void*)"receive context", &sge, 1);
+    uint32_t const LocalToken = NDSPI::GetLocalToken(S->pMemoryRegion);
+    ND2_SGE sge = { S->buffer, (ULONG)S->buffer_size, LocalToken };
+    fprintf(stderr, "start receive of up to %u bytes\n", sge.BufferLength);
+    NDSPI::Receive(S->pQueuePair, (void*)"receive context", &sge, 1);
 
-    NDSPI::ConnectorBind(state->pConnector, state->LocalAddress);
+    NDSPI::ConnectorBind(S->pConnector, S->LocalAddress);
     fprintf(stderr, "connecting to server ...\n");
-    NDSPI::ConnectAndWait(state->pConnector,
-                         state->pQueuePair,
-                         state->RemoteAddress);
-    NDSPI::CompleteConnectAndWait(state->pConnector);
+    NDSPI::ConnectAndWait(S->pConnector, S->pQueuePair, S->RemoteAddress);
+    NDSPI::CompleteConnectAndWait(S->pConnector);
     fprintf(stderr, "connection completed\n");
 
     // Wait for receive result
     ND2_RESULT result;
     while (true)
     {
-        if (NDSPI::GetResults(state->pCompletionQueue, &result, 1) == 1)
+        if (NDSPI::GetResults(S->pCompletionQueue, &result, 1) == 1)
             break;
-        HRESULT hr = NDSPI::Notify(state->pCompletionQueue,
-                                   ND_CQ_NOTIFY_ANY,
-                                   state->ov);
+        HRESULT hr = 
+            NDSPI::Notify(S->pCompletionQueue, ND_CQ_NOTIFY_ANY, S->ov);
         if (ND_PENDING == hr)
         {
-            NDSPI::GetOverlappedResult(
-                state->pCompletionQueue,
-                &state->ov,
-                TRUE);  //!!! THIS WILL BLOCK
+            ///!!! THIS WILL BLOCK
+            NDSPI::GetOverlappedResult(S->pCompletionQueue, &S->ov, TRUE);
         }
     }
-    fprintf(
-        stderr, 
-        "received %u bytes: \"%s\"\n", 
-        result.BytesTransferred, 
-        (const char*)sge.Buffer);
+    fprintf(stderr, "The completion queue has a result!\n");
+    fprintf(stderr, "RequestContext: \"%s\"\n", (char*)result.RequestContext);
+    const char* const fmt = "received %u bytes: \"%s\"\n";
+    fprintf(stderr, fmt, result.BytesTransferred, (const char*)sge.Buffer);
 
     LOG_VOID_RETURN();
 }
@@ -111,6 +99,8 @@ void server(params_t* const params, State* const S)
             NDSPI::GetOverlappedResult(S->pCompletionQueue, &S->ov, TRUE);
         }
     }
+    fprintf(stderr, "The completion queue has a result!");
+    fprintf(stderr, "RequestContext: \"%s\"\n", (char*)result.RequestContext);
     fprintf(stderr, "send complete");
     LOG_VOID_RETURN();
 }
