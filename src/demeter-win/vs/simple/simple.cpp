@@ -99,7 +99,7 @@ void server(params_t* const params, State* const S)
             NDSPI::GetOverlappedResult(S->pCompletionQueue, &S->ov, TRUE);
         }
     }
-    fprintf(stderr, "The completion queue has a result!");
+    fprintf(stderr, "The completion queue has a result!\n");
     fprintf(stderr, "RequestContext: \"%s\"\n", (char*)result.RequestContext);
     fprintf(stderr, "send complete");
     LOG_VOID_RETURN();
