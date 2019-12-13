@@ -20,7 +20,7 @@ ND2_ADAPTER_INFO NDSPI::GetAdapterInfo(IND2Adapter* pAdapter)
     return ans;
 }
 
-IND2CompletionQueue* NDSPI::CreateCompletionQueue(IND2Adapter* pAdapter, HANDLE hOverlappedFile, uint32_t depth)
+IND2CompletionQueue* NDSPI::SimplifiedCreateCompletionQueue(IND2Adapter* pAdapter, HANDLE hOverlappedFile, uint32_t depth)
 {
     LOG_ENTER();
     IND2CompletionQueue* ans = 0;
@@ -180,7 +180,7 @@ struct sockaddr_in NDSPI::GetSocketAddress(const char* ip, uint16_t Port)
     return v4Svr;
 }
 
-struct sockaddr_in NDSPI::ResolveAddress(struct sockaddr_in& saddrRemote)
+struct sockaddr_in NDSPI::SimplifiedResolveAddress(struct sockaddr_in& saddrRemote)
 {
     LOG_ENTER();
     struct sockaddr_in ans = { 0 };
@@ -198,7 +198,7 @@ struct sockaddr_in NDSPI::ResolveAddress(struct sockaddr_in& saddrRemote)
     return ans;
 }
 
-IND2Adapter* NDSPI::OpenAdapter(const struct sockaddr_in& Local)
+IND2Adapter* NDSPI::SimplifiedOpenAdapter(const struct sockaddr_in& Local)
 {
     LOG_ENTER();
     IND2Adapter* ans = 0;
@@ -226,7 +226,7 @@ HANDLE NDSPI::CreateOverlappedEvent()
     return ans;
 }
 
-IND2Connector* NDSPI::CreateConnector(IND2Adapter* pAdapter, HANDLE hOverlappedFile)
+IND2Connector* NDSPI::SimplifiedCreateConnector(IND2Adapter* pAdapter, HANDLE hOverlappedFile)
 {
     LOG_ENTER();
     IND2Connector* ans = 0;
@@ -274,7 +274,7 @@ void NDSPI::RegisterMemoryAndWait(IND2MemoryRegion* pMemoryRegion, const void* b
     LOG_VOID_RETURN();
 }
 
-HANDLE NDSPI::CreateOverlappedFile(IND2Adapter* pAdapter)
+HANDLE NDSPI::SimplifiedCreateOverlappedFile(IND2Adapter* pAdapter)
 {
     LOG_ENTER();
     HANDLE ans = 0;
@@ -286,7 +286,7 @@ HANDLE NDSPI::CreateOverlappedFile(IND2Adapter* pAdapter)
     return ans;
 }
 
-IND2MemoryRegion* NDSPI::CreateMemoryRegion(IND2Adapter* pAdapter, HANDLE hOverlappedFile)
+IND2MemoryRegion* NDSPI::SimplifiedCreateMemoryRegion(IND2Adapter* pAdapter, HANDLE hOverlappedFile)
 {
     LOG_ENTER();
     IND2MemoryRegion* ans = 0;
@@ -298,7 +298,7 @@ IND2MemoryRegion* NDSPI::CreateMemoryRegion(IND2Adapter* pAdapter, HANDLE hOverl
     return ans;
 }
 
-IND2QueuePair* NDSPI::CreateQueuePair(
+IND2QueuePair* NDSPI::SimplifiedCreateQueuePair(
     IND2Adapter* pAdapter,
     IND2CompletionQueue* pCompletionQueue,
     uint32_t qp_depth,
@@ -432,6 +432,7 @@ uint32_t NDSPI::GetResults(IND2CompletionQueue* pCompletionQueue, ND2_RESULT res
 {
     LOG_ENTER();
     uint32_t ans = pCompletionQueue->GetResults(results, nResults);
+    LOG("IND2CompletionQueue::GetResults %p -> %u", pCompletionQueue, ans);
     LOG_ULONG_RETURN(ans);
     return ans;
 }
@@ -447,7 +448,7 @@ HRESULT NDSPI::Notify(IND2CompletionQueue* pCompletionQueue, uint32_t type, OVER
     return hr;
 }
 
-IND2Listener* NDSPI::CreateListener(IND2Adapter* pAdapter, HANDLE hOverlappedFile)
+IND2Listener* NDSPI::SimplifiedCreateListener(IND2Adapter* pAdapter, HANDLE hOverlappedFile)
 {
     LOG_ENTER();
     IND2Listener* ans = 0;

@@ -27,19 +27,19 @@ void client(params_t* const params, State* const state)
 {
     LOG_ENTER();
     state->RemoteAddress = NDSPI::GetSocketAddress(params->ip.c_str(), params->port);
-    state->LocalAddress = NDSPI::ResolveAddress(state->RemoteAddress);
+    state->LocalAddress = NDSPI::SimplifiedResolveAddress(state->RemoteAddress);
     //++ init
-    state->pAdapter = NDSPI::OpenAdapter(state->LocalAddress);
+    state->pAdapter = NDSPI::SimplifiedOpenAdapter(state->LocalAddress);
     state->ov.hEvent = NDSPI::CreateOverlappedEvent();
-    state->hOverlappedFile = NDSPI::CreateOverlappedFile(state->pAdapter);
+    state->hOverlappedFile = NDSPI::SimplifiedCreateOverlappedFile(state->pAdapter);
     //-- init
     state->Info = NDSPI::GetAdapterInfo(state->pAdapter);
-    state->pMemoryRegion = NDSPI::CreateMemoryRegion(state->pAdapter, state->hOverlappedFile);
+    state->pMemoryRegion = NDSPI::SimplifiedCreateMemoryRegion(state->pAdapter, state->hOverlappedFile);
     uint32_t const cq_depth = get_client_cq_depth(params->queue_depth, state->Info);
-    state->pCompletionQueue = NDSPI::CreateCompletionQueue(state->pAdapter, state->hOverlappedFile, cq_depth);
-    state->pConnector = NDSPI::CreateConnector(state->pAdapter, state->hOverlappedFile);
+    state->pCompletionQueue = NDSPI::SimplifiedCreateCompletionQueue(state->pAdapter, state->hOverlappedFile, cq_depth);
+    state->pConnector = NDSPI::SimplifiedCreateConnector(state->pAdapter, state->hOverlappedFile);
     uint32_t const qp_depth = min(cq_depth, state->Info.MaxReceiveQueueDepth);
-    state->pQueuePair = NDSPI::CreateQueuePair(state->pAdapter, state->pCompletionQueue, qp_depth, state->Info.InlineRequestThreshold, params->nsge);
+    state->pQueuePair = NDSPI::SimplifiedCreateQueuePair(state->pAdapter, state->pCompletionQueue, qp_depth, state->Info.InlineRequestThreshold, params->nsge);
 
     state->buffer = NDSPI::Alloc(params->size);
     state->buffer_size = params->size;
@@ -49,11 +49,14 @@ void client(params_t* const params, State* const state)
     sge.Buffer = state->buffer;
     sge.BufferLength = (ULONG)state->buffer_size;
     sge.MemoryRegionToken = NDSPI::GetLocalToken(state->pMemoryRegion);
+    fprintf(stderr, "initiating a receive\n");
     NDSPI::Receive(state->pQueuePair, (void*)"receive context", &sge, 1);
 
     NDSPI::ConnectorBind(state->pConnector, state->LocalAddress);
+    fprintf(stderr, "connecting to server ...\n");
     NDSPI::ConnectAndWait(state->pConnector, state->pQueuePair, state->RemoteAddress);
     NDSPI::CompleteConnectAndWait(state->pConnector);
+    fprintf(stderr, "connection completed\n");
 
     // Wait for receive result
     ND2_RESULT result;
@@ -68,7 +71,7 @@ void client(params_t* const params, State* const state)
             LOG("IND2CompletionQueue::GetOverlappedResult %p -> %08X", state->pCompletionQueue, hr);
         }
     }
-    fprintf(stderr, "received: \"%s\"\n", sge.Buffer);
+    fprintf(stderr, "received: \"%s\"\n", (const char*)sge.Buffer);
 
     LOG_VOID_RETURN();
 }
@@ -78,23 +81,24 @@ void server(params_t* const params, State* const state)
     LOG_ENTER();
     state->LocalAddress = NDSPI::GetSocketAddress(params->ip.c_str(), params->port);
     //++ init
-    state->pAdapter = NDSPI::OpenAdapter(state->LocalAddress);
+    state->pAdapter = NDSPI::SimplifiedOpenAdapter(state->LocalAddress);
     state->ov.hEvent = NDSPI::CreateOverlappedEvent();
-    state->hOverlappedFile = NDSPI::CreateOverlappedFile(state->pAdapter);
+    state->hOverlappedFile = NDSPI::SimplifiedCreateOverlappedFile(state->pAdapter);
     //-- init
     state->Info = NDSPI::GetAdapterInfo(state->pAdapter);
-    state->pCompletionQueue = NDSPI::CreateCompletionQueue(state->pAdapter, state->hOverlappedFile, state->Info.MaxInitiatorQueueDepth);
-    state->pConnector = NDSPI::CreateConnector(state->pAdapter, state->hOverlappedFile);
-    state->pMemoryRegion = NDSPI::CreateMemoryRegion(state->pAdapter, state->hOverlappedFile);
+    state->pCompletionQueue = NDSPI::SimplifiedCreateCompletionQueue(state->pAdapter, state->hOverlappedFile, state->Info.MaxInitiatorQueueDepth);
+    state->pConnector = NDSPI::SimplifiedCreateConnector(state->pAdapter, state->hOverlappedFile);
+    state->pMemoryRegion = NDSPI::SimplifiedCreateMemoryRegion(state->pAdapter, state->hOverlappedFile);
 
     uint32_t depth = min(state->Info.MaxCompletionQueueDepth, state->Info.MaxReceiveQueueDepth);
-    state->pQueuePair = NDSPI::CreateQueuePair(state->pAdapter, state->pCompletionQueue, depth, 0, params->nsge);
-    state->pListener = NDSPI::CreateListener(state->pAdapter, state->hOverlappedFile);
+    state->pQueuePair = NDSPI::SimplifiedCreateQueuePair(state->pAdapter, state->pCompletionQueue, depth, 0, params->nsge);
+    state->pListener = NDSPI::SimplifiedCreateListener(state->pAdapter, state->hOverlappedFile);
     NDSPI::ListenerBind(state->pListener, state->LocalAddress);
     NDSPI::Listen(state->pListener, 0);
+    fprintf(stderr, "waiting for a connection ...\n");
     NDSPI::GetConnectionRequestAndWait(state->pListener, state->pConnector);
     NDSPI::AcceptAndWait(state->pConnector, state->pQueuePair, state->Info.MaxInboundReadLimit, 0);
-
+    fprintf(stderr, "connection accepted\n");
     state->buffer = NDSPI::Alloc(params->size);
     state->buffer_size = params->size;
     NDSPI::RegisterMemoryAndWait(state->pMemoryRegion, state->buffer, state->buffer_size);
@@ -105,7 +109,7 @@ void server(params_t* const params, State* const state)
     sge.BufferLength = size;
     sge.MemoryRegionToken = NDSPI::GetLocalToken(state->pMemoryRegion);
 
-    fprintf(stderr, "sending: \"%s\"\n", sge.Buffer);
+    fprintf(stderr, "sending: \"%s\"\n", (const char*)sge.Buffer);
     NDSPI::Send(state->pQueuePair, (void*)"server context", &sge, 1, 0);
 
     // Wait for send result
@@ -121,6 +125,7 @@ void server(params_t* const params, State* const state)
             LOG("IND2CompletionQueue::GetOverlappedResult %p -> %08X", state->pCompletionQueue, hr);
         }
     }
+    fprintf(stderr, "send complete");
     LOG_VOID_RETURN();
 }
 
