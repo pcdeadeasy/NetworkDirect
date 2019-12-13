@@ -31,6 +31,7 @@
 #define EX_ACCEPT                   29
 #define EX_SEND                     30
 #define EX_GET_OVERLAPPED_RESULT    31
+#define EX_DEREGISTER               32
 
 namespace errors
 {

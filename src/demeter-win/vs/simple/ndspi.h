@@ -42,5 +42,6 @@ public:
     static void GetConnectionRequestAndWait(IND2Listener* pListener, IND2Connector* pConnector);
     static void AcceptAndWait(IND2Connector* pConnector, IND2QueuePair* pQueuePair, uint32_t inboundReadLimit, uint32_t outboundReadLimit);
     static HRESULT GetOverlappedResult(IND2Overlapped* pobj, OVERLAPPED* pov , bool wait);
+    static void Wait(IND2Overlapped* pObject, OVERLAPPED* pOverlapped);
 };
 

@@ -46,6 +46,7 @@ static void init_emap(std::unordered_map<int, const char*>& emap)
     DEFINE(EX_ACCEPT);
     DEFINE(EX_SEND);
     DEFINE(EX_GET_OVERLAPPED_RESULT);
+    DEFINE(EX_DEREGISTER);
 
 #undef DEFINE
 }
