@@ -66,10 +66,10 @@ void client(params_t* const params, State* const state)
     LOG_VOID_RETURN();
 }
 
-void server(params_t* const params, State* const state)
+void server(params_t* const params, State* const S)
 {
     LOG_ENTER();
-    state->InitServer(
+    S->InitServer(
         params->ip.c_str(),
         params->port,
         params->queue_depth,
@@ -77,66 +77,38 @@ void server(params_t* const params, State* const state)
         params->nsge);
 
     fprintf(stderr, "waiting for a connection ...\n");
-    NDSPI::GetConnectionRequestAndWait(state->pListener, 
-                                       state->pConnector);
+    NDSPI::GetConnectionRequestAndWait(S->pListener, S->pConnector);
     NDSPI::AcceptAndWait(
-        state->pConnector,
-        state->pQueuePair,
-        state->Info.MaxInboundReadLimit,
+        S->pConnector,
+        S->pQueuePair,
+        S->Info.MaxInboundReadLimit,
         0);
     fprintf(stderr, "connection accepted\n");
-    state->buffer = NDSPI::Alloc(params->size);
-    state->buffer_size = params->size;
-    NDSPI::RegisterMemoryAndWait(
-        state->pMemoryRegion,
-        state->buffer,
-        state->buffer_size);
+    S->buffer = NDSPI::Alloc(params->size);
+    S->buffer_size = params->size;
+    NDSPI::RegisterMemoryAndWait(S->pMemoryRegion, S->buffer, S->buffer_size);
 
-    ULONG size = sprintf_s(
-                (char*)state->buffer,
-                state->buffer_size,
-                "hello from the server") + 1;
-    ND2_SGE sge = { 
-        state->buffer,
-        size,
-        NDSPI::GetLocalToken(state->pMemoryRegion) 
-    };
+    const char* msg = "hello from the server";
+    ULONG size = sprintf_s((char*)S->buffer, S->buffer_size, msg) + 1;
+    ND2_SGE sge = { S->buffer, size, NDSPI::GetLocalToken(S->pMemoryRegion) };
 
-    fprintf(
-        stderr,
-        "sending %u bytes: \"%s\"\n",
-        size,
-        (const char*)sge.Buffer
-    );
+    fprintf(stderr, "sending %u bytes: \"%s\"\n", size, (const char*)sge.Buffer);
 
-    NDSPI::Send(
-        state->pQueuePair,
-        (void*)"server context",
-        &sge,
-        1,      // nsge
-        0       // flags
-    );
+    void* const context = (void*)"server context";
+    NDSPI::Send(S->pQueuePair, context, &sge, 1, 0);
 
     // Wait for send result
     ND2_RESULT result;
     while (true)
     {
-        if (NDSPI::GetResults(state->pCompletionQueue, &result, 1) == 1)
+        if (NDSPI::GetResults(S->pCompletionQueue, &result, 1) == 1)
             break;
-        HRESULT hr = NDSPI::Notify(state->pCompletionQueue,
-                                   ND_CQ_NOTIFY_ANY,
-                                   state->ov);
+        HRESULT hr = 
+            NDSPI::Notify(S->pCompletionQueue, ND_CQ_NOTIFY_ANY, S->ov);
         if (ND_PENDING == hr)
         {
-            ////!!! WARNING THIS WILL BLOCK because the second argument is TRUE
-            //hr = state->pCompletionQueue->GetOverlappedResult(&state->ov, TRUE);
-            //LOG("IND2CompletionQueue::GetOverlappedResult %p -> %08X",
-            //    state->pCompletionQueue,
-            //    hr);
-            NDSPI::GetOverlappedResult(
-                state->pCompletionQueue,
-                &state->ov,
-                TRUE);  //!!! THIS WILL BLOCK
+            //!!! THIS WILL BLOCK
+            NDSPI::GetOverlappedResult(S->pCompletionQueue, &S->ov, TRUE);
         }
     }
     fprintf(stderr, "send complete");
