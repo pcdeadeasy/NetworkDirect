@@ -26,7 +26,10 @@ void client(params_t* const params, State* const state)
         (ULONG)state->buffer_size,
         NDSPI::GetLocalToken(state->pMemoryRegion)
     };
-    fprintf(stderr, "initiating a receive\n");
+    fprintf(
+        stderr,
+        "initiating a receive of up to %u bytes\n",
+        sge.BufferLength);
     NDSPI::Receive(state->pQueuePair, (void*)"receive context", &sge, 1);
 
     NDSPI::ConnectorBind(state->pConnector, state->LocalAddress);
@@ -48,14 +51,17 @@ void client(params_t* const params, State* const state)
                                    state->ov);
         if (ND_PENDING == hr)
         {
-            //!!! WARNING THIS WILL BLOCK because the second argument is TRUE
-            hr = state->pCompletionQueue->GetOverlappedResult(&state->ov, TRUE);
-            LOG("IND2CompletionQueue::GetOverlappedResult %p -> %08X",
+            NDSPI::GetOverlappedResult(
                 state->pCompletionQueue,
-                hr);
+                &state->ov,
+                TRUE);  //!!! THIS WILL BLOCK
         }
     }
-    fprintf(stderr, "received %u bytes: \"%s\"\n", result.BytesTransferred, (const char*)sge.Buffer);
+    fprintf(
+        stderr, 
+        "received %u bytes: \"%s\"\n", 
+        result.BytesTransferred, 
+        (const char*)sge.Buffer);
 
     LOG_VOID_RETURN();
 }
@@ -90,11 +96,26 @@ void server(params_t* const params, State* const state)
                 (char*)state->buffer,
                 state->buffer_size,
                 "hello from the server") + 1;
-    ND2_SGE 
-        sge = { state->buffer, size, NDSPI::GetLocalToken(state->pMemoryRegion) };
+    ND2_SGE sge = { 
+        state->buffer,
+        size,
+        NDSPI::GetLocalToken(state->pMemoryRegion) 
+    };
 
-    fprintf(stderr, "sending %u bytes: \"%s\"\n", size, (const char*)sge.Buffer);
-    NDSPI::Send(state->pQueuePair, (void*)"server context", &sge, 1, 0);
+    fprintf(
+        stderr,
+        "sending %u bytes: \"%s\"\n",
+        size,
+        (const char*)sge.Buffer
+    );
+
+    NDSPI::Send(
+        state->pQueuePair,
+        (void*)"server context",
+        &sge,
+        1,      // nsge
+        0       // flags
+    );
 
     // Wait for send result
     ND2_RESULT result;
@@ -104,14 +125,18 @@ void server(params_t* const params, State* const state)
             break;
         HRESULT hr = NDSPI::Notify(state->pCompletionQueue,
                                    ND_CQ_NOTIFY_ANY,
-            state->ov);
+                                   state->ov);
         if (ND_PENDING == hr)
         {
-            //!!! WARNING THIS WILL BLOCK because the second argument is TRUE
-            hr = state->pCompletionQueue->GetOverlappedResult(&state->ov, TRUE);
-            LOG("IND2CompletionQueue::GetOverlappedResult %p -> %08X",
+            ////!!! WARNING THIS WILL BLOCK because the second argument is TRUE
+            //hr = state->pCompletionQueue->GetOverlappedResult(&state->ov, TRUE);
+            //LOG("IND2CompletionQueue::GetOverlappedResult %p -> %08X",
+            //    state->pCompletionQueue,
+            //    hr);
+            NDSPI::GetOverlappedResult(
                 state->pCompletionQueue,
-                hr);
+                &state->ov,
+                TRUE);  //!!! THIS WILL BLOCK
         }
     }
     fprintf(stderr, "send complete");
