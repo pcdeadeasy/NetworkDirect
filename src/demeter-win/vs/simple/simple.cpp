@@ -92,14 +92,11 @@ void sserver(params_t* const params, State* const state)
     NDSPI::ListenerBind(state->pListener, state->LocalAddress);
     NDSPI::Listen(state->pListener, 0);
     NDSPI::GetConnectionRequest(state->pListener, state->pConnector);
+    NDSPI::Accept(state->pConnector, state->pQueuePair, state->Info.MaxInboundReadLimit, 0);
 
     state->buffer = NDSPI::Alloc(params->size);
     state->buffer_size = params->size;
     NDSPI::RegisterMemory(state->pMemoryRegion, state->buffer, state->buffer_size);
-
-
-
-
 
     int size = sprintf_s((char*)state->buffer, state->buffer_size, "hello from the server") + 1;
     ND2_SGE sge;
@@ -107,7 +104,21 @@ void sserver(params_t* const params, State* const state)
     sge.BufferLength = size;
     sge.MemoryRegionToken = NDSPI::GetLocalToken(state->pMemoryRegion);
 
+    NDSPI::Send(state->pQueuePair, (void*)"server context", &sge, 1, 0);
 
+    // Wait for send result
+    ND2_RESULT result;
+    while (true)
+    {
+        if (NDSPI::GetResults(state->pCompletionQueue, &result, 1) == 1)
+            break;
+        if (ND_PENDING == NDSPI::Notify(state->pCompletionQueue, ND_CQ_NOTIFY_ANY, state->ov))
+        {
+            // WARNING WARNING WARNING THIS WILL BLOCK because the second argument is TRUE
+            HRESULT hr = state->pCompletionQueue->GetOverlappedResult(&state->ov, TRUE);
+            LOG("IND2CompletionQueue::GetOverlappedResult %p -> %08X", state->pCompletionQueue, hr);
+        }
+    }
     LOG_VOID_RETURN();
 }
 

@@ -337,6 +337,15 @@ uint32_t NDSPI::GetLocalToken(IND2MemoryRegion* pMemoryRegion)
     return ans;
 }
 
+uint32_t NDSPI::GetRemoteToken(IND2MemoryRegion* pMemoryRegion)
+{
+    LOG_ENTER();
+    uint32_t ans = pMemoryRegion->GetRemoteToken();
+    LOG("IND2MemoryRegion::GetRemoteToken %p -> %u", pMemoryRegion, ans);
+    LOG_ULONG_RETURN(ans);
+    return ans;
+}
+
 void NDSPI::Receive(IND2QueuePair* pQueuePair, void* context, ND2_SGE sges[], uint32_t nsge)
 {
     LOG_ENTER();
@@ -346,6 +355,17 @@ void NDSPI::Receive(IND2QueuePair* pQueuePair, void* context, ND2_SGE sges[], ui
         throw EX_RECEIVE;
     LOG_VOID_RETURN();
 }
+
+void NDSPI::Send(IND2QueuePair* pQueuePair, void* context, ND2_SGE sges[], uint32_t nsge, uint32_t flags)
+{
+    LOG_ENTER();
+    HRESULT hr = pQueuePair->Send(context, sges, nsge, flags);
+    LOG("IND2QueuePair::Send %p -> %08X", pQueuePair, hr);
+    if (ND_SUCCESS != hr)
+        throw EX_SEND;
+    LOG_VOID_RETURN();
+}
+
 
 void NDSPI::ConnectorBind(IND2Connector* pConnector, sockaddr_in& localAddress)
 {
@@ -474,6 +494,36 @@ void NDSPI::GetConnectionRequest(IND2Listener* pListener, IND2Connector* pConnec
         }
         if (ND_SUCCESS != hr)
             throw EX_GET_CONNECTION_REQUEST;
+    }
+    LOG_VOID_RETURN();
+}
+
+void NDSPI::Accept(IND2Connector* pConnector, IND2QueuePair* pQueuePair, uint32_t inboundReadLimit, uint32_t outboundReadLimit)
+{
+    LOG_ENTER();
+    OVERLAPPED ov = { 0 };
+    HRESULT hr =
+        pConnector->Accept(
+            pQueuePair,
+            inboundReadLimit,
+            outboundReadLimit,
+            0,  // pointer to private data
+            0,  // size of private data
+            &ov
+        );
+    LOG("IND2Connector::Accept %p -> %08X", pConnector, hr);
+    if (ND_SUCCESS != hr)
+    {
+        uint64_t count = 0;
+        if (ND_PENDING == hr)
+        {
+            //!!! WARNING WARNING WARNING THIS WILL BLOCK
+            hr = pConnector->GetOverlappedResult(&ov, TRUE);
+            LOG("IND2Connector::GetOverlappedResult %p -> %08X", pConnector, hr);
+        }
+        if (ND_SUCCESS != hr)
+            throw EX_ACCEPT;
+
     }
     LOG_VOID_RETURN();
 }

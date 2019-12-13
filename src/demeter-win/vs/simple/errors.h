@@ -28,3 +28,5 @@
 #define EX_NSGE                     26
 #define EX_COMPLETE_CONNECT         27
 #define EX_NOTIFY                   28
+#define EX_ACCEPT                   29
+#define EX_SEND                     30

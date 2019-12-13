@@ -27,7 +27,9 @@ public:
     static IND2CompletionQueue* CreateCompletionQueue(IND2Adapter*, HANDLE, uint32_t);
     static IND2QueuePair* CreateQueuePair(IND2Adapter* pAdapter, IND2CompletionQueue* pCompletionQueue, uint32_t qp_depth, uint32_t inline_threshold, uint32_t max_nsge);
     static uint32_t GetLocalToken(IND2MemoryRegion* pMemoryRegion);
+    static uint32_t GetRemoteToken(IND2MemoryRegion* pMemoryRegion);
     static void Receive(IND2QueuePair* pQueuePair, void* context, ND2_SGE sges[], uint32_t nsge);
+    static void Send(IND2QueuePair* pQueuePair, void* context, ND2_SGE sges[], uint32_t nsge, uint32_t flags);
     static void ConnectorBind(IND2Connector* pConnector, sockaddr_in& localAddress);
     static void Connect(IND2Connector* pConnector, IND2QueuePair* pQueuePair, const struct sockaddr_in& remoteAddress);
     static void CompleteConnect(IND2Connector* pConnector);
@@ -38,5 +40,6 @@ public:
     static void ListenerBind(IND2Listener* pListener, const struct sockaddr_in& localAddress);
     static void Listen(IND2Listener* pListener, uint32_t backlog);
     static void GetConnectionRequest(IND2Listener* pListener, IND2Connector* pConnector);
+    static void Accept(IND2Connector* pConnector, IND2QueuePair* pQueuePair, uint32_t inboundReadLimit, uint32_t outboundReadLimit);
 };
 
