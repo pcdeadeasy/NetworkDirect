@@ -153,6 +153,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="errors.cpp" />
     <ClCompile Include="ndspi.cpp" />
     <ClCompile Include="params.cpp" />
     <ClCompile Include="simple.cpp" />

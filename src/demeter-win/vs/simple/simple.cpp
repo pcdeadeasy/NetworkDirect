@@ -132,7 +132,7 @@ int main(int argc, char* argv[])
     }
     catch (int i)
     {
-        fprintf(stderr, "exception %d was caught", i);
+        fprintf(stderr, "exception %d was caught: \"%s\"\n", i, errors::get_string(i));
     }
     catch (...)
     {

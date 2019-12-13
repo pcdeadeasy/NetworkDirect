@@ -31,3 +31,8 @@
 #define EX_ACCEPT                   29
 #define EX_SEND                     30
 #define EX_GET_OVERLAPPED_RESULT    31
+
+namespace errors
+{
+    const char* get_string(int error_number);
+}
