@@ -148,14 +148,7 @@ void NDSPI::DeregisterMemoryRegionAndWait(IND2MemoryRegion* p)
     {
         if (ND_PENDING != hr)
             throw EX_DEREGISTER;
-        NDSPI::Wait(p, &ov);
-
-        //uint64_t count = 1;
-        //while ((hr = p->GetOverlappedResult(&ov, FALSE)) == ND_PENDING)
-        //{
-        //    count += 1;
-        //}
-        //LOG("IND2MemoryRegion::GetOverlappedResult %p -> %s (%zu times)", p, HRSTR(hr), count);
+        Wait(p, &ov);
     }
     LOG_VOID_RETURN();
 }
@@ -410,16 +403,7 @@ void NDSPI::CompleteConnectAndWait(IND2Connector* pConnector)
     {
         if (ND_PENDING != hr)
             throw EX_COMPLETE_CONNECT;
-        NDSPI::Wait(pConnector, &ov);
-        //uint64_t count = 0;
-        //while (ND_PENDING == hr)
-        //{
-        //    count++;
-        //    hr = pConnector->GetOverlappedResult(&ov, FALSE);
-        //}
-        //LOG("IND2Connector::GetOverlappedResult %p -> %s (%zu times)", pConnector, HRSTR(hr), count);
-        //if (ND_SUCCESS != hr)
-        //    throw EX_COMPLETE_CONNECT;
+        Wait(pConnector, &ov);
     }
     LOG_VOID_RETURN();
 }
@@ -486,7 +470,7 @@ void NDSPI::GetConnectionRequestAndWait(IND2Listener* pListener, IND2Connector* 
     {
         if (ND_PENDING != hr)
             throw EX_GET_CONNECTION_REQUEST;        
-        NDSPI::Wait(pListener, &ov);
+        Wait(pListener, &ov);
     }
     LOG_VOID_RETURN();
 }
@@ -501,8 +485,11 @@ void NDSPI::Wait(IND2Overlapped* pObject, OVERLAPPED* pOverlapped)
         Sleep(100);
         count++;
     }
-    LOG("%zu call%s to GetOverlappedResults"
-        " returned ND_PENDING", count - 1, count == 2 ? "" : "s");
+    if (count > 1)
+    {
+        LOG("%zu call%s to GetOverlappedResults"
+            " returned ND_PENDING", count - 1, count == 2 ? "" : "s");
+    }
     LOG("GetOverlappedResults %p -> %s", pObject, errors::get_ndspi_result_string(hr));
     if (ND_SUCCESS != hr)
         throw EX_GET_OVERLAPPED_RESULT;
