@@ -424,7 +424,7 @@ HRESULT NDSPI::Notify(IND2CompletionQueue* pCompletionQueue, uint32_t type, OVER
     LOG("IND2CompletionQueue::Notify %p -> %s", pCompletionQueue, HRSTR(hr));
     if ((hr != ND_SUCCESS)  && (hr != ND_PENDING))
         throw EX_NOTIFY;
-    LOG_HEX_RETURN(hr);
+    LOG_NDSPI_RETURN(hr);
     return hr;
 }
 
