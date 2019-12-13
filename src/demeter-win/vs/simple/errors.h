@@ -30,3 +30,4 @@
 #define EX_NOTIFY                   28
 #define EX_ACCEPT                   29
 #define EX_SEND                     30
+#define EX_GET_OVERLAPPED_RESULT    31

@@ -32,24 +32,20 @@ params_t get_params(int argc, char* argv[])
         throw EX_HELP_CALLED;
     }
 
+    // throw exceptions if required values have not been set
     if (!vm.count("role"))
         throw EX_INVALID_ROLE;
     if (!vm.count("ip"))
         throw EX_INVALID_IP;
     if (!vm.count("nsge"))
         throw EX_NSGE;
+    // set default values if necessary
     if (!vm.count("port"))
-    {
         ans.port = 54326;
-    }
     if (!vm.count("size"))
-    {
         ans.size = 4048;
-    }
     if (!vm.count("qdepth"))
-    {
         ans.queue_depth = 0;
-    }
 
     return ans;
 }

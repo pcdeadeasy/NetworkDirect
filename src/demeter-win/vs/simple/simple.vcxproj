@@ -153,13 +153,10 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="client.cpp" />
     <ClCompile Include="ndspi.cpp" />
     <ClCompile Include="params.cpp" />
-    <ClCompile Include="server.cpp" />
     <ClCompile Include="simple.cpp" />
     <ClCompile Include="State.cpp" />
-    <ClCompile Include="work.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\logger\logger.vcxproj">
@@ -176,14 +173,11 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="client.h" />
     <ClInclude Include="errors.h" />
     <ClInclude Include="ndscope.h" />
     <ClInclude Include="ndspi.h" />
     <ClInclude Include="params.h" />
-    <ClInclude Include="server.h" />
     <ClInclude Include="State.h" />
-    <ClInclude Include="work.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -21,15 +21,6 @@
     <ClCompile Include="params.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="work.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="client.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="server.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="State.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -45,15 +36,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="errors.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="work.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="client.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="server.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="State.h">

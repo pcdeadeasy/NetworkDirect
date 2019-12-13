@@ -23,7 +23,7 @@ uint32_t get_client_cq_depth(uint32_t queueDepth, const ND2_ADAPTER_INFO& info)
     return ans;
 }
 
-void sclient(params_t* const params, State* const state)
+void client(params_t* const params, State* const state)
 {
     LOG_ENTER();
     state->RemoteAddress = NDSPI::GetSocketAddress(params->ip.c_str(), params->port);
@@ -43,7 +43,7 @@ void sclient(params_t* const params, State* const state)
 
     state->buffer = NDSPI::Alloc(params->size);
     state->buffer_size = params->size;
-    NDSPI::RegisterMemory(state->pMemoryRegion, state->buffer, state->buffer_size);
+    NDSPI::RegisterMemoryAndWait(state->pMemoryRegion, state->buffer, state->buffer_size);
 
     ND2_SGE sge = { 0 };
     sge.Buffer = state->buffer;
@@ -52,8 +52,8 @@ void sclient(params_t* const params, State* const state)
     NDSPI::Receive(state->pQueuePair, (void*)"receive context", &sge, 1);
 
     NDSPI::ConnectorBind(state->pConnector, state->LocalAddress);
-    NDSPI::Connect(state->pConnector, state->pQueuePair, state->RemoteAddress);
-    NDSPI::CompleteConnect(state->pConnector);
+    NDSPI::ConnectAndWait(state->pConnector, state->pQueuePair, state->RemoteAddress);
+    NDSPI::CompleteConnectAndWait(state->pConnector);
 
     // Wait for receive result
     ND2_RESULT result;
@@ -68,11 +68,12 @@ void sclient(params_t* const params, State* const state)
             LOG("IND2CompletionQueue::GetOverlappedResult %p -> %08X", state->pCompletionQueue, hr);
         }
     }
+    fprintf(stderr, "received: \"%s\"\n", sge.Buffer);
 
     LOG_VOID_RETURN();
 }
 
-void sserver(params_t* const params, State* const state)
+void server(params_t* const params, State* const state)
 {
     LOG_ENTER();
     state->LocalAddress = NDSPI::GetSocketAddress(params->ip.c_str(), params->port);
@@ -91,12 +92,12 @@ void sserver(params_t* const params, State* const state)
     state->pListener = NDSPI::CreateListener(state->pAdapter, state->hOverlappedFile);
     NDSPI::ListenerBind(state->pListener, state->LocalAddress);
     NDSPI::Listen(state->pListener, 0);
-    NDSPI::GetConnectionRequest(state->pListener, state->pConnector);
-    NDSPI::Accept(state->pConnector, state->pQueuePair, state->Info.MaxInboundReadLimit, 0);
+    NDSPI::GetConnectionRequestAndWait(state->pListener, state->pConnector);
+    NDSPI::AcceptAndWait(state->pConnector, state->pQueuePair, state->Info.MaxInboundReadLimit, 0);
 
     state->buffer = NDSPI::Alloc(params->size);
     state->buffer_size = params->size;
-    NDSPI::RegisterMemory(state->pMemoryRegion, state->buffer, state->buffer_size);
+    NDSPI::RegisterMemoryAndWait(state->pMemoryRegion, state->buffer, state->buffer_size);
 
     int size = sprintf_s((char*)state->buffer, state->buffer_size, "hello from the server") + 1;
     ND2_SGE sge;
@@ -104,6 +105,7 @@ void sserver(params_t* const params, State* const state)
     sge.BufferLength = size;
     sge.MemoryRegionToken = NDSPI::GetLocalToken(state->pMemoryRegion);
 
+    fprintf(stderr, "sending: \"%s\"\n", sge.Buffer);
     NDSPI::Send(state->pQueuePair, (void*)"server context", &sge, 1, 0);
 
     // Wait for send result
@@ -126,9 +128,9 @@ void run(params_t* const params, State* const state)
 {
     LOG_ENTER();
     if (params->role == "client")
-        sclient(params, state);
+        client(params, state);
     else if (params->role == "server")
-        sserver(params, state);
+        server(params, state);
     else
         throw EX_INVALID_ROLE;
     LOG_VOID_RETURN();
@@ -139,7 +141,7 @@ int main(int argc, char* argv[])
     try
     {
         params_t params = get_params(argc, argv);
-        Logger logger;
+        Logger logger("log.json");
         LOG_ENTER();
         WsaScope wsaScope;
         NdScope ndScope;
