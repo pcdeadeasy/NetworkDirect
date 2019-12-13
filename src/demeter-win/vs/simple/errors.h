@@ -35,4 +35,5 @@
 namespace errors
 {
     const char* get_string(int error_number);
+    const char* get_ndspi_result_string(int hr);
 }

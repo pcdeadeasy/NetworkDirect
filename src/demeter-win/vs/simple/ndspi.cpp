@@ -5,6 +5,8 @@
 #include "errors.h"
 #include "ndspi.h"
 
+#define HRSTR(hr) errors::get_ndspi_result_string(hr)
+
 ND2_ADAPTER_INFO NDSPI::GetAdapterInfo(IND2Adapter* pAdapter)
 {
     LOG_ENTER();
@@ -13,7 +15,7 @@ ND2_ADAPTER_INFO NDSPI::GetAdapterInfo(IND2Adapter* pAdapter)
     ans.InfoVersion = ND_VERSION_2;
     ULONG size = sizeof(ans);
     HRESULT hr = pAdapter->Query(&ans, &size);
-    LOG("IND2Adapter::Query %p -> %08X", pAdapter, hr);
+    LOG("IND2Adapter::Query %p -> %s", pAdapter, HRSTR(hr));
     if (ND_SUCCESS != hr)
         throw EX_QUERY;
     LOG_STRUCT_RETURN(ND2_ADAPTER_INFO);
@@ -33,7 +35,7 @@ IND2CompletionQueue* NDSPI::SimplifiedCreateCompletionQueue(IND2Adapter* pAdapte
             0,
             (void**)&ans
         );
-    LOG("IND2Adapter::CreateCompletionQueue %p -> %08X", pAdapter, hr);
+    LOG("IND2Adapter::CreateCompletionQueue %p -> %s", pAdapter, HRSTR(hr));
     if (ND_SUCCESS != hr)
         throw EX_CREATE_COMPLETION_QUEUE;
     LOG_PVOID_RETURN(ans);
@@ -141,7 +143,7 @@ void NDSPI::DeregisterMemoryRegionAndWait(IND2MemoryRegion* p)
     LOG_ENTER();
     OVERLAPPED ov = { 0 };
     HRESULT hr = p->Deregister(&ov);
-    LOG("IND2MemoryRegion::Deregister %p -> %08X", p, hr);
+    LOG("IND2MemoryRegion::Deregister %p -> %s", p, HRSTR(hr));
     if (hr == ND_PENDING)
     {
         uint64_t count = 1;
@@ -149,7 +151,7 @@ void NDSPI::DeregisterMemoryRegionAndWait(IND2MemoryRegion* p)
         {
             count += 1;
         }
-        LOG("IND2MemoryRegion::GetOverlappedResult %p -> %08X (%zu times)", p, hr, count);
+        LOG("IND2MemoryRegion::GetOverlappedResult %p -> %s (%zu times)", p, HRSTR(hr), count);
     }
     LOG_VOID_RETURN();
 }
@@ -231,7 +233,7 @@ IND2Connector* NDSPI::SimplifiedCreateConnector(IND2Adapter* pAdapter, HANDLE hO
     LOG_ENTER();
     IND2Connector* ans = 0;
     HRESULT hr = pAdapter->CreateConnector(IID_IND2Connector, hOverlappedFile, (void**)&ans);
-    LOG("IND2Adapter::CreateConnector %p -> %08X", pAdapter, hr);
+    LOG("IND2Adapter::CreateConnector %p -> %s", pAdapter, HRSTR(hr));
     if (ND_SUCCESS != hr)
         throw EX_CREATE_CONNECTOR;
     LOG_PVOID_RETURN(ans);
@@ -257,7 +259,7 @@ void NDSPI::RegisterMemoryAndWait(IND2MemoryRegion* pMemoryRegion, const void* b
     ULONG const flags = ND_MR_FLAG_ALLOW_LOCAL_WRITE;
     OVERLAPPED ov = { 0 };
     HRESULT hr = pMemoryRegion->Register(buffer, size, flags, &ov);
-    LOG("IND2MemoryRegion::Register %p %p -> %08X", pMemoryRegion, buffer, hr);
+    LOG("IND2MemoryRegion::Register %p %p -> %s", pMemoryRegion, buffer, HRSTR(hr));
     if (ND_SUCCESS != hr)
     {
         uint64_t count = 0;
@@ -266,7 +268,7 @@ void NDSPI::RegisterMemoryAndWait(IND2MemoryRegion* pMemoryRegion, const void* b
             count += 1;
             hr = pMemoryRegion->GetOverlappedResult(&ov, FALSE);
         }
-        LOG("IND2MemoryRegion::GetOverlappedResult %p -> %08X (%zu times)", pMemoryRegion, hr, count);
+        LOG("IND2MemoryRegion::GetOverlappedResult %p -> %s (%zu times)", pMemoryRegion, HRSTR(hr), count);
         if (ND_SUCCESS != hr)
             throw EX_REGISTER;
 
@@ -279,7 +281,7 @@ HANDLE NDSPI::CreateOverlappedFile(IND2Adapter* pAdapter)
     LOG_ENTER();
     HANDLE ans = 0;
     HRESULT hr = pAdapter->CreateOverlappedFile(&ans);
-    LOG("IND2Adapter::CreateOverlappedFile %p -> %08X", hr, ans);
+    LOG("IND2Adapter::CreateOverlappedFile %p -> %s", pAdapter, HRSTR(hr));
     if (ND_SUCCESS != hr)
         throw EX_CREATE_OVERLAPPED_FILE;
     LOG_PVOID_RETURN(ans);
@@ -291,7 +293,7 @@ IND2MemoryRegion* NDSPI::CreateMemoryRegion(IND2Adapter* pAdapter, HANDLE hOverl
     LOG_ENTER();
     IND2MemoryRegion* ans = 0;
     HRESULT hr = pAdapter->CreateMemoryRegion(IID_IND2MemoryRegion, hOverlappedFile, (void**)&ans);
-    LOG("IND2Adapter::CreateMemoryRegion %p -> %08X", hr);
+    LOG("IND2Adapter::CreateMemoryRegion %p -> %s", pAdapter, HRSTR(hr));
     if (ND_SUCCESS != hr)
         throw EX_CREATE_MEMORY_REGION;
     LOG_PVOID_RETURN(ans);
@@ -321,7 +323,7 @@ IND2QueuePair* NDSPI::SimplifiedCreateQueuePair(
             inline_threshold,
             (void**)&ans
         );
-    LOG("IND2Adapter::CreateQueuePair %p -> %08X", pAdapter, hr);
+    LOG("IND2Adapter::CreateQueuePair %p -> %s", pAdapter, HRSTR(hr));
     if (ND_SUCCESS != hr)
         throw EX_CREATE_QUEUE_PAIR;
     LOG_PVOID_RETURN(ans);
@@ -350,7 +352,7 @@ void NDSPI::Receive(IND2QueuePair* pQueuePair, void* context, ND2_SGE sges[], ui
 {
     LOG_ENTER();
     HRESULT hr = pQueuePair->Receive(context, sges, nsge);
-    LOG("IND2QueuePair::Receive %p -> %08X", pQueuePair, hr);
+    LOG("IND2QueuePair::Receive %p -> %s", pQueuePair, HRSTR(hr));
     if (ND_SUCCESS != hr)
         throw EX_RECEIVE;
     LOG_VOID_RETURN();
@@ -360,7 +362,7 @@ void NDSPI::Send(IND2QueuePair* pQueuePair, void* context, ND2_SGE sges[], uint3
 {
     LOG_ENTER();
     HRESULT hr = pQueuePair->Send(context, sges, nsge, flags);
-    LOG("IND2QueuePair::Send %p -> %08X", pQueuePair, hr);
+    LOG("IND2QueuePair::Send %p -> %s", pQueuePair, HRSTR(hr));
     if (ND_SUCCESS != hr)
         throw EX_SEND;
     LOG_VOID_RETURN();
@@ -370,7 +372,7 @@ void NDSPI::ConnectorBind(IND2Connector* pConnector, sockaddr_in& localAddress)
 {
     LOG_ENTER();
     HRESULT hr = pConnector->Bind((const sockaddr*)&localAddress, sizeof(localAddress));
-    LOG("IND2Connector::Bind %p -> %08X", pConnector, hr);
+    LOG("IND2Connector::Bind %p -> %s", pConnector, HRSTR(hr));
     if (ND_SUCCESS != hr)
         throw EX_CONNECTOR_BIND;
     LOG_VOID_RETURN();
@@ -391,7 +393,7 @@ void NDSPI::ConnectAndWait(IND2Connector* pConnector, IND2QueuePair* pQueuePair,
             0,  // cbPrivateData
             &ov
         );
-    LOG("IND2Connnector::Connect %p -> %08X", pConnector, hr);
+    LOG("IND2Connnector::Connect %p -> %s", pConnector, HRSTR(hr));
     if (ND_SUCCESS != hr)
     {
         uint64_t count = 0;
@@ -400,7 +402,7 @@ void NDSPI::ConnectAndWait(IND2Connector* pConnector, IND2QueuePair* pQueuePair,
             count++;
             hr = pConnector->GetOverlappedResult(&ov, FALSE);
         }
-        LOG("IND2Connector::GetOverlappedResult %p -> %08X (%zu times)", pConnector, hr, count);
+        LOG("IND2Connector::GetOverlappedResult %p -> %s (%zu times)", pConnector, HRSTR(hr), count);
         if (ND_SUCCESS != hr)
             throw EX_CONNECT;
     }
@@ -412,7 +414,7 @@ void NDSPI::CompleteConnectAndWait(IND2Connector* pConnector)
     LOG_ENTER();
     OVERLAPPED ov = { 0 };
     HRESULT hr = pConnector->CompleteConnect(&ov);
-    LOG("IND2Connector::CompleteConnect %p -> %08X", pConnector, hr);
+    LOG("IND2Connector::CompleteConnect %p -> %s", pConnector, HRSTR(hr));
     if (ND_SUCCESS != hr)
     {
         uint64_t count = 0;
@@ -421,7 +423,7 @@ void NDSPI::CompleteConnectAndWait(IND2Connector* pConnector)
             count++;
             hr = pConnector->GetOverlappedResult(&ov, FALSE);
         }
-        LOG("IND2Connector::GetOverlappedResult %p -> %08X (%zu times)", pConnector, hr, count);
+        LOG("IND2Connector::GetOverlappedResult %p -> %s (%zu times)", pConnector, HRSTR(hr), count);
         if (ND_SUCCESS != hr)
             throw EX_COMPLETE_CONNECT;
     }
@@ -441,7 +443,7 @@ HRESULT NDSPI::Notify(IND2CompletionQueue* pCompletionQueue, uint32_t type, OVER
 {
     LOG_ENTER();
     HRESULT hr = pCompletionQueue->Notify(type, &ov);
-    LOG("IND2CompletionQueue::Notify %p -> %08X", pCompletionQueue, hr);
+    LOG("IND2CompletionQueue::Notify %p -> %s", pCompletionQueue, HRSTR(hr));
     if ((hr != ND_SUCCESS)  && (hr != ND_PENDING))
         throw EX_NOTIFY;
     LOG_HEX_RETURN(hr);
@@ -453,7 +455,7 @@ IND2Listener* NDSPI::CreateListener(IND2Adapter* pAdapter, HANDLE hOverlappedFil
     LOG_ENTER();
     IND2Listener* ans = 0;
     HRESULT hr = pAdapter->CreateListener(IID_IND2Listener, hOverlappedFile, (void**)&ans);
-    LOG("IND2Adapter::CreateListener %p -> %08X", pAdapter, hr);
+    LOG("IND2Adapter::CreateListener %p -> %s", pAdapter, HRSTR(hr));
     if (ND_SUCCESS != hr)
         throw EX_CREATE_LISTENER;
     LOG_PVOID_RETURN(ans);
@@ -464,7 +466,7 @@ void NDSPI::ListenerBind(IND2Listener* pListener, const struct sockaddr_in& loca
 {
     LOG_ENTER();
     HRESULT hr = pListener->Bind((const sockaddr*)&localAddress, sizeof(localAddress));
-    LOG("IND2Listener::Bind %p -> %08X", pListener, hr);
+    LOG("IND2Listener::Bind %p -> %s", pListener, HRSTR(hr));
     if (ND_SUCCESS != hr)
         throw EX_LISTEN_BIND;
     LOG_VOID_RETURN();
@@ -474,7 +476,7 @@ void NDSPI::Listen(IND2Listener* pListener, uint32_t backlog)
 {
     LOG_ENTER();
     HRESULT hr = pListener->Listen(backlog);
-    LOG("IND2Listner::Listen %p -> %08X", pListener, hr);
+    LOG("IND2Listner::Listen %p -> %s", pListener, HRSTR(hr));
     if (ND_SUCCESS != hr)
         throw EX_LISTEN;
     LOG_VOID_RETURN();
@@ -485,12 +487,14 @@ void NDSPI::GetConnectionRequestAndWait(IND2Listener* pListener, IND2Connector* 
     LOG_ENTER();
     OVERLAPPED ov = { 0 };
     HRESULT hr = pListener->GetConnectionRequest(pConnector, &ov);
+    LOG("IND2Listener::GetConnectionRequest %p -> %s", pListener, HRSTR(hr));
     if (ND_SUCCESS != hr)
     {
         if (ND_PENDING == hr)
         {
             //!!! WARNING WARNING WARNING this will block
             hr = pListener->GetOverlappedResult(&ov, TRUE);
+            LOG("IND2Listener::GetOverlappedResult %p -> %s", pListener, HRSTR(hr));
         }
         if (ND_SUCCESS != hr)
             throw EX_GET_CONNECTION_REQUEST;
@@ -511,7 +515,7 @@ void NDSPI::AcceptAndWait(IND2Connector* pConnector, IND2QueuePair* pQueuePair, 
             0,  // size of private data
             &ov
         );
-    LOG("IND2Connector::Accept %p -> %08X", pConnector, hr);
+    LOG("IND2Connector::Accept %p -> %s", pConnector, HRSTR(hr));
     if (ND_SUCCESS != hr)
     {
         uint64_t count = 0;
@@ -519,7 +523,7 @@ void NDSPI::AcceptAndWait(IND2Connector* pConnector, IND2QueuePair* pQueuePair, 
         {
             //!!! WARNING WARNING WARNING THIS WILL BLOCK
             hr = pConnector->GetOverlappedResult(&ov, TRUE);
-            LOG("IND2Connector::GetOverlappedResult %p -> %08X", pConnector, hr);
+            LOG("IND2Connector::GetOverlappedResult %p -> %s", pConnector, HRSTR(hr));
         }
         if (ND_SUCCESS != hr)
             throw EX_ACCEPT;
@@ -532,7 +536,8 @@ HRESULT NDSPI::GetOverlappedResult(IND2Overlapped* pobj, OVERLAPPED* pov, bool w
 {
     LOG_ENTER();
     HRESULT hr = pobj->GetOverlappedResult(pov, wait);
-    LOG("IND2Overlapped::GetOverlappedResult %p (wait:%d) -> %08X", pobj, wait, hr);
+    const char* const desc = wait ? "BLOCKING" : "NON BLOCKING";
+    LOG("IND2Overlapped::GetOverlappedResult %p %s -> %s", pobj, desc, HRSTR(hr));
     if ((hr != ND_SUCCESS) && (hr != ND_PENDING))
         throw EX_GET_OVERLAPPED_RESULT;
     LOG_HEX_RETURN(hr);
