@@ -46,23 +46,6 @@ void client(params_t* const params, State* const S)
                 throw EX_NOTIFY;
             NDSPI::Wait(S->pCompletionQueue, &S->ov);
         }
-        //if (ND_PENDING == hr)
-        //{
-        //    uint64_t count = 0;
-        //    while (hr == ND_PENDING)
-        //    {
-        //        count++;
-        //        hr = S->pCompletionQueue->GetOverlappedResult(&S->ov, FALSE);
-        //        Sleep(100);
-        //    }
-
-        //    LOG("%zu call%s to "
-        //        "IND2CompletionQueue::GetOverlappedResults "
-        //        "returned ND_PENDING", count - 1, count == 2 ? "" : "s");
-        //    LOG("IND2CompletionQueue::GetOverlappedResults %p -> %s", 
-        //        S->pCompletionQueue, 
-        //        errors::get_ndspi_result_string(hr));
-        //}
     }
     fprintf(stderr, "The completion queue has a result!\n");
     fprintf(stderr, "RequestContext: \"%s\"\n", (char*)result.RequestContext);
@@ -84,11 +67,10 @@ void server(params_t* const params, State* const S)
 
     fprintf(stderr, "waiting for a connection ...\n");
     NDSPI::GetConnectionRequestAndWait(S->pListener, S->pConnector);
-    NDSPI::AcceptAndWait(
-        S->pConnector,
-        S->pQueuePair,
-        S->Info.MaxInboundReadLimit,
-        0);
+    NDSPI::AcceptAndWait(S->pConnector,
+                         S->pQueuePair,
+                         S->Info.MaxInboundReadLimit,
+                         0);
     fprintf(stderr, "connection accepted\n");
     S->buffer = NDSPI::Alloc(params->size);
     S->buffer_size = params->size;
@@ -109,25 +91,12 @@ void server(params_t* const params, State* const S)
     {
         if (NDSPI::GetResults(S->pCompletionQueue, &result, 1) == 1)
             break;
-        HRESULT hr = 
-            NDSPI::Notify(S->pCompletionQueue, ND_CQ_NOTIFY_ANY, S->ov);
+        HRESULT hr = NDSPI::Notify(S->pCompletionQueue,
+                                   ND_CQ_NOTIFY_ANY,
+                                   S->ov);
         if (ND_PENDING == hr)
         {
             NDSPI::Wait(S->pCompletionQueue, &S->ov);
-            //uint64_t count = 0;
-            //while (hr == ND_PENDING)
-            //{
-            //    count++;
-            //    hr = S->pCompletionQueue->GetOverlappedResult(&S->ov, FALSE);
-            //    Sleep(100);
-            //}
-
-            //LOG("%zu call%s to "
-            //    "IND2CompletionQueue::GetOverlappedResults"
-            //    " returned ND_PENDING", count - 1, count == 2 ? "" : "s");
-            //LOG("IND2CompletionQueue::GetOverlappedResults %p -> %s",
-            //    S->pCompletionQueue,
-            //    errors::get_ndspi_result_string(hr));
         }
     }
     fprintf(stderr, "The completion queue has a result!\n");
