@@ -10,6 +10,8 @@
 #include "errors.h"
 #include "State.h"
 #include "ndspi.h"
+#include <libraries/Utils/Utils.h>
+
 
 void client(params_t* const params, State* const S)
 {
@@ -49,8 +51,16 @@ void client(params_t* const params, State* const S)
     }
     fprintf(stderr, "The completion queue has a result!\n");
     fprintf(stderr, "RequestContext: \"%s\"\n", (char*)result.RequestContext);
-    const char* const fmt = "received %u bytes: \"%s\"\n";
-    fprintf(stderr, fmt, result.BytesTransferred, (const char*)sge.Buffer);
+
+    char buffer[4048];
+    Utils::hexdumptostring(buffer, sizeof(buffer), sge.Buffer, result.BytesTransferred);
+    fprintf(stderr, "\nreceived %u bytes:\n%s", result.BytesTransferred, buffer);
+
+    fprintf(stderr, "Press ENTER to continue ...\n");
+    char *psz = fgets(buffer, sizeof(buffer), stdin);
+    //const char* const fmt = "received %u bytes: \"%s\"\n";
+    //fprintf(stderr, fmt, result.BytesTransferred, (const char*)sge.Buffer);
+
 
     LOG_VOID_RETURN();
 }
