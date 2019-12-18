@@ -13,6 +13,29 @@
 #include <libraries/Utils/Utils.h>
 
 
+void reverse(void* pv, size_t size)
+{
+    uint8_t* bytes = (uint8_t*)pv;
+    size_t i = 0;
+    size_t j = size - 1;
+    while (i < j)
+    {
+        uint8_t t = bytes[i];
+        bytes[i] = bytes[j];
+        bytes[j] = t;
+        i++;
+        j--;
+    }
+}
+
+uint32_t get_dword(const void* Blob)
+{
+    uint32_t ans;
+    memcpy(&ans, Blob, sizeof(ans));
+    reverse(&ans, sizeof(ans));
+    return ans;
+}
+
 void client(params_t* const params, State* const S)
 {
     LOG_ENTER();
@@ -56,10 +79,19 @@ void client(params_t* const params, State* const S)
     Utils::hexdumptostring(buffer, sizeof(buffer), sge.Buffer, result.BytesTransferred);
     fprintf(stderr, "\nreceived %u bytes:\n%s", result.BytesTransferred, buffer);
 
-    fprintf(stderr, "Press ENTER to continue ...\n");
-    char *psz = fgets(buffer, sizeof(buffer), stdin);
-    //const char* const fmt = "received %u bytes: \"%s\"\n";
-    //fprintf(stderr, fmt, result.BytesTransferred, (const char*)sge.Buffer);
+    const uint8_t* Blob = (const uint8_t*)sge.Buffer;
+
+    fprintf(stderr, "\n");
+    fprintf(stderr, "h_magic: %08X\n", get_dword(&Blob[0]));
+    fprintf(stderr, "h_bytes: %08X\n", get_dword(&Blob[4]));
+    fprintf(stderr, "h_sgasegs: %08X\n", get_dword(&Blob[8]));
+    fprintf(stderr, "lengths[0]: %08X\n", get_dword(&Blob[12]));
+    fprintf(stderr, "lengths[1]: %08X\n", get_dword(&Blob[16]));
+    fprintf(stderr, "lengths[2]: %08X\n", get_dword(&Blob[20]));
+
+
+    //fprintf(stderr, "Press ENTER to continue ...\n");
+    //char *psz = fgets(buffer, sizeof(buffer), stdin);
 
 
     LOG_VOID_RETURN();
@@ -86,14 +118,38 @@ void server(params_t* const params, State* const S)
     S->buffer_size = params->size;
     NDSPI::RegisterMemoryAndWait(S->pMemoryRegion, S->buffer, S->buffer_size);
 
-    const char* msg = "hello from the server";
-    ULONG size = sprintf_s((char*)S->buffer, S->buffer_size, msg) + 1;
-    ND2_SGE sge = { S->buffer, size, NDSPI::GetLocalToken(S->pMemoryRegion) };
+    {
+        char header[] =
+            "\x10\x10\x20\x10" // h_magic
+            "\x00\x00\x00\x16" // h_bytes
+            "\x00\x00\x00\x01" // h_sgasegs
+            "\x00\x00\x00\x16" // length 0
+            "\x00\x00\x00\x00" // length 1
+            "\x00\x00\x00"     // length 2 (terminating null has been appended)
+            ;
 
-    fprintf(stderr, "sending %u bytes: \"%s\"\n", size, (const char*)sge.Buffer);
+        char data[] = "hello from the client"; // terminating null has been appended
 
-    void* const context = (void*)"server context";
-    NDSPI::Send(S->pQueuePair, context, &sge, 1, 0);
+        char* dst = (char*)S->buffer;
+        void* dst0 = &dst[0];
+        void* dst1 = &dst[sizeof(header)];
+        memcpy(dst0, header, sizeof(header));
+        memcpy(dst1, data, sizeof(data));
+
+        ND2_SGE sges[2];
+        sges[0].Buffer = dst0;
+        sges[0].BufferLength = (ULONG)sizeof(header);
+        sges[0].MemoryRegionToken = NDSPI::GetLocalToken(S->pMemoryRegion);
+        sges[1].Buffer = dst1;
+        sges[1].BufferLength = (ULONG)sizeof(data);
+        sges[1].MemoryRegionToken = NDSPI::GetLocalToken(S->pMemoryRegion);
+
+
+        fprintf(stderr, "sizeof(header): %zX\n", sizeof(header));
+        fprintf(stderr, "sizeof(data): %zX\n", sizeof(data));
+        void* const context = (void*)"server context";
+        NDSPI::Send(S->pQueuePair, context, sges, 2, 0);
+    }
 
     // Wait for send result
     ND2_RESULT result;
