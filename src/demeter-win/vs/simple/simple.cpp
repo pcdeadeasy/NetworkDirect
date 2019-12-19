@@ -139,10 +139,14 @@ void server(params_t* const params, State* const S)
         sges[1].BufferLength = (ULONG)sizeof(data);
         sges[1].MemoryRegionToken = NDSPI::GetLocalToken(S->pMemoryRegion);
 
-
-        fprintf(stderr, "sizeof(header): %zX\n", sizeof(header));
-        fprintf(stderr, "sizeof(data): %zX\n", sizeof(data));
         void* const context = (void*)"server context";
+
+        char buffer[4096];
+        fprintf(stderr, "\nsending:\n");
+        Utils::hexdumptostring(buffer, sizeof(buffer), sges[0].Buffer, sges[0].BufferLength);
+        fprintf(stderr, "\n%s\n", buffer);
+        Utils::hexdumptostring(buffer, sizeof(buffer), sges[1].Buffer, sges[1].BufferLength);
+        fprintf(stderr, "\n%s\n", buffer);
         NDSPI::Send(S->pQueuePair, context, sges, 2, 0);
     }
 
