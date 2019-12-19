@@ -82,17 +82,12 @@ void client(params_t* const params, State* const S)
     const uint8_t* Blob = (const uint8_t*)sge.Buffer;
 
     fprintf(stderr, "\n");
-    fprintf(stderr, "h_magic: %08X\n", get_dword(&Blob[0]));
-    fprintf(stderr, "h_bytes: %08X\n", get_dword(&Blob[4]));
-    fprintf(stderr, "h_sgasegs: %08X\n", get_dword(&Blob[8]));
+    fprintf(stderr, "h_magic:    %08X\n", get_dword(&Blob[0]));
+    fprintf(stderr, "h_bytes:    %08X\n", get_dword(&Blob[4]));
+    fprintf(stderr, "h_sgasegs:  %08X\n", get_dword(&Blob[8]));
     fprintf(stderr, "lengths[0]: %08X\n", get_dword(&Blob[12]));
     fprintf(stderr, "lengths[1]: %08X\n", get_dword(&Blob[16]));
     fprintf(stderr, "lengths[2]: %08X\n", get_dword(&Blob[20]));
-
-
-    //fprintf(stderr, "Press ENTER to continue ...\n");
-    //char *psz = fgets(buffer, sizeof(buffer), stdin);
-
 
     LOG_VOID_RETURN();
 }
